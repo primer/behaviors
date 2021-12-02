@@ -1,5 +1,5 @@
 {
-  "name": "@github/frontend-project",
+  "name": "@primer/behaviors",
   "private": true,
   "version": "1.0.0",
   "description": "Template repository making it easier for developers to write frontend functionality that will be integrated into dotcom",
@@ -8,6 +8,10 @@
     "./utils": "./dist/utils/index.js"
   },
   "type": "module",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "style": "dist/index.css",
   "assets": [],
   "scripts": {

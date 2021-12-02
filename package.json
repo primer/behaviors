@@ -1,24 +1,22 @@
 {
   "name": "@primer/behaviors",
-  "private": true,
   "version": "1.0.0",
-  "description": "Template repository making it easier for developers to write frontend functionality that will be integrated into dotcom",
-  "exports": {
-    ".": "./dist/index.js",
-    "./utils": "./dist/utils/index.js"
-  },
+  "description": "Shared behaviors for JavaScript components",
+  "main": "./dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "style": "dist/index.css",
-  "assets": [],
+  "sideEffects": [
+    "dist/focus-zone.js",
+    "dist/focus-trap.js"
+  ],
   "scripts": {
     "lint": "eslint src/",
     "test": "npm run jest && npm run lint",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "jest": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "jest --watch",
+    "jest": "jest",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "build": "tsc",
@@ -27,19 +25,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github/frontend-project.git"
+    "url": "git+https://github.com/primer/behaviors.git"
   },
-  "keywords": [],
+  "keywords": [
+    "primer",
+    "behavior",
+    "behaviors",
+    "focus"
+  ],
   "author": "",
   "prettier": "@github/prettier-config",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/github/frontend-project/issues"
+    "url": "https://github.com/primer/behaviors/issues"
   },
-  "homepage": "https://github.com/github/frontend-project#readme",
+  "homepage": "https://github.com/primer/behaviors#readme",
   "size-limit": [
     {
-      "limit": "100kb",
+      "limit": "10kb",
       "path": "dist/index.js"
     }
   ],

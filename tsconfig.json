@@ -2,12 +2,15 @@
   "compilerOptions": {
     "module": "ES2020",
     "target": "es2020",
-    "lib": ["es2020", "dom"],
+    "jsx": "react",
+    "lib": ["es2020", "dom", "dom.iterable"],
     "strict": true,
     "declaration": true,
     "outDir": "dist",
     "removeComments": true,
     "preserveConstEnums": true,
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["src/__tests__", "dist"]
 }

@@ -9,7 +9,9 @@
   "assets": [],
   "scripts": {
     "lint": "eslint src/",
-    "test": "npm run lint",
+    "test": "npm run jest && npm run lint",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "jest": "NODE_OPTIONS=--experimental-vm-modules jest",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "build": "tsc",
@@ -37,10 +39,13 @@
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
     "@size-limit/preset-small-lib": "^7.0.3",
+    "@types/jest": "^27.0.3",
     "eslint": "^8.2.0",
     "eslint-plugin-github": "^4.3.5",
+    "jest": "^27.4.3",
     "prettier": "^2.4.1",
     "size-limit": "^7.0.3",
+    "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
   }
 }

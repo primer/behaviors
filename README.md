@@ -28,7 +28,7 @@
 ## Installation
 
 ```bash
-npm install --save-dev @primer/behaviors
+npm install @primer/behaviors
 ```
 
 or 

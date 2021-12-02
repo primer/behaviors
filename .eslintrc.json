@@ -6,5 +6,6 @@
   "rules": {
     "import/extensions": ["error", "always"],
     "import/no-unresolved": "off"
-  }
+  },
+  "ignorePatterns": ["dist"]
 }

@@ -1,7 +1,8 @@
 {
-    "rules": {
-      "i18n-text/no-en": "off",
-      "filenames/match-regex": ["error", "^[a-z0-9-]+(\\.test)?$", true]
-    }
+  "rules": {
+    "i18n-text/no-en": "off",
+    "filenames/match-regex": ["error", "^[a-z0-9-]+(\\.test)?$", true],
+    "github/unescaped-html-literal": "off",
+    "github/no-inner-html": "off"
   }
-  
+}

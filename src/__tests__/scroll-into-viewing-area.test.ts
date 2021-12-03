@@ -94,7 +94,12 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, 'vertical', scrollMargin, scrollMargin, 'auto')
+      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+        direction: 'vertical',
+        startMargin: scrollMargin,
+        endMargin: scrollMargin,
+        behavior: 'auto'
+      })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
         top: expectedScrollPosition
@@ -123,7 +128,12 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, 'vertical', scrollMargin, scrollMargin, 'auto')
+      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+        direction: 'vertical',
+        startMargin: scrollMargin,
+        endMargin: scrollMargin,
+        behavior: 'auto'
+      })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
         top: expectedScrollPosition
@@ -155,7 +165,12 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollLeft = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, 'horizontal', scrollMargin, scrollMargin, 'auto')
+      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+        direction: 'horizontal',
+        startMargin: scrollMargin,
+        endMargin: scrollMargin,
+        behavior: 'auto'
+      })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
         left: expectedScrollPosition
@@ -184,7 +199,12 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, 'horizontal', scrollMargin, scrollMargin, 'auto')
+      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+        direction: 'horizontal',
+        startMargin: scrollMargin,
+        endMargin: scrollMargin,
+        behavior: 'auto'
+      })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
         left: expectedScrollPosition

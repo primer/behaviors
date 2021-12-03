@@ -20,9 +20,9 @@
 
 ## Documentation
 
-* [Anchored Position](https://primer.style/react/anchoredPosition)
-* [Focus Trap](https://primer.style/react/focusTrap)
-* [Focus Zone](https://primer.style/react/focusZone)
+* [Anchored Position](/docs/anchored-position)
+* [Focus Trap](/docs/focus-trap)
+* [Focus Zone](/docs/focus-zone)
 * Scroll Into Viewing Area - coming soon
 
 ## Installation

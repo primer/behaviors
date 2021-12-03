@@ -1,29 +1,16 @@
-<h1 align="center">Primer Behaviors</h1>
+# Primer Behaviors
 
-<p align="center">Shared behaviors for JavaScript components</p>
+[![npm](https://img.shields.io/npm/v/@primer/behaviors)](https://www.npmjs.com/package/@primer/behaviors)
+[![CI](https://github.com/primer/behaviors/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/primer/behaviors/actions/workflows/ci.yml)
 
-<p align="center">
-  <a aria-label="npm package" href="https://www.npmjs.com/package/@primer/behaviors">
-    <img alt="" src="https://img.shields.io/npm/v/@primer/behaviors.svg">
-  </a>
-  <a aria-label="contributors graph" href="https://github.com/primer/behaviors/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/primer/behaviors.svg">
-  </a>
-  <a aria-label="last commit" href="https://github.com/primer/behaviors/commits/main">
-    <img alt="" src=
-  "https://img.shields.io/github/last-commit/primer/behaviors.svg">
-  </a>
-  <a aria-label="license" href="https://github.com/primer/behaviors/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/primer/behaviors.svg" alt="">
-  </a>
-</p>
+Shared behaviors for JavaScript components
 
 ## Documentation
 
-* [Anchored Position](https://primer.style/react/anchoredPosition)
-* [Focus Trap](https://primer.style/react/focusTrap)
-* [Focus Zone](https://primer.style/react/focusZone)
-* Scroll Into Viewing Area - coming soon
+* [Anchored Position](/docs/anchored-position.md)
+* [Focus Trap](/docs/focus-trap.md)
+* [Focus Zone](/docs/focus-zone.md)
+* [Scroll Into Viewing Area](/docs/scroll-into-viewing-area.md)
 
 ## Installation
 

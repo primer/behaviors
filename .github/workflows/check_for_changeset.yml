@@ -2,6 +2,8 @@ name: Check for changeset
 
 on:
   pull_request:
+    branches-ignore:
+      - 'dependabot/**'
     types:
       # On by default if you specify no types.
       - "opened"

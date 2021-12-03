@@ -2,8 +2,6 @@ name: Check for changeset
 
 on:
   pull_request:
-    branches-ignore:
-      - 'dependabot/**'
     types:
       # On by default if you specify no types.
       - "opened"
@@ -16,6 +14,7 @@ on:
 jobs:
   check-for-changeset:
     name: Check for changeset
+    if: startsWith(github.head_ref, 'dependabot/') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

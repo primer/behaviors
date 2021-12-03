@@ -51,7 +51,7 @@ describe('scrollIntoView', () => {
     const viewAreaHeight = 100
     const childStart = viewAreaHeight + 10
     const expectedScrollPosition = scrollPositionFormula(
-      {viewingAreaEdgePosition: viewAreaHeight, childEdgePosition: childStart + childHeight, margin: 8},
+      {viewingAreaEdgePosition: viewAreaHeight, childEdgePosition: childStart + childHeight, margin: 0},
       false
     )
 

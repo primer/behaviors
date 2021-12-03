@@ -1,4 +1,4 @@
-import {scrollIntoViewingArea} from '../scroll-into-viewing-area.js'
+import {scrollIntoView} from '../scroll-into-view.js'
 
 function scrollPositionFormula(
   positionData: {viewingAreaEdgePosition: number; childEdgePosition: number; margin: number},
@@ -40,7 +40,7 @@ function createVirtualDOM(viewingAreaRect: DOMRect, childRect: DOMRect) {
   return {viewingArea, child}
 }
 
-describe('scrollIntoViewingArea', () => {
+describe('scrollIntoView', () => {
   it('scrolls the expected amount when only the viewingArea element and child element are passed to the function', () => {
     const scrollToMock = jest.fn()
     Object.defineProperty(window.Element.prototype, 'scrollTo', {
@@ -63,7 +63,7 @@ describe('scrollIntoViewingArea', () => {
     viewingArea.scrollTop = 0
     child.getBoundingClientRect = () => childRect
 
-    scrollIntoViewingArea(child as HTMLDivElement, viewingArea)
+    scrollIntoView(child as HTMLDivElement, viewingArea)
     expect(scrollToMock).toHaveBeenCalledWith({
       behavior: 'smooth',
       top: expectedScrollPosition
@@ -94,7 +94,7 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+      scrollIntoView(child as HTMLDivElement, viewingArea, {
         direction: 'vertical',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
@@ -128,7 +128,7 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+      scrollIntoView(child as HTMLDivElement, viewingArea, {
         direction: 'vertical',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
@@ -165,7 +165,7 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollLeft = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+      scrollIntoView(child as HTMLDivElement, viewingArea, {
         direction: 'horizontal',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
@@ -199,7 +199,7 @@ describe('scrollIntoViewingArea', () => {
       viewingArea.scrollTop = 0
       child.getBoundingClientRect = () => childRect
 
-      scrollIntoViewingArea(child as HTMLDivElement, viewingArea, {
+      scrollIntoView(child as HTMLDivElement, viewingArea, {
         direction: 'horizontal',
         startMargin: scrollMargin,
         endMargin: scrollMargin,

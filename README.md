@@ -10,7 +10,7 @@ Shared behaviors for JavaScript components
 * [Anchored Position](/docs/anchored-position.md)
 * [Focus Trap](/docs/focus-trap.md)
 * [Focus Zone](/docs/focus-zone.md)
-* [Scroll Into Viewing Area](/docs/scroll-into-viewing-area.md)
+* [Scroll Into View](/docs/scroll-into-view.md)
 
 ## Installation
 

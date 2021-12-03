@@ -1,3 +1,3 @@
-# Scroll Into Viewing Area
+# Scroll Into View
 
-The `scrollIntoViewingArea` behavior is used scroll an element into view within a parent "viewing area" element.
+The `scrollIntoView` behavior is used scroll an element into view within a parent `viewingArea` element.

@@ -27,7 +27,7 @@ const dialogController = showDialog()
 
 // later
 if (dialogController) {
-  hideDialog(controller)
+  hideDialog(dialogController)
 }
 ```
 

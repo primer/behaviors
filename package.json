@@ -10,8 +10,8 @@
       "default": "./lib-esm/index.js"
     },
     "./utils": {
-      "node": "./lib/utils.js",
-      "default": "./lib-esm/utils.js"
+      "node": "./lib/utils/index.js",
+      "default": "./lib-esm/utils/index.js"
     }
   },
   "types": "dist/index.d.ts",

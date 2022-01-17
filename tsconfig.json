@@ -10,7 +10,7 @@
     "emitDeclarationOnly": true,
     "strict": true,
     "moduleResolution": "node",
-    "rootDirs": ["src"],
+    "rootDirs": ["src", "src/utils"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

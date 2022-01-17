@@ -9,15 +9,17 @@
       "node": "./lib/index.js",
       "default": "./lib-esm/index.js"
     },
-    "./drafts": {
-      "node": "./lib/drafts.js",
-      "default": "./lib-esm/drafts.js"
+    "./utils": {
+      "node": "./lib/utils.js",
+      "default": "./lib-esm/utils.js"
     }
   },
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "utils"
+    "utils",
+    "lib",
+    "lib-esm"
   ],
   "sideEffects": [
     "dist/focus-zone.js",

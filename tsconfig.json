@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
-    "module": "ES2020",
-    "target": "ES2015",
-    "jsx": "react",
-    "lib": ["es2020", "dom", "dom.iterable"],
-    "strict": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "preserve",
     "declaration": true,
-    "outDir": "dist",
-    "removeComments": true,
-    "preserveConstEnums": true,
+    "outDir": "./lib",
+    "emitDeclarationOnly": true,
+    "strict": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "rootDirs": ["src"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["./node_modules/@types", "./@types"]
   },
-  "exclude": ["src/__tests__", "dist"]
+  "include": ["@types/**/*.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.tsx", "script/**/*.ts"]
 }

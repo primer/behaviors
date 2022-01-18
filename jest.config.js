@@ -4,7 +4,7 @@
  */
 
 // eslint-disable-next-line filenames/match-regex
-export default {
+module.exports = {
   clearMocks: true,
   testEnvironment: 'jsdom',
   transform: {

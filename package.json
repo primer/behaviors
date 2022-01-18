@@ -7,14 +7,15 @@
   "exports":{
     ".": {
       "node": "./lib/index.js",
-      "default": "./lib-esm/index.js"
+      "default": "./lib-esm/index.js",
+      "types":"./lib/index.d.ts"
     },
     "./utils": {
       "node": "./lib/utils/index.js",
-      "default": "./lib-esm/utils/index.js"
+      "default": "./lib-esm/utils/index.js",
+      "types":"./lib/utils/index.d.ts"
     }
   },
-  "types": "lib/index.d.ts",
   "files": [
     "dist",
     "utils",

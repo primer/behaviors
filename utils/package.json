@@ -1,7 +1,0 @@
-{
-    "name": "@primer/behaviors/utils",
-    "types": "../lib/utils/index.d.ts",
-    "main": "../lib/utils/index.js",
-    "module": "../lib-esm/utils/index.js",
-    "sideEffects": false
-  }

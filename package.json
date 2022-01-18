@@ -6,12 +6,12 @@
   "module": "lib-esm/index.js",
   "exports":{
     ".": {
-      "types":"./lib/index.d.ts",
+      "types":"./dist/index.d.ts",
       "node": "./lib/index.js",
       "default": "./lib-esm/index.js"
     },
     "./utils": {
-      "types":"./lib/utils/index.d.ts",
+      "types":"./dist/utils/index.d.ts",
       "node": "./lib/utils/index.js",
       "default": "./lib-esm/utils/index.js"
     }
@@ -24,8 +24,8 @@
     "lib/utils"
   ],
   "sideEffects": [
-    "dist/focus-zone.js",
-    "dist/focus-trap.js"
+    "lib/focus-zone.js",
+    "lib/focus-trap.js"
   ],
   "scripts": {
     "build:cjs": "cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions '.js,.ts'",
@@ -34,7 +34,7 @@
     "test": "npm run jest && npm run lint",
     "test:watch": "jest --watch",
     "jest": "jest",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist lib lib-esm",
     "prebuild": "npm run clean",
     "build": "./scripts/build",
     "size-limit": "npm run build && size-limit",
@@ -60,7 +60,7 @@
   "size-limit": [
     {
       "limit": "10kb",
-      "path": "dist/index.js"
+      "path": "lib/index.js"
     }
   ],
   "devDependencies": {

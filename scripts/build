@@ -3,7 +3,6 @@
 set -e
 
 # Clean up
-rm -rf dist
 rm -rf lib
 rm -rf lib-esm
 

@@ -6,21 +6,22 @@
   "module": "lib-esm/index.js",
   "exports":{
     ".": {
+      "types":"./lib/index.d.ts",
       "node": "./lib/index.js",
-      "default": "./lib-esm/index.js",
-      "types":"./lib/index.d.ts"
+      "default": "./lib-esm/index.js"
     },
     "./utils": {
+      "types":"./lib/utils/index.d.ts",
       "node": "./lib/utils/index.js",
-      "default": "./lib-esm/utils/index.js",
-      "types":"./lib/utils/index.d.ts"
+      "default": "./lib-esm/utils/index.js"
     }
   },
   "files": [
     "dist",
     "utils",
     "lib",
-    "lib-esm"
+    "lib-esm",
+    "lib/utils"
   ],
   "sideEffects": [
     "dist/focus-zone.js",

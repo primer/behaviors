@@ -2,6 +2,7 @@
   "name": "@primer/behaviors",
   "version": "1.0.2",
   "description": "Shared behaviors for JavaScript components",
+  "type": "module",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
   "exports":{
@@ -28,8 +29,8 @@
     "dist/focus-trap.js"
   ],
   "scripts": {
-    "build:esm": "cross-env BABEL_ENV=esmUnbundled babel src --extensions '.ts' --out-dir 'lib/esm' --source-maps",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src --extensions '.ts' --out-dir 'lib/cjs' --source-maps",
+    "build:cjs": "cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions '.js,.ts,.jsx,.tsx'",
+    "build:esm": "babel src --out-dir lib-esm --extensions '.js,.ts,.jsx,.tsx'",
     "lint": "eslint src/",
     "test": "npm run jest && npm run lint",
     "test:watch": "jest --watch",

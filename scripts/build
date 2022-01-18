@@ -7,11 +7,11 @@ rm -rf lib
 rm -rf lib-esm
 
 # Compile
-npx cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions ".js,.ts,.jsx,.tsx"
-npx babel src --out-dir lib-esm --extensions ".js,.ts,.jsx,.tsx"
+npx cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions ".js,.ts"
+npx babel src --out-dir lib-esm --extensions ".js,.ts"
 
 # Type check
-npx tsc --project tsconfig.build.json
+npx tsc
 
 # Copy type declarations
 npx copyfiles -u 1 "./lib/**/*.d.ts" ./lib-esm

@@ -7,8 +7,8 @@ rm -rf lib
 rm -rf lib-esm
 
 # Compile
-npx cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions ".js,.ts"
-npx babel src --out-dir lib-esm --extensions ".js,.ts"
+npx cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions ".js,.ts" --ignore '**/__tests__'
+npx babel src --out-dir lib-esm --extensions ".js,.ts" --ignore '**/__tests__'
 
 # Type check
 npx tsc

@@ -28,8 +28,8 @@
     "lib/focus-trap.js"
   ],
   "scripts": {
-    "build:cjs": "cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions '.js,.ts'",
-    "build:esm": "babel src --out-dir lib-esm --extensions '.js,.ts'",
+    "build:cjs": "cross-env BABEL_MODULE=commonjs babel src --out-dir lib --extensions '.js,.ts' --ignore '**/__tests__'",
+    "build:esm": "babel src --out-dir lib-esm --extensions '.js,.ts' --ignore '**/__tests__'",
     "lint": "eslint src/",
     "test": "npm run jest && npm run lint",
     "test:watch": "jest --watch",

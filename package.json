@@ -2,16 +2,30 @@
   "name": "@primer/behaviors",
   "version": "1.0.2",
   "description": "Shared behaviors for JavaScript components",
-  "main": "./dist/index.js",
-  "type": "module",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "module": "./dist/esm/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "require": "./dist/cjs/utils/index.js",
+      "module": "./dist/esm/utils/index.js"
+    }
+  },
+  "types": "dist/cjs/index.d.ts",
   "files": [
     "dist",
     "utils"
   ],
   "sideEffects": [
-    "dist/focus-zone.js",
-    "dist/focus-trap.js"
+    "dist/esm/focus-zone.js",
+    "dist/esm/focus-trap.js",
+    "dist/cjs/focus-zone.js",
+    "dist/cjs/focus-trap.js"
   ],
   "scripts": {
     "lint": "eslint src/",
@@ -20,7 +34,9 @@
     "jest": "jest",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "build": "tsc",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
     "size-limit": "npm run build && size-limit",
     "release": "npm run build && changeset publish"
   },

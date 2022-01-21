@@ -1,7 +1,7 @@
 {
   "name": "@primer/behaviors/utils",
-  "types": "../dist/utils/index.d.ts",
-  "main": "../dist/utils/index.js",
+  "types": "../dist/esm/utils/index.d.ts",
+  "main": "../dist/esm/utils/index.js",
   "type": "module",
   "sideEffects": false
 }

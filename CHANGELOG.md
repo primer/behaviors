@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.0.3
+
+### Patch Changes
+
+- [#42](https://github.com/primer/behaviors/pull/42) [`41945a3`](https://github.com/primer/behaviors/commit/41945a37ef07da82ce5a29feb03d7a7d96ec76ea) Thanks [@dgreif](https://github.com/dgreif)! - Build both esm and cjs output for the package
+
 ## 1.0.2
 
 ### Patch Changes

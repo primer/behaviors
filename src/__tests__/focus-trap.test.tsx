@@ -1,7 +1,7 @@
-import {fireEvent, render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {focusTrap} from '../focus-trap.js'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 // Since we use strict `isTabbable` checks within focus trap, we need to mock these
 // properties that Jest does not populate.
@@ -92,7 +92,7 @@ it('Should cycle focus from last element to first element and vice-versa', async
   userEvent.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({ shift: true })
+  userEvent.tab({shift: true})
   expect(document.activeElement).toEqual(lastButton)
 
   controller.abort()
@@ -142,20 +142,20 @@ it('Should should release the trap when the container is removed from the DOM', 
   //     </button>
   //   </div>
   // )
-
+  //
   // const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
   // const durianButton = container.querySelector<HTMLElement>('#durian')!
   // const firstButton = trapContainer.querySelector('button')!
-
+  //
   // focusTrap(trapContainer)
-
+  //
   // focus(durianButton)
   // expect(document.activeElement).toEqual(trapContainer)
-
+  //
   // // empty trap and remove it from the DOM
   // trapContainer.removeChild(firstButton)
   // trapContainer.parentElement?.removeChild(trapContainer)
-
+  //
   // focus(durianButton)
   // expect(document.activeElement).toEqual(durianButton)
 })
@@ -185,17 +185,8 @@ it('Should handle dynamic content', async () => {
   userEvent.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({ shift: true })
+  userEvent.tab({shift: true})
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()
 })
-
-/**
- * Helper to handle firing the focusin event, which jest/JSDOM does not do for us.
- * @param element
- */
-function focus(element: HTMLElement) {
-  element.focus()
-  fireEvent(element, new FocusEvent('focusin', {bubbles: true}))
-}

@@ -1,5 +1,5 @@
-import {getFocusableChild} from './utils/iterate-focusable-elements.js'
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
+import {getFocusableChild} from './utils/iterate-focusable-elements.js'
 
 eventListenerSignalPolyfill()
 

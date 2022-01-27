@@ -1,7 +1,7 @@
 /**
  * Options to the focusable elements iterator
  */
-export interface IterateFocusableElements {
+ export interface IterateFocusableElements {
   /**
    * (Default: false) Iterate through focusable elements in reverse-order
    */
@@ -9,22 +9,22 @@ export interface IterateFocusableElements {
 
   /**
    * (Default: false) Perform additional checks to determine tabbability
-   * which may adversely affect app performance.
+   * which may adversely affect app performance
    */
   strict?: boolean
 
   /**
    * (Default: false) Only iterate tabbable elements, which is the subset
-   * of focusable elements that are part of the page's tab sequence.
+   * of focusable elements that are part of the page's tab sequence
    */
   onlyTabbable?: boolean
 }
 
 /**
- * Returns an iterator over all of the focusable elements within `container`.
- * Note: If `container` is itself focusable it will be included in the results.
- * @param container The container over which to find focusable elements.
- * @param reverse If true, iterate backwards through focusable elements.
+ * Returns an iterator over all of the focusable elements within `container`
+ * Note: If `container` is itself focusable it will be included in the results
+ * @param container The container over which to find focusable elements
+ * @param reverse If true, iterate backwards through focusable elements
  */
 export function* iterateFocusableElements(
   container: HTMLElement,
@@ -68,6 +68,16 @@ export function* iterateFocusableElements(
 }
 
 /**
+ * Returns the first focusable child of `container`. If `lastChild` is true,
+ * returns the last focusable child of `container`.
+ * @param container
+ * @param lastChild
+ */
+export function getFocusableChild(container: HTMLElement, lastChild = false) {
+  return iterateFocusableElements(container, {reverse: lastChild, strict: true, onlyTabbable: true}).next().value
+}
+
+/**
  * Determines whether the given element is focusable. If `strict` is true, we may
  * perform additional checks that require a reflow (less performant).
  * @param elem
@@ -80,12 +90,13 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
     (elem as HTMLElement & {disabled: boolean}).disabled
   const hiddenInert = elem.hidden
   const hiddenInputInert = elem instanceof HTMLInputElement && elem.type === 'hidden'
-  if (disabledAttrInert || hiddenInert || hiddenInputInert) {
+  const sentinelInert = elem.classList.contains('sentinel')
+  if (disabledAttrInert || hiddenInert || hiddenInputInert || sentinelInert) {
     return false
   }
 
   // Each of the conditions checked below require a reflow, thus are gated by the `strict`
-  // argument. If any are true, the element is not focusable, even if tabindex is set.
+  // argument. If any are true, the element is not focusable, even if tabindex is set
   if (strict) {
     const sizeInert = elem.offsetWidth === 0 || elem.offsetHeight === 0
     const visibilityInert = ['hidden', 'collapse'].includes(getComputedStyle(elem).visibility)
@@ -100,7 +111,7 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
     return true
   }
 
-  // One last way `elem.tabIndex` can be wrong.
+  // One last way `elem.tabIndex` can be wrong
   if (elem instanceof HTMLAnchorElement && elem.getAttribute('href') == null) {
     return false
   }
@@ -112,7 +123,7 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
  * Determines whether the given element is tabbable. If `strict` is true, we may
  * perform additional checks that require a reflow (less performant). This check
  * ensures that the element is focusable and that its tabindex is not explicitly
- * set to "-1" (which makes it focusable, but removes it from the tab order).
+ * set to "-1" (which makes it focusable, but removes it from the tab order)
  * @param elem
  * @param strict
  */

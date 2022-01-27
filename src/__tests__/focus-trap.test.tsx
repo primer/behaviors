@@ -28,7 +28,7 @@ it('Should initially focus the first element when activated', () => {
     <div>
       <button tabIndex={0}>Bad Apple</button>
       <div id="trapContainer">
-        <button id="firstButton" tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Apple</button>
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>

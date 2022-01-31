@@ -7,7 +7,10 @@ class ModalDialogElement extends HTMLElement {
     super()
 
     this.querySelector('.close-button')?.addEventListener('click', () => this.close())
-    document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', () => this.show())
+    document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', (event) => {
+      event.stopPropagation()
+      this.show()
+    })
   }
 
   connectedCallback(): void {
@@ -18,7 +21,8 @@ class ModalDialogElement extends HTMLElement {
     const subscriptions = [
       fromEvent(this, 'compositionstart', e => trackComposition(this, e)),
       fromEvent(this, 'compositionend', e => trackComposition(this, e)),
-      fromEvent(this, 'keydown', e => keydown(this, e))
+      fromEvent(this, 'keydown', e => keydown(this, e)),
+      fromEvent(window, 'click', e => clickToDismiss(this, e))
     ]
 
     states.set(this, {subscriptions, loaded: false, isComposing: false})
@@ -96,6 +100,13 @@ function trackComposition(dialog: Element, event: Event) {
   const state = states.get(dialog)
   if (!state) return
   state.isComposing = event.type === 'compositionstart'
+}
+
+function clickToDismiss(dialog: ModalDialogElement, event: Event) {
+  const target = event.target as HTMLElement
+  if (dialog.hasAttribute('open') && target && !target.matches(`#${dialog.id}, #${dialog.id} *`)) {
+    dialog.close()
+  }
 }
 
 // TODO: Find out how we can reactive this code

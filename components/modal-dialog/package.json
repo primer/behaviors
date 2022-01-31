@@ -1,0 +1,10 @@
+{
+  "name": "@primer/behaviors/components/modal-dialog",
+  "types": "../dist/esm/components/modal-dialog.d.ts",
+  "main": "../dist/esm/components/modal-dialog/index.js",
+  "type": "module",
+  "sideEffects": [
+    "../../dist/esm/components/modal-dialog.js",
+    "../../dist/cjs/components/modal-dialog.js"
+  ]
+}

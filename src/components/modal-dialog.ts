@@ -1,6 +1,6 @@
 import { focusTrap } from '../focus-trap.js'
 
-export class ModalDialogElement extends HTMLElement {
+class ModalDialogElement extends HTMLElement {
   private abortController: AbortController | undefined
 
   constructor() {
@@ -99,18 +99,18 @@ function trackComposition(dialog: Element, event: Event) {
 }
 
 // TODO: Find out how we can reactive this code
-// declare global {
-//   interface Window {
-//     ModalDialogElement: typeof ModalDialogElement
-//   }
-//   interface HTMLElementTagNameMap {
-//     'modal-dialog': ModalDialogElement
-//   }
-// }
+declare global {
+  interface Window {
+    ModalDialogElement: typeof ModalDialogElement
+  }
+  interface HTMLElementTagNameMap {
+    'modal-dialog': ModalDialogElement
+  }
+}
 
-// export default ModalDialogElement
+export default ModalDialogElement
 
-// if (!window.customElements.get('modal-dialog')) {
-//   window.ModalDialogElement = ModalDialogElement
-//   window.customElements.define('modal-dialog', ModalDialogElement)
-// }
+if (!window.customElements.get('modal-dialog')) {
+  window.ModalDialogElement = ModalDialogElement
+  window.customElements.define('modal-dialog', ModalDialogElement)
+}

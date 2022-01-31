@@ -6,17 +6,17 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
-      "types": "./dist/cjs/index.d.ts",
+      "types": "./dist/index.d.ts",
       "require": "./dist/cjs/index.js",
       "module": "./dist/esm/index.js"
     },
     "./utils": {
-      "types": "./dist/cjs/utils/index.d.ts",
+      "types": "./dist/utils/index.d.ts",
       "require": "./dist/cjs/utils/index.js",
       "module": "./dist/esm/utils/index.js"
     },
-    "./modal-dialog": {
-      "types": "./dist/cjs/components/modal-dialog.d.ts",
+    "./components/modal-dialog": {
+      "types": "./dist/components/modal-dialog.d.ts",
       "require": "./dist/cjs/components/modal-dialog.js",
       "module": "./dist/esm/components/modal-dialog.js"
     }
@@ -24,13 +24,16 @@
   "types": "dist/cjs/index.d.ts",
   "files": [
     "dist",
-    "utils"
+    "utils",
+    "modal-dialog"
   ],
   "sideEffects": [
     "dist/esm/focus-zone.js",
     "dist/esm/focus-trap.js",
     "dist/cjs/focus-zone.js",
-    "dist/cjs/focus-trap.js"
+    "dist/cjs/focus-trap.js",
+    "dist/esm/components/modal-dialog.js",
+    "dist/cjs/components/modal-dialog.js"
   ],
   "scripts": {
     "lint": "eslint src/",

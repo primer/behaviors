@@ -1,4 +1,4 @@
-import { focusTrap } from '../focus-trap.js'
+import {focusTrap} from '../focus-trap.js'
 
 class ModalDialogElement extends HTMLElement {
   private abortController: AbortController | undefined

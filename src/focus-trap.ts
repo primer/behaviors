@@ -1,5 +1,5 @@
+import {getFocusableChild, isTabbable} from './utils/iterate-focusable-elements.js'
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
-import {getFocusableChild} from './utils/iterate-focusable-elements.js'
 
 eventListenerSignalPolyfill()
 
@@ -66,11 +66,31 @@ export function focusTrap(
   container.prepend(sentinelStart)
   container.append(sentinelEnd)
 
-  if (initialFocus) {
-    initialFocus.focus()
-  } else {
-    const firstFocusableChild = getFocusableChild(container)
-    firstFocusableChild?.focus()
+  let lastFocusedChild: HTMLElement | undefined = undefined
+  // Ensure focus remains in the trap zone by checking that a given recently-focused
+  // element is inside the trap zone. If it isn't, redirect focus to a suitable
+  // element within the trap zone. If need to redirect focus and a suitable element
+  // is not found, focus the container.
+  function ensureTrapZoneHasFocus(focusedElement: EventTarget | null) {
+    if (focusedElement instanceof HTMLElement && document.contains(container)) {
+      if (container.contains(focusedElement)) {
+        // If a child of the trap zone was focused, remember it
+        lastFocusedChild = focusedElement
+        return
+      } else {
+        if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
+          lastFocusedChild.focus()
+          return
+        } else if (initialFocus && container.contains(initialFocus)) {
+          initialFocus.focus()
+          return
+        } else {
+          const firstFocusableChild = getFocusableChild(container)
+          firstFocusableChild?.focus()
+          return
+        }
+      }
+    }
   }
 
   const wrappingController = followSignal(signal)
@@ -98,6 +118,19 @@ export function focusTrap(
     }
     tryReactivate()
   })
+
+  // Prevent focus leaving the trap container
+  document.addEventListener(
+    'focus',
+    event => {
+      ensureTrapZoneHasFocus(event.target)
+    },
+    // use capture to ensure we get all events.  focus events do not bubble
+    {signal: wrappingController.signal, capture: true}
+  )
+
+  // focus the first element
+  ensureTrapZoneHasFocus(document.activeElement)
 
   activeTrap = {
     container,

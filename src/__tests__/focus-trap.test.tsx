@@ -188,7 +188,6 @@ it('Should should release the trap when the container is removed from the DOM', 
 })
 
 it('Should handle dynamic content', async () => {
-  // TODO: check how this was handled previously, maybe there's a better solution?
   const {container} = render(
     <div>
       <div id="trapContainer">

@@ -7,7 +7,7 @@ class ModalDialogElement extends HTMLElement {
     super()
 
     this.querySelector('.close-button')?.addEventListener('click', () => this.close())
-    document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', (event) => {
+    document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', event => {
       event.stopPropagation()
       this.show()
     })

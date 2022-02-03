@@ -3,7 +3,11 @@
     "module": "ES2020",
     "target": "ES2015",
     "jsx": "react",
-    "lib": ["es2020", "dom", "dom.iterable"],
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
     "strict": true,
     "declaration": true,
     "outDir": "dist/esm",
@@ -12,5 +16,8 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true
   },
-  "exclude": ["src/__tests__", "dist"]
+  "exclude": [
+    "src/__tests__",
+    "dist"
+  ]
 }

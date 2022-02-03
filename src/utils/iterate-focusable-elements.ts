@@ -68,6 +68,16 @@ export function* iterateFocusableElements(
 }
 
 /**
+ * Returns the first focusable child of `container`. If `lastChild` is true,
+ * returns the last focusable child of `container`.
+ * @param container
+ * @param lastChild
+ */
+export function getFocusableChild(container: HTMLElement, lastChild = false) {
+  return iterateFocusableElements(container, {reverse: lastChild, strict: true, onlyTabbable: true}).next().value
+}
+
+/**
  * Determines whether the given element is focusable. If `strict` is true, we may
  * perform additional checks that require a reflow (less performant).
  * @param elem
@@ -80,7 +90,8 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
     (elem as HTMLElement & {disabled: boolean}).disabled
   const hiddenInert = elem.hidden
   const hiddenInputInert = elem instanceof HTMLInputElement && elem.type === 'hidden'
-  if (disabledAttrInert || hiddenInert || hiddenInputInert) {
+  const sentinelInert = elem.classList.contains('sentinel')
+  if (disabledAttrInert || hiddenInert || hiddenInputInert || sentinelInert) {
     return false
   }
 

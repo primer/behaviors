@@ -1,4 +1,4 @@
-import {isTabbable, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
+import {getFocusableChild, isTabbable} from './utils/iterate-focusable-elements.js'
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
 
 eventListenerSignalPolyfill()
@@ -31,40 +31,43 @@ function followSignal(signal: AbortSignal): AbortController {
 }
 
 /**
- * Returns the first focusable child of `container`. If `lastChild` is true,
- * returns the last focusable child of `container`.
- * @param container
- * @param lastChild
- */
-function getFocusableChild(container: HTMLElement, lastChild = false) {
-  return iterateFocusableElements(container, {reverse: lastChild, strict: true, onlyTabbable: true}).next().value
-}
-
-/**
- * Traps focus within the given container.
+ * Traps focus within the given container
  * @param container The container in which to trap focus
- * @returns AbortController - call `.abort()` to disable the focus trap
+ * @param initialFocus The element to focus when the trap is enabled
+ * @param abortSignal An AbortSignal to control the focus trap
  */
-export function focusTrap(container: HTMLElement, initialFocus?: HTMLElement): AbortController
-
-/**
- * Traps focus within the given container.
- * @param container The container in which to trap focus
- * @param abortSignal An AbortSignal to control the focus trap.
- */
-export function focusTrap(container: HTMLElement, initialFocus: HTMLElement | undefined, abortSignal: AbortSignal): void
 export function focusTrap(
   container: HTMLElement,
   initialFocus?: HTMLElement,
   abortSignal?: AbortSignal
-): AbortController | void {
+): AbortController | undefined {
   // Set up an abort controller if a signal was not passed in
   const controller = new AbortController()
   const signal = abortSignal ?? controller.signal
 
   container.setAttribute('data-focus-trap', 'active')
-  let lastFocusedChild: HTMLElement | undefined = undefined
+  const sentinelStart = document.createElement('span')
+  sentinelStart.setAttribute('class', 'sentinel')
+  sentinelStart.setAttribute('tabindex', '0')
+  sentinelStart.setAttribute('aria-hidden', 'true')
+  sentinelStart.onfocus = () => {
+    const lastFocusableChild = getFocusableChild(container, true)
+    lastFocusableChild?.focus()
+  }
 
+  const sentinelEnd = document.createElement('span')
+  sentinelEnd.setAttribute('class', 'sentinel')
+  sentinelEnd.setAttribute('tabindex', '0')
+  sentinelEnd.setAttribute('aria-hidden', 'true')
+  sentinelEnd.onfocus = () => {
+    // If the end sentinel was focused, move focus to the start
+    const firstFocusableChild = getFocusableChild(container)
+    firstFocusableChild?.focus()
+  }
+  container.prepend(sentinelStart)
+  container.append(sentinelEnd)
+
+  let lastFocusedChild: HTMLElement | undefined = undefined
   // Ensure focus remains in the trap zone by checking that a given recently-focused
   // element is inside the trap zone. If it isn't, redirect focus to a suitable
   // element within the trap zone. If need to redirect focus and a suitable element
@@ -83,24 +86,8 @@ export function focusTrap(
           initialFocus.focus()
           return
         } else {
-          // Ensure the container is focusable:
-          // - Either the container already has a `tabIndex`
-          // - Or provide a temporary `tabIndex`
-          const containerNeedsTemporaryTabIndex = container.getAttribute('tabindex') === null
-          if (containerNeedsTemporaryTabIndex) {
-            container.setAttribute('tabindex', '-1')
-          }
-          // Focus the container.
-          container.focus()
-          // If a temporary `tabIndex` was provided, remove it.
-          if (containerNeedsTemporaryTabIndex) {
-            // Once focus has moved from the container to a child within the FocusTrap,
-            // the container can be made un-refocusable by removing `tabIndex`.
-            container.addEventListener('blur', () => container.removeAttribute('tabindex'), {once: true})
-            // NB: If `tabIndex` was removed *before* `blur`, then certain browsers (e.g. Chrome)
-            // would consider `body` the `activeElement`, and as a result, keyboard navigation
-            // between children would break, since `body` is outside the `FocusTrap`.
-          }
+          const firstFocusableChild = getFocusableChild(container)
+          firstFocusableChild?.focus()
           return
         }
       }
@@ -108,27 +95,6 @@ export function focusTrap(
   }
 
   const wrappingController = followSignal(signal)
-
-  container.addEventListener(
-    'keydown',
-    event => {
-      if (event.key !== 'Tab' || event.defaultPrevented) {
-        return
-      }
-
-      const {target} = event
-      const firstFocusableChild = getFocusableChild(container)
-      const lastFocusableChild = getFocusableChild(container, true)
-      if (target === firstFocusableChild && event.shiftKey) {
-        event.preventDefault()
-        lastFocusableChild?.focus()
-      } else if (target === lastFocusableChild && !event.shiftKey) {
-        event.preventDefault()
-        firstFocusableChild?.focus()
-      }
-    },
-    {signal: wrappingController.signal}
-  )
 
   if (activeTrap) {
     const suspendedTrap = activeTrap
@@ -145,6 +111,8 @@ export function focusTrap(
   // Only when user-canceled
   signal.addEventListener('abort', () => {
     container.removeAttribute('data-focus-trap')
+    const sentinels = container.getElementsByClassName('sentinel')
+    while (sentinels.length > 0) sentinels[0].remove()
     const suspendedTrapIndex = suspendedTrapStack.findIndex(t => t.container === container)
     if (suspendedTrapIndex >= 0) {
       suspendedTrapStack.splice(suspendedTrapIndex, 1)
@@ -173,7 +141,7 @@ export function focusTrap(
   }
 
   // If we are activating a focus trap for a container that was previously
-  // suspended, just remove it from the suspended list.
+  // suspended, just remove it from the suspended list
   const suspendedTrapIndex = suspendedTrapStack.findIndex(t => t.container === container)
   if (suspendedTrapIndex >= 0) {
     suspendedTrapStack.splice(suspendedTrapIndex, 1)

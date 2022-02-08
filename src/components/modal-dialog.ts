@@ -2,15 +2,21 @@ import {focusTrap} from '../focus-trap.js'
 
 class ModalDialogElement extends HTMLElement {
   private abortController: AbortController | undefined
+  private overlayBackdrop: HTMLElement | undefined
 
   constructor() {
     super()
 
-    this.querySelector('.close-button')?.addEventListener('click', () => this.close())
+    this.querySelector('.Overlay-closeButton')?.addEventListener('click', () => this.close())
     document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', event => {
       event.stopPropagation()
       this.show()
     })
+
+    if (this.parentElement?.classList.contains('Overlay-backdrop')) {
+      this.overlayBackdrop = this.parentElement
+      this.overlayBackdrop.classList.add('Overlay-hidden')
+    }
   }
 
   connectedCallback(): void {
@@ -38,25 +44,19 @@ class ModalDialogElement extends HTMLElement {
   }
 
   show() {
-    const isClosed = this.classList.contains('hidden')
-    if (!isClosed) return
-    this.classList.remove('hidden')
+    const isOpen = this.hasAttribute('open')
+    if (isOpen) return
     this.setAttribute('open', '')
-    if (this.parentElement?.classList.contains('modal-dialog-backdrop')) {
-      this.parentElement.classList.add('active')
-    }
+    this.overlayBackdrop?.classList.remove('Overlay-hidden')
     document.body.style.overflow = 'hidden'
     this.abortController = focusTrap(this)
   }
 
   close() {
-    const isClosed = this.classList.contains('hidden')
-    if (isClosed) return
-    this.classList.add('hidden')
+    const isOpen = this.hasAttribute('open')
+    if (!isOpen) return
     this.removeAttribute('open')
-    if (this.parentElement?.classList.contains('modal-dialog-backdrop')) {
-      this.parentElement.classList.remove('active')
-    }
+    this.overlayBackdrop?.classList.add('Overlay-hidden')
     document.body.style.overflow = 'initial'
     this.abortController?.abort()
   }

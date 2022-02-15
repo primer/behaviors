@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.1.0
+
+### Minor Changes
+
+- [#52](https://github.com/primer/behaviors/pull/52) [`1aa3027`](https://github.com/primer/behaviors/commit/1aa302782e3c833f9d9c27f602a046e81f05c3e5) Thanks [@owenniblock](https://github.com/owenniblock)! - Update focusTrap to use new methodology after accessibility discussions
+
 ## 1.0.3
 
 ### Patch Changes

@@ -1,4 +1,4 @@
-import {getFocusableChild, isTabbable} from './utils/iterate-focusable-elements.js'
+import {focusIfNeeded, getFocusableChild, isTabbable} from './utils/iterate-focusable-elements.js'
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
 
 eventListenerSignalPolyfill()
@@ -16,7 +16,7 @@ let activeTrap: FocusTrapMetadata | undefined = undefined
 function tryReactivate() {
   const trapToReactivate = suspendedTrapStack.pop()
   if (trapToReactivate) {
-    focusTrap(trapToReactivate.container, trapToReactivate.initialFocus, trapToReactivate.originalSignal)
+    focusTrap(trapToReactivate.container, trapToReactivate.originalSignal, trapToReactivate.initialFocus)
   }
 }
 
@@ -33,18 +33,11 @@ function followSignal(signal: AbortSignal): AbortController {
 /**
  * Traps focus within the given container
  * @param container The container in which to trap focus
- * @param initialFocus The element to focus when the trap is enabled
  * @param abortSignal An AbortSignal to control the focus trap
+ * @param initialFocus The element to focus when the trap is enabled
  */
-export function focusTrap(
-  container: HTMLElement,
-  initialFocus?: HTMLElement,
-  abortSignal?: AbortSignal
-): AbortController | undefined {
-  // Set up an abort controller if a signal was not passed in
-  const controller = new AbortController()
-  const signal = abortSignal ?? controller.signal
-
+export function focusTrap(container: HTMLElement, abortSignal: AbortSignal, initialFocus?: HTMLElement): void {
+  // TODO: Investigate using an HTML Comment Element here instead
   container.setAttribute('data-focus-trap', 'active')
   const sentinelStart = document.createElement('span')
   sentinelStart.setAttribute('class', 'sentinel')
@@ -80,21 +73,21 @@ export function focusTrap(
         return
       } else {
         if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
-          lastFocusedChild.focus()
+          focusIfNeeded(lastFocusedChild)
           return
         } else if (initialFocus && container.contains(initialFocus)) {
-          initialFocus.focus()
+          focusIfNeeded(initialFocus)
           return
         } else {
           const firstFocusableChild = getFocusableChild(container)
-          firstFocusableChild?.focus()
+          focusIfNeeded(firstFocusableChild)
           return
         }
       }
     }
   }
 
-  const wrappingController = followSignal(signal)
+  const wrappingController = followSignal(abortSignal)
 
   if (activeTrap) {
     const suspendedTrap = activeTrap
@@ -109,7 +102,7 @@ export function focusTrap(
   })
 
   // Only when user-canceled
-  signal.addEventListener('abort', () => {
+  abortSignal.addEventListener('abort', () => {
     container.removeAttribute('data-focus-trap')
     const sentinels = container.getElementsByClassName('sentinel')
     while (sentinels.length > 0) sentinels[0].remove()
@@ -137,7 +130,7 @@ export function focusTrap(
     container,
     controller: wrappingController,
     initialFocus,
-    originalSignal: signal
+    originalSignal: abortSignal
   }
 
   // If we are activating a focus trap for a container that was previously
@@ -145,8 +138,5 @@ export function focusTrap(
   const suspendedTrapIndex = suspendedTrapStack.findIndex(t => t.container === container)
   if (suspendedTrapIndex >= 0) {
     suspendedTrapStack.splice(suspendedTrapIndex, 1)
-  }
-  if (!abortSignal) {
-    return controller
   }
 }

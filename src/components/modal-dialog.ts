@@ -1,115 +1,115 @@
+import {focusIfNeeded} from '../utils/iterate-focusable-elements.js'
 import {focusTrap} from '../focus-trap.js'
 
 class ModalDialogElement extends HTMLElement {
-  private abortController: AbortController | undefined
-  private overlayBackdrop: HTMLElement | undefined
+  //TODO: Do we remove the abortController from focusTrap?
+  #focusAbortController = new AbortController()
+  #abortController = new AbortController()
+  #isComposing = false
+  #openButton: HTMLButtonElement | undefined
 
-  constructor() {
-    super()
-
-    this.querySelector('.Overlay-closeButton')?.addEventListener('click', () => this.close())
-    document.body.querySelector(`.js-dialog-show-${this.id}`)?.addEventListener('click', event => {
-      event.stopPropagation()
-      this.show()
-    })
-
-    if (this.parentElement?.classList.contains('Overlay-backdrop')) {
-      this.overlayBackdrop = this.parentElement
-      this.overlayBackdrop.classList.add('Overlay-hidden')
+  get open() {
+    return this.hasAttribute('open')
+  }
+  set open(value: boolean) {
+    if (value) {
+      if (this.open) return
+      this.setAttribute('open', '')
+      this.#overlayBackdrop?.classList.remove('Overlay-hidden')
+      document.body.style.overflow = 'hidden'
+      if (this.#focusAbortController.signal.aborted) {
+        this.#focusAbortController = new AbortController()
+      }
+      focusTrap(this, this.#focusAbortController.signal)
+    } else {
+      if (!this.open) return
+      this.removeAttribute('open')
+      this.#overlayBackdrop?.classList.add('Overlay-hidden')
+      document.body.style.overflow = 'initial'
+      this.#focusAbortController.abort()
+      focusIfNeeded(this.#openButton)
+      this.#openButton = undefined
     }
+  }
+
+  get #overlayBackdrop(): HTMLElement | null {
+    if (this.parentElement?.classList.contains('Overlay-backdrop')) {
+      return this.parentElement
+    }
+
+    return null
   }
 
   connectedCallback(): void {
     if (!this.hasAttribute('role')) this.setAttribute('role', 'dialog')
 
-    // Find the associated button?
+    const signal = this.#abortController.signal
 
-    const subscriptions = [
-      fromEvent(this, 'compositionstart', e => trackComposition(this, e)),
-      fromEvent(this, 'compositionend', e => trackComposition(this, e)),
-      fromEvent(this, 'keydown', e => keydown(this, e)),
-      fromEvent(window, 'click', e => clickToDismiss(this, e))
-    ]
+    this.ownerDocument.addEventListener(
+      'click',
+      event => {
+        const target = event.target as HTMLElement
+        const clickOutsideDialog = target.closest(this.tagName) !== this
+        const button = target?.closest('button')
+        // go over this logic:
+        if (!button) {
+          if (clickOutsideDialog) {
+            // This click is outside the dialog
+            this.close()
+          }
+          return
+        }
 
-    states.set(this, {subscriptions, loaded: false, isComposing: false})
+        let dialogId = button.getAttribute('data-close-dialog-id')
+        if (dialogId === this.id) {
+          this.close()
+        }
+
+        dialogId = button.getAttribute('data-show-dialog-id')
+        if (dialogId === this.id) {
+          //TODO: see if I can remove this
+          event.stopPropagation()
+          this.#openButton = button
+          this.show()
+        }
+      },
+      {signal}
+    )
+
+    this.addEventListener('compositionstart', () => (this.#isComposing = true))
+    this.addEventListener('compositionend', () => (this.#isComposing = false))
+    this.addEventListener('keydown', e => this.#keydown(e))
   }
 
   disconnectedCallback(): void {
-    const state = states.get(this)
-    if (!state) return
-    states.delete(this)
-    for (const sub of state.subscriptions) {
-      sub.unsubscribe()
-    }
+    this.#abortController.abort()
   }
 
   show() {
-    const isOpen = this.hasAttribute('open')
-    if (isOpen) return
-    this.setAttribute('open', '')
-    this.overlayBackdrop?.classList.remove('Overlay-hidden')
-    document.body.style.overflow = 'hidden'
-    this.abortController = focusTrap(this)
+    this.open = true
   }
 
   close() {
-    const isOpen = this.hasAttribute('open')
-    if (!isOpen) return
-    this.removeAttribute('open')
-    this.overlayBackdrop?.classList.add('Overlay-hidden')
-    document.body.style.overflow = 'initial'
-    this.abortController?.abort()
+    this.open = false
   }
-}
 
-const states = new WeakMap()
+  #keydown(event: Event) {
+    if (!(event instanceof KeyboardEvent)) return
+    if (this.#isComposing) return
 
-type Subscription = {unsubscribe(): void}
-
-function fromEvent(
-  target: EventTarget,
-  eventName: string,
-  onNext: EventListenerOrEventListenerObject,
-  options: boolean | AddEventListenerOptions = false
-): Subscription {
-  target.addEventListener(eventName, onNext, options)
-  return {
-    unsubscribe: () => {
-      target.removeEventListener(eventName, onNext, options)
+    // We can ignore this line because it will eventually live in `primer/behaviors`
+    switch (event.key) {
+      case 'Escape':
+        if (this.open) {
+          this.close()
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        break
     }
   }
 }
 
-function keydown(dialog: ModalDialogElement, event: Event) {
-  if (!(event instanceof KeyboardEvent)) return
-  const state = states.get(dialog)
-  if (!state || state.isComposing) return
-
-  switch (event.key) {
-    case 'Escape':
-      if (dialog.hasAttribute('open')) {
-        dialog.close()
-        event.preventDefault()
-        event.stopPropagation()
-      }
-      break
-  }
-}
-
-function trackComposition(dialog: Element, event: Event) {
-  const state = states.get(dialog)
-  if (!state) return
-  state.isComposing = event.type === 'compositionstart'
-}
-
-function clickToDismiss(dialog: ModalDialogElement, event: Event) {
-  const target = event.target as HTMLElement
-  if (dialog.hasAttribute('open') && target && !target.matches(`#${dialog.id}, #${dialog.id} *`)) {
-    dialog.close()
-  }
-}
-
-// TODO: Find out how we can reactive this code
 declare global {
   interface Window {
     ModalDialogElement: typeof ModalDialogElement

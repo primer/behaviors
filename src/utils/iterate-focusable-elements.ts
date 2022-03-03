@@ -68,6 +68,16 @@ export function* iterateFocusableElements(
 }
 
 /**
+ * Focuses the `elem` element if it doesn't already have focus.
+ * @param elem
+ */
+export function focusIfNeeded(elem?: HTMLElement) {
+  if (document.activeElement !== elem) {
+    elem?.focus()
+  }
+}
+
+/**
  * Returns the first focusable child of `container`. If `lastChild` is true,
  * returns the last focusable child of `container`.
  * @param container

@@ -97,7 +97,6 @@ class ModalDialogElement extends HTMLElement {
     if (!(event instanceof KeyboardEvent)) return
     if (this.#isComposing) return
 
-    // We can ignore this line because it will eventually live in `primer/behaviors`
     switch (event.key) {
       case 'Escape':
         if (this.open) {

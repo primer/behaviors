@@ -5,7 +5,6 @@ class ModalDialogElement extends HTMLElement {
   //TODO: Do we remove the abortController from focusTrap?
   #focusAbortController = new AbortController()
   #abortController = new AbortController()
-  #isComposing = false
   #openButton: HTMLButtonElement | undefined
 
   get open() {
@@ -76,8 +75,6 @@ class ModalDialogElement extends HTMLElement {
       {signal}
     )
 
-    this.addEventListener('compositionstart', () => (this.#isComposing = true))
-    this.addEventListener('compositionend', () => (this.#isComposing = false))
     this.addEventListener('keydown', e => this.#keydown(e))
   }
 
@@ -95,7 +92,7 @@ class ModalDialogElement extends HTMLElement {
 
   #keydown(event: Event) {
     if (!(event instanceof KeyboardEvent)) return
-    if (this.#isComposing) return
+    if (event.isComposing) return
 
     switch (event.key) {
       case 'Escape':

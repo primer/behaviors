@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.1.1
+
+### Patch Changes
+
+- [#73](https://github.com/primer/behaviors/pull/73) [`a96d60f`](https://github.com/primer/behaviors/commit/a96d60fdb2a2ffdde71a22ea29fa2c788bf4c6aa) Thanks [@dgreif](https://github.com/dgreif)! - Add `import` conditional export type to the package for better NodeJS ESM compatibility
+
 ## 1.1.0
 
 ### Minor Changes

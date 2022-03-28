@@ -6,17 +6,19 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "module": "./dist/esm/index.js",
+      "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
-      "module": "./dist/esm/index.js"
+      "types": "./dist/esm/index.d.ts"
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
+      "module": "./dist/esm/utils/index.js",
+      "import": "./dist/esm/utils/index.js",
       "require": "./dist/cjs/utils/index.js",
-      "module": "./dist/esm/utils/index.js"
+      "types": "./dist/esm/utils/index.d.ts"
     }
   },
-  "types": "dist/cjs/index.d.ts",
+  "types": "dist/esm/index.d.ts",
   "files": [
     "dist",
     "utils"

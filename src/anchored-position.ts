@@ -99,6 +99,15 @@ const alternateOrders: Partial<Record<AnchorSide, [AnchorSide, AnchorSide, Ancho
   'outside-right': ['outside-left', 'outside-bottom', 'outside-top', 'outside-bottom']
 }
 
+// For each alignment, list the order of alternate alignments to try in
+// the event that the original position overflows.
+// Prefer start or end over center.
+const alternateAlignments: Partial<Record<AnchorAlignment, [AnchorAlignment, AnchorAlignment]>> = {
+  start: ['end', 'center'],
+  end: ['start', 'center'],
+  center: ['end', 'start']
+}
+
 interface Size {
   width: number
   height: number
@@ -113,6 +122,7 @@ export interface AnchorPosition {
   top: number
   left: number
   anchorSide: AnchorSide
+  anchorAlign: AnchorAlignment
 }
 
 interface BoxPosition extends Size, Position {}
@@ -275,12 +285,14 @@ function pureCalculateAnchoredPosition(
 
   let pos = calculatePosition(floatingRect, anchorRect, side, align, anchorOffset, alignmentOffset)
   let anchorSide = side
+  let anchorAlign = align
   pos.top -= relativePosition.top
   pos.left -= relativePosition.left
 
   // Handle screen overflow
   if (!allowOutOfBounds) {
     const alternateOrder = alternateOrders[side]
+
     let positionAttempt = 0
     if (alternateOrder) {
       let prevSide = side
@@ -300,6 +312,30 @@ function pureCalculateAnchoredPosition(
         anchorSide = nextSide
       }
     }
+
+    // If using alternate anchor side does not stop overflow,
+    // try using an alternate alignment
+    const alternateAlignment = alternateAlignments[align]
+
+    let alingmentAttempt = 0
+    if (alternateAlignment) {
+      let prevAlign = align
+
+      // Try all the alternate alignments until one does not overflow
+      while (
+        alingmentAttempt < alternateAlignment.length &&
+        shouldRecalculateAlignment(prevAlign, pos, relativeViewportRect, floatingRect)
+      ) {
+        const nextAlign = alternateAlignment[alingmentAttempt++]
+        prevAlign = nextAlign
+
+        pos = calculatePosition(floatingRect, anchorRect, anchorSide, nextAlign, anchorOffset, alignmentOffset)
+        pos.top -= relativePosition.top
+        pos.left -= relativePosition.left
+        anchorAlign = nextAlign
+      }
+    }
+
     // At this point we've flipped the position if applicable. Now just nudge until it's on-screen.
     if (pos.top < relativeViewportRect.top) {
       pos.top = relativeViewportRect.top
@@ -320,7 +356,7 @@ function pureCalculateAnchoredPosition(
     }
   }
 
-  return {...pos, anchorSide}
+  return {...pos, anchorSide, anchorAlign}
 }
 
 /**
@@ -438,5 +474,25 @@ function shouldRecalculatePosition(
       currentPos.left < containerDimensions.left ||
       currentPos.left + elementDimensions.width > containerDimensions.width + containerDimensions.left
     )
+  }
+}
+
+/**
+ * Determines if there is an overflow
+ * @param align,
+ * @param currentPos
+ * @param containerDimensions
+ * @param elementDimensions
+ */
+function shouldRecalculateAlignment(
+  align: AnchorAlignment,
+  currentPos: Position,
+  containerDimensions: BoxPosition,
+  elementDimensions: Size
+) {
+  if (align === 'end') {
+    return currentPos.left < containerDimensions.left
+  } else if (align === 'start' || align === 'center') {
+    return currentPos.left + elementDimensions.width > containerDimensions.left + containerDimensions.width
   }
 }

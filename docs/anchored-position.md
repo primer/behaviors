@@ -29,7 +29,8 @@ Once we have the clipping container, its bounding box is used as the viewport fo
 With the positions and sizes of the above DOM elements, the algorithm calculates the (x, y) coordinate for the floating element. Then, it checks to see if, based on the floating element's size, if it would overflow the bounds of the container. If it would, it does one of two things:
 
 A) If the overflow happens in the same direction as the anchor side (e.g. side is `'outside-bottom'` and the overflowing portion of the floating element is the bottom), try to find a different side, recalculate the position, and check for overflow again. If we check all four sides and don't find one that fits, revert to the bottom side, in hopes that a scrollbar might appear.
-B) Otherwise, adjust the alignment offset so that the floating element can stay inside the container's bounds.
+B) If the overflow happens in the same direction as the anchor alignment (e.g. align is `'start'` and the overflowing portion of the floating element is the right), try to find a different alignment, recalculate the position, and check for overflow again. If we check all three alignments and don't find one that fits, revert to initial aligment, in hopes that (C) will fix it.
+C) Otherwise, adjust the alignment offset so that the floating element can stay inside the container's bounds.
 
 For a more in-depth explanation of the positioning settings, see `PositionSettings` below.
 

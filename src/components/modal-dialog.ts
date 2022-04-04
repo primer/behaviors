@@ -4,7 +4,7 @@ import {focusTrap} from '../focus-trap.js'
 class ModalDialogElement extends HTMLElement {
   //TODO: Do we remove the abortController from focusTrap?
   #focusAbortController = new AbortController()
-  #abortController = new AbortController()
+  #abortController: AbortController | null = null
   #openButton: HTMLButtonElement | undefined
 
   get open() {
@@ -42,7 +42,7 @@ class ModalDialogElement extends HTMLElement {
   connectedCallback(): void {
     if (!this.hasAttribute('role')) this.setAttribute('role', 'dialog')
 
-    const signal = this.#abortController.signal
+    const {signal} = (this.#abortController = new AbortController())
 
     this.ownerDocument.addEventListener(
       'click',
@@ -79,7 +79,7 @@ class ModalDialogElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
-    this.#abortController.abort()
+    this.#abortController?.abort()
   }
 
   show() {

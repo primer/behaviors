@@ -317,16 +317,16 @@ function pureCalculateAnchoredPosition(
     // try using an alternate alignment
     const alternateAlignment = alternateAlignments[align]
 
-    let alingmentAttempt = 0
+    let alignmentAttempt = 0
     if (alternateAlignment) {
       let prevAlign = align
 
       // Try all the alternate alignments until one does not overflow
       while (
-        alingmentAttempt < alternateAlignment.length &&
+        alignmentAttempt < alternateAlignment.length &&
         shouldRecalculateAlignment(prevAlign, pos, relativeViewportRect, floatingRect)
       ) {
-        const nextAlign = alternateAlignment[alingmentAttempt++]
+        const nextAlign = alternateAlignment[alignmentAttempt++]
         prevAlign = nextAlign
 
         pos = calculatePosition(floatingRect, anchorRect, anchorSide, nextAlign, anchorOffset, alignmentOffset)

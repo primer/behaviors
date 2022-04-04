@@ -291,4 +291,58 @@ describe('getAnchoredPosition', () => {
     // anchorRect.left + anchorRect.width - floatingRect.width - (settings.anchorOffset ?? 4) - parentRect.left
     expect(left).toEqual(290)
   })
+
+  it('properly calculates the position when alignment needs to be flipped', () => {
+    const parentRect = makeDOMRect(20, 20, 500, 500)
+    const anchorRect = makeDOMRect(450, 20, 50, 50) // right aligned square, at the edge
+    const floatingRect = makeDOMRect(NaN, NaN, 100, 50)
+    const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
+    const settings: Partial<PositionSettings> = {side: 'outside-bottom', align: 'start'} // but there's not enough room for that
+
+    const {top, left, anchorAlign} = getAnchoredPosition(float, anchor, settings)
+    expect(top).toEqual(54) // anchorRect.top - parentRect.top + anchorRect.height + (settings.anchorOffset ?? 4)
+
+    /**
+     * with align:start, left = anchorRect.left - parentTop.left = 430
+     * and right = left + floatingRect.width = 530
+     * which would overflow parentRect.left + parentRect.width = 520
+     * so it should flip to align:end
+     */
+    expect(anchorAlign).toEqual('end')
+    // based on align:end, anchorRect.left + anchorRect.width - parentRect.left - floatingRect.width
+    expect(left).toEqual(380)
+  })
+
+  it('properly calculates the position when only side needs to be flipped', () => {
+    const parentRect = makeDOMRect(20, 20, 500, 500)
+    const anchorRect = makeDOMRect(450, 20, 50, 50) // right aligned square, at the edge
+    const floatingRect = makeDOMRect(NaN, NaN, 100, 50)
+    const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
+
+    // not enough space for specified side or alignment
+    const settings: Partial<PositionSettings> = {side: 'outside-right', align: 'start'}
+
+    const {top, left, anchorSide, anchorAlign} = getAnchoredPosition(float, anchor, settings)
+    expect(top).toEqual(0) // anchorRect.top - parentRect.top
+
+    expect(anchorSide).toEqual('outside-left') // flipped
+    expect(anchorAlign).toEqual('start') // no need to flip
+    expect(left).toEqual(326) // anchorRect.left - floatingRect.width - (settings.anchorOffset ?? 4) - parentRect.left
+  })
+
+  it('properly calculates the position when both side and alignment need to be flipped', () => {
+    const parentRect = makeDOMRect(20, 20, 500, 500)
+    const anchorRect = makeDOMRect(450, 20, 50, 50) // right aligned square, at the edge
+    const floatingRect = makeDOMRect(NaN, NaN, 100, 50)
+    const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
+
+    // not enough space for specified side or alignment
+    const settings: Partial<PositionSettings> = {side: 'outside-top', align: 'start'}
+
+    const {top, left, anchorSide, anchorAlign} = getAnchoredPosition(float, anchor, settings)
+    expect(anchorSide).toEqual('outside-bottom')
+    expect(anchorAlign).toEqual('end')
+    expect(top).toEqual(54) // anchorRect.top + anchorRect.height + (settings.anchorOffset ?? 4) - parentRect.top
+    expect(left).toEqual(380) // anchorRect.left + anchorRect.width - parentRect.left - floatingRect.width
+  })
 })

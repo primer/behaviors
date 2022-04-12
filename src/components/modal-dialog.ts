@@ -91,8 +91,8 @@ class ModalDialogElement extends HTMLElement {
     this.open = true
   }
 
-  close(cancelled = true) {
-    const eventType = cancelled ? 'cancel' : 'close'
+  close(closed = false) {
+    const eventType = closed ? 'close' : 'cancel'
     const dialogEvent = new Event(eventType)
     this.dispatchEvent(dialogEvent)
     this.open = false

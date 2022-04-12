@@ -51,7 +51,7 @@ it('fires cancel event when you call close()', function () {
   expect(cancelFired).toEqual(true)
 })
 
-it('fires close event when you call close(false)', function () {
+it('fires close event when you call close(true)', function () {
   const el = new window.ModalDialogElement()
   let closeFired = false
   el.addEventListener('close', () => {
@@ -60,8 +60,26 @@ it('fires close event when you call close(false)', function () {
   el.show()
   expect(el.open).toEqual(true)
 
-  el.close(false)
+  el.close(true)
   expect(closeFired).toEqual(true)
+})
+
+it('fires cancel event when you call close(false)', function () {
+  const el = new window.ModalDialogElement()
+  let closeFired = false
+  let cancelFired = false
+  el.addEventListener('close', () => {
+    closeFired = true
+  })
+  el.addEventListener('cancel', () => {
+    cancelFired = true
+  })
+  el.show()
+  expect(el.open).toEqual(true)
+
+  el.close(false)
+  expect(closeFired).toEqual(false)
+  expect(cancelFired).toEqual(true)
 })
 
 it('adds class from overlay when you call close()', function () {

@@ -64,6 +64,11 @@ class ModalDialogElement extends HTMLElement {
           this.close()
         }
 
+        dialogId = button.getAttribute('data-submit-dialog-id')
+        if (dialogId === this.id) {
+          this.close(true)
+        }
+
         dialogId = button.getAttribute('data-show-dialog-id')
         if (dialogId === this.id) {
           //TODO: see if I can remove this
@@ -86,7 +91,10 @@ class ModalDialogElement extends HTMLElement {
     this.open = true
   }
 
-  close() {
+  close(cancelled = true) {
+    const eventType = cancelled ? 'cancel' : 'close'
+    const dialogEvent = new Event(eventType)
+    this.dispatchEvent(dialogEvent)
     this.open = false
   }
 

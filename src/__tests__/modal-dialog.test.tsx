@@ -38,6 +38,32 @@ it('closes dialog when you call close()', function () {
   expect(el.open).toEqual(false)
 })
 
+it('fires cancel event when you call close()', function () {
+  const el = new window.ModalDialogElement()
+  let cancelFired = false
+  el.addEventListener('cancel', () => {
+    cancelFired = true
+  })
+  el.show()
+  expect(el.open).toEqual(true)
+
+  el.close()
+  expect(cancelFired).toEqual(true)
+})
+
+it('fires close event when you call close(false)', function () {
+  const el = new window.ModalDialogElement()
+  let closeFired = false
+  el.addEventListener('close', () => {
+    closeFired = true
+  })
+  el.show()
+  expect(el.open).toEqual(true)
+
+  el.close(false)
+  expect(closeFired).toEqual(true)
+})
+
 it('adds class from overlay when you call close()', function () {
   const el = document.createElement('modal-dialog')
   const overlay = document.createElement('div')

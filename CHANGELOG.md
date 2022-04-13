@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.1.2
+
+### Patch Changes
+
+- [#78](https://github.com/primer/behaviors/pull/78) [`62e5459`](https://github.com/primer/behaviors/commit/62e545913dae8ca42f88fd6184f190cdf3df9c4c) Thanks [@siddharthkp](https://github.com/siddharthkp)! - Anchored Position: Add alternative alignments to flip to if there isn't enough space
+
 ## 1.1.1
 
 ### Patch Changes

@@ -493,6 +493,11 @@ function shouldRecalculateAlignment(
   if (align === 'end') {
     return currentPos.left < containerDimensions.left
   } else if (align === 'start' || align === 'center') {
-    return currentPos.left + elementDimensions.width > containerDimensions.left + containerDimensions.width
+    return (
+      // right edge
+      currentPos.left + elementDimensions.width > containerDimensions.left + containerDimensions.width ||
+      // left edge
+      currentPos.left < containerDimensions.left
+    )
   }
 }

@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.1.3
+
+### Patch Changes
+
+- [#93](https://github.com/primer/behaviors/pull/93) [`e5aaf68`](https://github.com/primer/behaviors/commit/e5aaf688b084bf6e425c6bdb0963aa50aacf8fa4) Thanks [@siddharthkp](https://github.com/siddharthkp)! - Anchored position: Add check for boundary collision on left side
+
 ## 1.1.2
 
 ### Patch Changes

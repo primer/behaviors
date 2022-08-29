@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.2.0
+
+### Minor Changes
+
+- [#134](https://github.com/primer/behaviors/pull/134) [`cc5bf8e`](https://github.com/primer/behaviors/commit/cc5bf8e8404594bc6b3ff1493f253b171bfb03c0) Thanks [@jonrohan](https://github.com/jonrohan)! - Add Dimensions behavior
+
 ## 1.1.3
 
 ### Patch Changes

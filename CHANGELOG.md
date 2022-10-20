@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.0
+
+### Minor Changes
+
+- [#152](https://github.com/primer/behaviors/pull/152) [`afaf380`](https://github.com/primer/behaviors/commit/afaf380893cb858e6c85515bb490866d76d3d8b7) Thanks [@colebemis](https://github.com/colebemis)! - focusZone: Add `preventScroll` option
+
 ## 1.2.0
 
 ### Minor Changes

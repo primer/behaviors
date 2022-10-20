@@ -212,6 +212,15 @@ export interface FocusZoneSettings {
    * For more information, @see https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_general_within
    */
   focusInStrategy?: 'first' | 'closest' | 'previous' | ((previousFocusedElement: Element) => HTMLElement | undefined)
+
+  /**
+   * A boolean value indicating whether or not the browser should scroll the
+   * document to bring the newly-focused element into view. A value of `false`
+   * for `preventScroll` (the default) means that the browser will scroll the
+   * element into view after focusing it. If `preventScroll` is set to `true`,
+   * no scrolling will occur.
+   */
+  preventScroll?: boolean
 }
 
 function getDirection(keyboardEvent: KeyboardEvent) {
@@ -345,6 +354,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
   let currentFocusedElement: HTMLElement | undefined
+  const preventScroll = settings?.preventScroll ?? false
 
   function getFirstFocusableElement() {
     return focusableElements[0] as HTMLElement | undefined
@@ -516,7 +526,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     container.addEventListener('focusin', event => {
       if (event.target instanceof HTMLElement && focusableElements.includes(event.target)) {
         // Move focus to the activeDescendantControl if one of the descendants is focused
-        activeDescendantControl.focus()
+        activeDescendantControl.focus({preventScroll})
         updateFocusedElement(event.target)
       }
     })
@@ -576,7 +586,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
                 // be undefined.
                 const targetElementIndex = lastKeyboardFocusDirection === 'previous' ? focusableElements.length - 1 : 0
                 const targetElement = focusableElements[targetElementIndex] as HTMLElement | undefined
-                targetElement?.focus()
+                targetElement?.focus({preventScroll})
                 return
               } else {
                 updateFocusedElement(event.target)
@@ -589,7 +599,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
                   // Since we are calling focus() this handler will run again synchronously. Therefore,
                   // we don't want to let this invocation finish since it will clobber the value of
                   // currentFocusedElement.
-                  elementToFocus.focus()
+                  elementToFocus.focus({preventScroll})
                   return
                 } else {
                   // eslint-disable-next-line no-console
@@ -696,7 +706,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             lastKeyboardFocusDirection = direction
 
             // updateFocusedElement will be called implicitly when focus moves, as long as the event isn't prevented somehow
-            nextElementToFocus.focus()
+            nextElementToFocus.focus({preventScroll})
           }
           // Tab should always allow escaping from this container, so only
           // preventDefault if tab key press already resulted in a focus movement

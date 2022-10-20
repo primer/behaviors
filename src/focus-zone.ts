@@ -596,7 +596,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
                 const elementToFocus = focusInStrategy(event.relatedTarget)
                 const requestedFocusElementIndex = elementToFocus ? focusableElements.indexOf(elementToFocus) : -1
                 if (requestedFocusElementIndex >= 0 && elementToFocus instanceof HTMLElement) {
-                  // Since we are calling focus({preventScroll}) this handler will run again synchronously. Therefore,
+                  // Since we are calling focus() this handler will run again synchronously. Therefore,
                   // we don't want to let this invocation finish since it will clobber the value of
                   // currentFocusedElement.
                   elementToFocus.focus({preventScroll})

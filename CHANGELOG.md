@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.1
+
+### Patch Changes
+
+- [#155](https://github.com/primer/behaviors/pull/155) [`b14b5ac`](https://github.com/primer/behaviors/commit/b14b5ac5dc2ef9957e4b585e27acf7d5566edd5a) Thanks [@colebemis](https://github.com/colebemis)! - focusZone: Add Backspace key to list of FocusKeys
+
 ## 1.3.0
 
 ### Minor Changes

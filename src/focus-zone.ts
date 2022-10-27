@@ -25,34 +25,38 @@ export type FocusMovementKeys =
   | 'End'
   | 'PageUp'
   | 'PageDown'
+  | 'Backspace'
 
 export enum FocusKeys {
   // Left and right arrow keys (previous and next, respectively)
-  ArrowHorizontal = 0b000000001,
+  ArrowHorizontal = 0b0000000001,
 
   // Up and down arrow keys (previous and next, respectively)
-  ArrowVertical = 0b000000010,
+  ArrowVertical = 0b0000000010,
 
   // The "J" and "K" keys (next and previous, respectively)
-  JK = 0b000000100,
+  JK = 0b0000000100,
 
   // The "H" and "L" keys (previous and next, respectively)
-  HL = 0b000001000,
+  HL = 0b0000001000,
 
   // The Home and End keys (previous and next, respectively, to end)
-  HomeAndEnd = 0b000010000,
+  HomeAndEnd = 0b0000010000,
 
   // The PgUp and PgDn keys (previous and next, respectively, to end)
-  PageUpDown = 0b100000000,
+  PageUpDown = 0b0100000000,
 
   // The "W" and "S" keys (previous and next, respectively)
-  WS = 0b000100000,
+  WS = 0b0000100000,
 
   // The "A" and "D" keys (previous and next, respectively)
-  AD = 0b001000000,
+  AD = 0b0001000000,
 
   // The Tab key (next)
-  Tab = 0b010000000,
+  Tab = 0b0010000000,
+
+  // The Backspace key on Windows (not to be confused with the Delete key on macOS)
+  Backspace = 0b1000000000,
 
   ArrowAll = FocusKeys.ArrowHorizontal | FocusKeys.ArrowVertical,
   HJKL = FocusKeys.HL | FocusKeys.JK,
@@ -82,7 +86,8 @@ const KEY_TO_BIT = {
   Home: FocusKeys.HomeAndEnd,
   End: FocusKeys.HomeAndEnd,
   PageUp: FocusKeys.PageUpDown,
-  PageDown: FocusKeys.PageUpDown
+  PageDown: FocusKeys.PageUpDown,
+  Backspace: FocusKeys.Backspace
 } as {[k in FocusMovementKeys]: FocusKeys}
 
 const KEY_TO_DIRECTION = {
@@ -102,7 +107,8 @@ const KEY_TO_DIRECTION = {
   Home: 'start',
   End: 'end',
   PageUp: 'start',
-  PageDown: 'end'
+  PageDown: 'end',
+  Backspace: 'previous'
 } as {[k in FocusMovementKeys]: Direction}
 
 /**

@@ -433,11 +433,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     if (filteredElements.length === 0) {
       return
     }
-    // Insert all elements atomically. Assume that all passed elements are well-ordered.
-    const insertIndex = focusableElements.findIndex(
-      e => (e.compareDocumentPosition(filteredElements[0]) & Node.DOCUMENT_POSITION_PRECEDING) > 0
-    )
-    focusableElements.splice(insertIndex === -1 ? focusableElements.length : insertIndex, 0, ...filteredElements)
+    // Insert all elements atomically.
+    focusableElements.splice(findInsertionIndex(filteredElements), 0, ...filteredElements)
     for (const element of filteredElements) {
       // Set tabindex="-1" on all tabbable elements, but save the original
       // value in case we need to disable the behavior
@@ -450,6 +447,37 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     if (!currentFocusedElement) {
       updateFocusedElement(getFirstFocusableElement())
     }
+  }
+
+  function findInsertionIndex(elementsToInsert: HTMLElement[]) {
+    // Assume that all passed elements are well-ordered.
+    const firstElementToInsert = elementsToInsert[0]
+
+    if (focusableElements.length === 0) return 0
+
+    // Because the focusable elements are in document order,
+    // we can do a binary search to find the insertion index.
+    let iMin = 0
+    let iMax = focusableElements.length - 1
+    while (iMin <= iMax) {
+      const i = Math.floor((iMin + iMax) / 2)
+      const element = focusableElements[i]
+
+      if (followsInDocument(firstElementToInsert, element)) {
+        iMax = i - 1
+      } else {
+        iMin = i + 1
+      }
+    }
+
+    return iMin
+  }
+
+  /**
+   * @returns true if the second argument follows the first argument in the document
+   */
+  function followsInDocument(first: HTMLElement, second: HTMLElement) {
+    return (second.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_PRECEDING) > 0
   }
 
   function endFocusManagement(...elements: HTMLElement[]) {

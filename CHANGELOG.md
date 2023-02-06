@@ -1,5 +1,14 @@
 # @primer/behaviors
 
+## 1.3.2
+
+### Patch Changes
+
+- [#176](https://github.com/primer/behaviors/pull/176) [`5e74867`](https://github.com/primer/behaviors/commit/5e7486702074bbb89e6a7a96a4b0db71d763c74c) Thanks [@jbrown1618](https://github.com/jbrown1618)! - Use a binary search to find the insertion index for new elements managed by the focus zone.
+  For a use case with 1000 elements managed by the focus zone, added one at a time (by react),
+  this takes us from 500,000 calls to `compareDocumentPosition` over 1000ms to 8,000 calls
+  over 16ms.
+
 ## 1.3.1
 
 ### Patch Changes

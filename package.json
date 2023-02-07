@@ -71,7 +71,7 @@
     "@github/prettier-config": "0.0.4",
     "@size-limit/preset-small-lib": "^7.0.3",
     "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^27.0.3",
     "@types/react": "^17.0.37",
     "esbuild": "^0.15.16",

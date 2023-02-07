@@ -510,7 +510,9 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   beginFocusManagement(...iterateFocusableElements(container))
 
   // Open the first tabbable element for tabbing
-  updateFocusedElement(getFirstFocusableElement())
+  const initialElement =
+    typeof focusInStrategy === 'function' ? focusInStrategy(document.body) : getFirstFocusableElement()
+  updateFocusedElement(initialElement)
 
   // If the DOM structure of the container changes, make sure we keep our state up-to-date
   // with respect to the focusable elements cache and its order

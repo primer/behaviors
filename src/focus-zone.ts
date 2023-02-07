@@ -445,7 +445,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     }
 
     if (!currentFocusedElement) {
-      const initialElement = typeof focusInStrategy === "function" ? focusInStrategy() : getFirstFocusableElement()
+      const initialElement = typeof focusInStrategy === "function" ? focusInStrategy(null) : getFirstFocusableElement()
       updateFocusedElement(initialElement)
     }
   }

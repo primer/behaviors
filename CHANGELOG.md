@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.3
+
+### Patch Changes
+
+- [#180](https://github.com/primer/behaviors/pull/180) [`eca845b`](https://github.com/primer/behaviors/commit/eca845b9dbcd49383766ee55dfdcfa4fafbda4a6) Thanks [@colebemis](https://github.com/colebemis)! - FocusZone: If custom `focusInStrategy` is defined, use it to initialize tabIndexes
+
 ## 1.3.2
 
 ### Patch Changes

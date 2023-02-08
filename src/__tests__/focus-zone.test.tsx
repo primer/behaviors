@@ -314,9 +314,12 @@ it('Should call the custom focusInStrategy callback', () => {
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
   const outsideButton = container.querySelector<HTMLElement>('#outside')!
-  const [, secondButton] = focusZoneContainer.querySelectorAll('button')
+  const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')
   const focusInCallback = jest.fn().mockReturnValue(secondButton)
   const controller = focusZone(focusZoneContainer, {focusInStrategy: focusInCallback})
+
+  expect(firstButton.getAttribute('tabindex')).toEqual('-1')
+  expect(secondButton.getAttribute('tabindex')).toEqual('0')
 
   outsideButton.focus()
   userEvent.tab()

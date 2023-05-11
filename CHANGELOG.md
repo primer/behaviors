@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.4
+
+### Patch Changes
+
+- [#195](https://github.com/primer/behaviors/pull/195) [`bddd6c5`](https://github.com/primer/behaviors/commit/bddd6c5be9af240d43a53cc062a0f07a65e695af) Thanks [@keithamus](https://github.com/keithamus)! - Special case anchored-position calls on top-layer elements
+
 ## 1.3.3
 
 ### Patch Changes

@@ -169,6 +169,7 @@ export function getAnchoredPosition(
  * position is not "static", or document.body, whichever is closer
  */
 function getPositionedParent(element: Element) {
+  if (isOnTopLayer(element)) return document.body
   let parentNode = element.parentNode
   while (parentNode !== null) {
     if (parentNode instanceof HTMLElement && getComputedStyle(parentNode).position !== 'static') {
@@ -177,6 +178,23 @@ function getPositionedParent(element: Element) {
     parentNode = parentNode.parentNode
   }
   return document.body
+}
+
+/**
+ * Returns true if the element is likely to be on the `top-layer`.
+ */
+function isOnTopLayer(element: Element) {
+  if (element.tagName === 'DIALOG') {
+    return true
+  }
+  try {
+    if (element.matches(':popover-open')) {
+      return true
+    }
+  } catch {
+    return false
+  }
+  return false
 }
 
 /**

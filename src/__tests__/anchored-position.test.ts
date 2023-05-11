@@ -68,6 +68,27 @@ describe('getAnchoredPosition', () => {
     expect(left).toEqual(300)
   })
 
+  it('returns the correct position in the case of top-layer elements', () => {
+    const anchorRect = makeDOMRect(300, 200, 50, 50)
+    const parentRect = makeDOMRect(800, 600, 50, 50)
+    const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+    document.body.innerHTML = '<div><dialog id="float"></dialog><div id="anchor"></div></div>'
+    const parent = document.querySelector('div')!
+    parent.style.overflow = 'hidden'
+    parent.style.position = 'relative'
+    const float = document.querySelector('#float')!
+    const anchor = document.querySelector('#anchor')!
+    parent.getBoundingClientRect = () => parentRect
+    float.getBoundingClientRect = () => floatingRect
+    anchor.getBoundingClientRect = () => anchorRect
+    document.body.getBoundingClientRect = () => makeDOMRect(0, 0, 1920, 0)
+    Object.defineProperty(window, 'innerHeight', {get: () => 1080})
+    const settings: Partial<PositionSettings> = {anchorOffset: 4}
+    const {top, left} = getAnchoredPosition(float, anchor, settings)
+    expect(top).toEqual(254)
+    expect(left).toEqual(300)
+  })
+
   it('returns the correct position in the default case with no overflow, inside a clipping parent', () => {
     const parentRect = makeDOMRect(20, 20, 500, 500)
     const anchorRect = makeDOMRect(300, 200, 50, 50)

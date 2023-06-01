@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.5
+
+### Patch Changes
+
+- [#197](https://github.com/primer/behaviors/pull/197) [`ac8ea59`](https://github.com/primer/behaviors/commit/ac8ea59670099b836ed69e3dcf5b1b62cbbd2db3) Thanks [@jonrohan](https://github.com/jonrohan)! - Check if popover supported in isTopLayer
+
 ## 1.3.4
 
 ### Patch Changes

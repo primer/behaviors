@@ -9,14 +9,14 @@ beforeAll(() => {
   try {
     Object.defineProperties(HTMLElement.prototype, {
       offsetHeight: {
-        get: () => 42
+        get: () => 42,
       },
       offsetWidth: {
-        get: () => 42
+        get: () => 42,
       },
       getClientRects: {
-        get: () => () => [42]
-      }
+        get: () => () => [42],
+      },
     })
   } catch {
     // ignore
@@ -32,7 +32,7 @@ it('Should initially focus the first element when activated', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -49,7 +49,7 @@ it('Should initially focus the initialFocus element when specified', () => {
       <button tabIndex={0}>Apple</button>
       <button tabIndex={0}>Banana</button>
       <button tabIndex={0}>Cantaloupe</button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -71,7 +71,7 @@ it('Should prevent focus from exiting the trap, returns focus to first element',
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -107,7 +107,7 @@ it('Should cycle focus from last element to first element and vice-versa', async
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -137,7 +137,7 @@ it('Should should release the trap when the signal is aborted', async () => {
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -167,7 +167,7 @@ it('Should should release the trap when the container is removed from the DOM', 
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -198,7 +198,7 @@ it('Should handle dynamic content', async () => {
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!

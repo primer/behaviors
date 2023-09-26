@@ -2,7 +2,7 @@ import {scrollIntoView} from '../scroll-into-view.js'
 
 function scrollPositionFormula(
   positionData: {viewingAreaEdgePosition: number; childEdgePosition: number; margin: number},
-  isChildAboveViewingArea: boolean
+  isChildAboveViewingArea: boolean,
 ) {
   const {viewingAreaEdgePosition, childEdgePosition, margin} = positionData
   const marginOffset = margin * (isChildAboveViewingArea ? -1 : 1)
@@ -23,7 +23,7 @@ function makeDOMRect(x: number, y: number, width: number, height: number): DOMRe
     bottom: y + height,
     toJSON() {
       return this
-    }
+    },
   }
 }
 
@@ -45,14 +45,14 @@ describe('scrollIntoView', () => {
     const scrollToMock = jest.fn()
     Object.defineProperty(window.Element.prototype, 'scrollTo', {
       writable: true,
-      value: scrollToMock
+      value: scrollToMock,
     })
     const childHeight = 50
     const viewAreaHeight = 100
     const childStart = viewAreaHeight + 10
     const expectedScrollPosition = scrollPositionFormula(
       {viewingAreaEdgePosition: viewAreaHeight, childEdgePosition: childStart + childHeight, margin: 0},
-      false
+      false,
     )
 
     const viewingAreaRect = makeDOMRect(0, 0, 100, viewAreaHeight)
@@ -66,7 +66,7 @@ describe('scrollIntoView', () => {
     scrollIntoView(child as HTMLDivElement, viewingArea)
     expect(scrollToMock).toHaveBeenCalledWith({
       behavior: 'smooth',
-      top: expectedScrollPosition
+      top: expectedScrollPosition,
     })
   })
 
@@ -75,7 +75,7 @@ describe('scrollIntoView', () => {
       const scrollToMock = jest.fn()
       Object.defineProperty(window.Element.prototype, 'scrollTo', {
         writable: true,
-        value: scrollToMock
+        value: scrollToMock,
       })
       const childHeight = 50
       const viewAreaHeight = 100
@@ -83,7 +83,7 @@ describe('scrollIntoView', () => {
       const scrollMargin = 10
       const expectedScrollPosition = scrollPositionFormula(
         {viewingAreaEdgePosition: viewAreaHeight, childEdgePosition: childStart + childHeight, margin: scrollMargin},
-        false
+        false,
       )
 
       const viewingAreaRect = makeDOMRect(0, 0, 100, viewAreaHeight)
@@ -98,11 +98,11 @@ describe('scrollIntoView', () => {
         direction: 'vertical',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
-        behavior: 'auto'
+        behavior: 'auto',
       })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
-        top: expectedScrollPosition
+        top: expectedScrollPosition,
       })
     })
 
@@ -110,14 +110,14 @@ describe('scrollIntoView', () => {
       const scrollToMock = jest.fn()
       Object.defineProperty(window.Element.prototype, 'scrollTo', {
         writable: true,
-        value: scrollToMock
+        value: scrollToMock,
       })
       const childHeight = 50
       const childStart = childHeight * -1 - 10
       const scrollMargin = 10
       const expectedScrollPosition = scrollPositionFormula(
         {viewingAreaEdgePosition: 0, childEdgePosition: childStart, margin: scrollMargin},
-        true
+        true,
       )
 
       const viewingAreaRect = makeDOMRect(0, 0, 100, 100)
@@ -132,11 +132,11 @@ describe('scrollIntoView', () => {
         direction: 'vertical',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
-        behavior: 'auto'
+        behavior: 'auto',
       })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
-        top: expectedScrollPosition
+        top: expectedScrollPosition,
       })
     })
   })
@@ -146,7 +146,7 @@ describe('scrollIntoView', () => {
       const scrollToMock = jest.fn()
       Object.defineProperty(window.Element.prototype, 'scrollTo', {
         writable: true,
-        value: scrollToMock
+        value: scrollToMock,
       })
       const childWidth = 50
       const viewAreaWidth = 100
@@ -154,7 +154,7 @@ describe('scrollIntoView', () => {
       const scrollMargin = 10
       const expectedScrollPosition = scrollPositionFormula(
         {viewingAreaEdgePosition: viewAreaWidth, childEdgePosition: childStart + childWidth, margin: scrollMargin},
-        false
+        false,
       )
 
       const viewingAreaRect = makeDOMRect(0, 0, 100, viewAreaWidth)
@@ -169,11 +169,11 @@ describe('scrollIntoView', () => {
         direction: 'horizontal',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
-        behavior: 'auto'
+        behavior: 'auto',
       })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
-        left: expectedScrollPosition
+        left: expectedScrollPosition,
       })
     })
 
@@ -181,14 +181,14 @@ describe('scrollIntoView', () => {
       const scrollToMock = jest.fn()
       Object.defineProperty(window.Element.prototype, 'scrollTo', {
         writable: true,
-        value: scrollToMock
+        value: scrollToMock,
       })
       const childWidth = 50
       const childStart = childWidth * -1 - 10
       const scrollMargin = 10
       const expectedScrollPosition = scrollPositionFormula(
         {viewingAreaEdgePosition: 0, childEdgePosition: childStart, margin: scrollMargin},
-        true
+        true,
       )
 
       const viewingAreaRect = makeDOMRect(0, 0, 100, 100)
@@ -203,11 +203,11 @@ describe('scrollIntoView', () => {
         direction: 'horizontal',
         startMargin: scrollMargin,
         endMargin: scrollMargin,
-        behavior: 'auto'
+        behavior: 'auto',
       })
       expect(scrollToMock).toHaveBeenCalledWith({
         behavior: 'auto',
-        left: expectedScrollPosition
+        left: expectedScrollPosition,
       })
     })
   })

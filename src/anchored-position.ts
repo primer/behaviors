@@ -96,7 +96,7 @@ const alternateOrders: Partial<Record<AnchorSide, [AnchorSide, AnchorSide, Ancho
   'outside-top': ['outside-bottom', 'outside-right', 'outside-left', 'outside-bottom'],
   'outside-bottom': ['outside-top', 'outside-right', 'outside-left', 'outside-bottom'],
   'outside-left': ['outside-right', 'outside-bottom', 'outside-top', 'outside-bottom'],
-  'outside-right': ['outside-left', 'outside-bottom', 'outside-top', 'outside-bottom']
+  'outside-right': ['outside-left', 'outside-bottom', 'outside-top', 'outside-bottom'],
 }
 
 // For each alignment, list the order of alternate alignments to try in
@@ -105,7 +105,7 @@ const alternateOrders: Partial<Record<AnchorSide, [AnchorSide, AnchorSide, Ancho
 const alternateAlignments: Partial<Record<AnchorAlignment, [AnchorAlignment, AnchorAlignment]>> = {
   start: ['end', 'center'],
   end: ['start', 'center'],
-  center: ['end', 'start']
+  center: ['end', 'start'],
 }
 
 interface Size {
@@ -140,7 +140,7 @@ interface BoxPosition extends Size, Position {}
 export function getAnchoredPosition(
   floatingElement: Element,
   anchorElement: Element | DOMRect,
-  settings: Partial<PositionSettings> = {}
+  settings: Partial<PositionSettings> = {},
 ): AnchorPosition {
   const parentElement = getPositionedParent(floatingElement)
   const clippingRect = getClippingRect(parentElement)
@@ -148,11 +148,11 @@ export function getAnchoredPosition(
   const parentElementStyle = getComputedStyle(parentElement)
   const parentElementRect = parentElement.getBoundingClientRect()
   const [borderTop, borderLeft] = [parentElementStyle.borderTopWidth, parentElementStyle.borderLeftWidth].map(
-    v => parseInt(v, 10) || 0
+    v => parseInt(v, 10) || 0,
   )
   const relativeRect = {
     top: parentElementRect.top + borderTop,
-    left: parentElementRect.left + borderLeft
+    left: parentElementRect.left + borderLeft,
   }
 
   return pureCalculateAnchoredPosition(
@@ -160,7 +160,7 @@ export function getAnchoredPosition(
     relativeRect,
     floatingElement.getBoundingClientRect(),
     anchorElement instanceof Element ? anchorElement.getBoundingClientRect() : anchorElement,
-    getDefaultSettings(settings)
+    getDefaultSettings(settings),
   )
 }
 
@@ -188,6 +188,7 @@ function isOnTopLayer(element: Element) {
     return true
   }
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (element.matches(':popover-open') && /native code/.test((document.body as any).showPopover?.toString())) {
       return true
     }
@@ -224,7 +225,7 @@ function getClippingRect(element: Element): BoxPosition {
     elemStyle.borderTopWidth,
     elemStyle.borderLeftWidth,
     elemStyle.borderRightWidth,
-    elemStyle.borderBottomWidth
+    elemStyle.borderBottomWidth,
   ].map(v => parseInt(v, 10) || 0)
 
   return {
@@ -235,8 +236,8 @@ function getClippingRect(element: Element): BoxPosition {
     // If the clipping node is document.body, it can expand to the full height of the window
     height: Math.max(
       elemRect.height - borderTop - borderBottom,
-      clippingNode === document.body ? window.innerHeight : -Infinity
-    )
+      clippingNode === document.body ? window.innerHeight : -Infinity,
+    ),
   }
 }
 
@@ -252,7 +253,7 @@ const positionDefaults: PositionSettings = {
   // and align is not center
   alignmentOffset: 4,
 
-  allowOutOfBounds: false
+  allowOutOfBounds: false,
 }
 
 /**
@@ -271,7 +272,7 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
     alignmentOffset:
       settings.alignmentOffset ??
       (align !== 'center' && side.startsWith('inside') ? positionDefaults.alignmentOffset : 0),
-    allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds
+    allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds,
   }
 }
 
@@ -291,14 +292,14 @@ function pureCalculateAnchoredPosition(
   relativePosition: Position,
   floatingRect: Size,
   anchorRect: BoxPosition,
-  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset}: PositionSettings
+  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset}: PositionSettings,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
   const relativeViewportRect: BoxPosition = {
     top: viewportRect.top - relativePosition.top,
     left: viewportRect.left - relativePosition.left,
     width: viewportRect.width,
-    height: viewportRect.height
+    height: viewportRect.height,
   }
 
   let pos = calculatePosition(floatingRect, anchorRect, side, align, anchorOffset, alignmentOffset)
@@ -396,7 +397,7 @@ function calculatePosition(
   side: AnchorSide,
   align: AnchorAlignment,
   anchorOffset: number,
-  alignmentOffset: number
+  alignmentOffset: number,
 ) {
   const anchorRight = anchorPosition.left + anchorPosition.width
   const anchorBottom = anchorPosition.top + anchorPosition.height
@@ -480,7 +481,7 @@ function shouldRecalculatePosition(
   side: AnchorSide,
   currentPos: Position,
   containerDimensions: BoxPosition,
-  elementDimensions: Size
+  elementDimensions: Size,
 ) {
   if (side === 'outside-top' || side === 'outside-bottom') {
     return (
@@ -506,7 +507,7 @@ function shouldRecalculateAlignment(
   align: AnchorAlignment,
   currentPos: Position,
   containerDimensions: BoxPosition,
-  elementDimensions: Size
+  elementDimensions: Size,
 ) {
   if (align === 'end') {
     return currentPos.left < containerDimensions.left

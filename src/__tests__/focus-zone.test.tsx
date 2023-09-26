@@ -16,14 +16,14 @@ beforeAll(() => {
   try {
     Object.defineProperties(HTMLElement.prototype, {
       offsetHeight: {
-        get: () => 42
+        get: () => 42,
       },
       offsetWidth: {
-        get: () => 42
+        get: () => 42,
       },
       getClientRects: {
-        get: () => () => [42]
-      }
+        get: () => () => [42],
+      },
     })
   } catch {
     // ignore
@@ -39,7 +39,7 @@ it('Should allow arrow keys to move focus', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -65,7 +65,7 @@ it('Should have one tab-stop inside the focus zone when enabled', () => {
         <button tabIndex={0}>Cantaloupe</button>
       </div>
       <button tabIndex={0}>Next Apple</button>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -96,7 +96,7 @@ it('Should prevent moving focus outside the zone', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -130,7 +130,7 @@ it('Should do focus wrapping correctly', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -164,7 +164,7 @@ it('Should call custom getNextFocusable callback', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -195,7 +195,7 @@ it('Should focus-in to the most recently-focused element', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -228,7 +228,7 @@ it('Should focus-in to the first element when focusInStrategy is "first"', () =>
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -270,7 +270,7 @@ it('Should focus-in to the closest element when focusInStrategy is "closest"', (
       <button tabIndex={0} id="outsideAfter">
         Good Apple
       </button>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -309,7 +309,7 @@ it('Should call the custom focusInStrategy callback', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -340,7 +340,7 @@ it('Should respect inputs by not moving focus if key would have some other effec
         <input type="text" defaultValue="Banana" tabIndex={0} />
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -372,7 +372,7 @@ it('Should focus-in to the first element if the last-focused element is removed'
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -411,7 +411,7 @@ it('Should call onActiveDescendantChanged properly', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -420,7 +420,7 @@ it('Should call onActiveDescendantChanged properly', () => {
   const activeDescendantChangedCallback = jest.fn()
   const controller = focusZone(focusZoneContainer, {
     activeDescendantControl: control,
-    onActiveDescendantChanged: activeDescendantChangedCallback
+    onActiveDescendantChanged: activeDescendantChangedCallback,
   })
   type ActiveDescendantChangedCallbackParameters = Parameters<
     Exclude<FocusZoneSettings['onActiveDescendantChanged'], undefined>
@@ -430,37 +430,37 @@ it('Should call onActiveDescendantChanged properly', () => {
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     undefined,
-    false
+    false,
   )
   userEvent.type(control, '{arrowdown}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     secondButton,
     firstButton,
-    true
+    true,
   )
   userEvent.type(control, '{arrowup}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     secondButton,
-    true
+    true,
   )
   fireEvent.mouseMove(secondButton)
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     secondButton,
     firstButton,
-    false
+    false,
   )
   userEvent.type(control, '{arrowup}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     secondButton,
-    true
+    true,
   )
   userEvent.type(control, '{arrowUp}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     firstButton,
-    true
+    true,
   )
   activeDescendantChangedCallback.mockReset()
   fireEvent.mouseMove(firstButton)
@@ -481,7 +481,7 @@ it('Should set aria-activedescendant correctly', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
@@ -514,7 +514,7 @@ it('Should handle elements being reordered', async () => {
         <button tabIndex={0}>Cantaloupe</button>
         <button tabIndex={0}>Durian</button>
       </div>
-    </div>
+    </div>,
   )
 
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!

@@ -21,7 +21,7 @@ function makeDOMRect(x: number, y: number, width: number, height: number): DOMRe
     bottom: y + height,
     toJSON() {
       return this
-    }
+    },
   }
 }
 
@@ -31,7 +31,7 @@ function createVirtualDOM(
   parentRect: DOMRect,
   anchorRect: DOMRect,
   floatingRect: DOMRect,
-  parentBorders: {top: number; right: number; bottom: number; left: number} = {top: 0, right: 0, bottom: 0, left: 0}
+  parentBorders: {top: number; right: number; bottom: number; left: number} = {top: 0, right: 0, bottom: 0, left: 0},
 ) {
   const parent = document.createElement('div')
   parent.style.overflow = 'hidden'
@@ -280,7 +280,7 @@ describe('getAnchoredPosition', () => {
       side: 'outside-right',
       align: 'center',
       alignmentOffset: 10,
-      anchorOffset: -10
+      anchorOffset: -10,
     }
 
     const {top, left} = getAnchoredPosition(float, anchor, settings)
@@ -301,7 +301,7 @@ describe('getAnchoredPosition', () => {
       side: 'inside-right',
       align: 'center',
       alignmentOffset: 10,
-      anchorOffset: -10
+      anchorOffset: -10,
     }
 
     const {top, left} = getAnchoredPosition(float, anchor, settings)

@@ -39,7 +39,7 @@ function followSignal(signal: AbortSignal): AbortController {
 export function focusTrap(
   container: HTMLElement,
   initialFocus?: HTMLElement,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): AbortController | undefined {
   // Set up an abort controller if a signal was not passed in
   const controller = new AbortController()
@@ -127,7 +127,7 @@ export function focusTrap(
       ensureTrapZoneHasFocus(event.target)
     },
     // use capture to ensure we get all events.  focus events do not bubble
-    {signal: wrappingController.signal, capture: true}
+    {signal: wrappingController.signal, capture: true},
   )
 
   // focus the first element
@@ -137,7 +137,7 @@ export function focusTrap(
     container,
     controller: wrappingController,
     initialFocus,
-    originalSignal: signal
+    originalSignal: signal,
   }
 
   // If we are activating a focus trap for a container that was previously

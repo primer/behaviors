@@ -8,7 +8,7 @@ export interface ScrollIntoViewOptions {
 export function scrollIntoView(
   child: HTMLElement,
   viewingArea: HTMLElement,
-  {direction = 'vertical', startMargin = 0, endMargin = 0, behavior = 'smooth'}: ScrollIntoViewOptions = {}
+  {direction = 'vertical', startMargin = 0, endMargin = 0, behavior = 'smooth'}: ScrollIntoViewOptions = {},
 ) {
   const startSide = direction === 'vertical' ? 'top' : 'left'
   const endSide = direction === 'vertical' ? 'bottom' : 'right'

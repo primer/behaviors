@@ -17,7 +17,7 @@ export function offset(element: HTMLElement): Offset {
   const rect = element.getBoundingClientRect()
   return {
     top: rect.top + window.pageYOffset,
-    left: rect.left + window.pageXOffset
+    left: rect.left + window.pageXOffset,
   }
 }
 
@@ -95,7 +95,7 @@ export function overflowParent(targetElement: HTMLElement): HTMLElement | null |
 // //=> {top: 100, left: 100, bottom: 800, right: 800, height: 1000, width 1000}.
 export function overflowOffset(
   element: HTMLElement,
-  targetContainer: Document | HTMLElement | null
+  targetContainer: Document | HTMLElement | null,
 ): Dimensions | undefined {
   let container = targetContainer
   const document = element.ownerDocument
@@ -123,11 +123,11 @@ export function overflowOffset(
     container === document.documentElement && document.defaultView
       ? {
           top: document.defaultView.pageYOffset,
-          left: document.defaultView.pageXOffset
+          left: document.defaultView.pageXOffset,
         }
       : {
           top: container.scrollTop,
-          left: container.scrollLeft
+          left: container.scrollLeft,
         }
 
   const top = elementOffset.top - scroll.top
@@ -170,7 +170,7 @@ export function overflowOffset(
 // This value is useful for assigning to `scrollTop` to scroll to the item.
 export function positionedOffset(
   targetElement: HTMLElement,
-  container: HTMLElement | Document | Window | null
+  container: HTMLElement | Document | Window | null,
 ): (Dimensions & {_container: HTMLElement}) | undefined {
   let element = targetElement
   const document = element.ownerDocument
@@ -236,7 +236,7 @@ function getDocumentHeight(documentBody: HTMLElement, documentElement: HTMLEleme
     documentElement.scrollHeight,
     documentBody.offsetHeight,
     documentElement.offsetHeight,
-    documentElement.clientHeight
+    documentElement.clientHeight,
   )
 }
 
@@ -246,6 +246,6 @@ function getDocumentWidth(documentBody: HTMLElement, documentElement: HTMLElemen
     documentElement.scrollWidth,
     documentBody.offsetWidth,
     documentElement.offsetWidth,
-    documentElement.clientWidth
+    documentElement.clientWidth,
   )
 }

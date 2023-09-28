@@ -28,13 +28,13 @@ export interface IterateFocusableElements {
  */
 export function* iterateFocusableElements(
   container: HTMLElement,
-  options: IterateFocusableElements = {}
+  options: IterateFocusableElements = {},
 ): Generator<HTMLElement, undefined, undefined> {
   const strict = options.strict ?? false
   const acceptFn = options.onlyTabbable ?? false ? isTabbable : isFocusable
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
     acceptNode: node =>
-      node instanceof HTMLElement && acceptFn(node, strict) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+      node instanceof HTMLElement && acceptFn(node, strict) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP,
   })
   let nextNode: Node | null = null
 

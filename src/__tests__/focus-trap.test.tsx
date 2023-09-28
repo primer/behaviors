@@ -61,6 +61,7 @@ it('Should initially focus the initialFocus element when specified', () => {
 })
 
 it('Should prevent focus from exiting the trap, returns focus to first element', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -82,13 +83,13 @@ it('Should prevent focus from exiting the trap, returns focus to first element',
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(durianButton)
 })
 
@@ -97,6 +98,7 @@ it('Should raise an error if there are no focusable children', async () => {
 })
 
 it('Should cycle focus from last element to first element and vice-versa', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -117,16 +119,17 @@ it('Should cycle focus from last element to first element and vice-versa', async
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({shift: true})
+  await user.tab({shift: true})
   expect(document.activeElement).toEqual(lastButton)
 
   controller.abort()
 })
 
 it('Should should release the trap when the signal is aborted', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -148,13 +151,13 @@ it('Should should release the trap when the signal is aborted', async () => {
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(durianButton)
 })
 
@@ -188,6 +191,7 @@ it('Should should release the trap when the container is removed from the DOM', 
 })
 
 it('Should handle dynamic content', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -208,10 +212,10 @@ it('Should handle dynamic content', async () => {
 
   secondButton.focus()
   trapContainer.removeChild(thirdButton)
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({shift: true})
+  await user.tab({shift: true})
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()

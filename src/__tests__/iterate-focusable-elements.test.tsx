@@ -17,7 +17,7 @@ it('Should iterate through focusable elements only', () => {
         </a>
         <a href="#yah">Focusable</a>
       </div>
-    </div>
+    </div>,
   )
 
   const focusable = Array.from(iterateFocusableElements(container as HTMLElement, {onlyTabbable: true}))
@@ -45,7 +45,7 @@ it('Should iterate through focusable elements in reverse', () => {
         </a>
         <a href="#yah">Focusable</a>
       </div>
-    </div>
+    </div>,
   )
 
   const focusable = Array.from(iterateFocusableElements(container as HTMLElement, {reverse: true, onlyTabbable: true}))

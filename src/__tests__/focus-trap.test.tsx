@@ -9,14 +9,14 @@ beforeAll(() => {
   try {
     Object.defineProperties(HTMLElement.prototype, {
       offsetHeight: {
-        get: () => 42
+        get: () => 42,
       },
       offsetWidth: {
-        get: () => 42
+        get: () => 42,
       },
       getClientRects: {
-        get: () => () => [42]
-      }
+        get: () => () => [42],
+      },
     })
   } catch {
     // ignore
@@ -32,7 +32,7 @@ it('Should initially focus the first element when activated', () => {
         <button tabIndex={0}>Banana</button>
         <button tabIndex={0}>Cantaloupe</button>
       </div>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -49,7 +49,7 @@ it('Should initially focus the initialFocus element when specified', () => {
       <button tabIndex={0}>Apple</button>
       <button tabIndex={0}>Banana</button>
       <button tabIndex={0}>Cantaloupe</button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -61,6 +61,7 @@ it('Should initially focus the initialFocus element when specified', () => {
 })
 
 it('Should prevent focus from exiting the trap, returns focus to first element', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -71,7 +72,7 @@ it('Should prevent focus from exiting the trap, returns focus to first element',
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -82,13 +83,13 @@ it('Should prevent focus from exiting the trap, returns focus to first element',
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(durianButton)
 })
 
@@ -97,6 +98,7 @@ it('Should raise an error if there are no focusable children', async () => {
 })
 
 it('Should cycle focus from last element to first element and vice-versa', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -107,7 +109,7 @@ it('Should cycle focus from last element to first element and vice-versa', async
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -117,16 +119,17 @@ it('Should cycle focus from last element to first element and vice-versa', async
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({shift: true})
+  await user.tab({shift: true})
   expect(document.activeElement).toEqual(lastButton)
 
   controller.abort()
 })
 
 it('Should should release the trap when the signal is aborted', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -137,7 +140,7 @@ it('Should should release the trap when the signal is aborted', async () => {
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -148,13 +151,13 @@ it('Should should release the trap when the signal is aborted', async () => {
   const controller = focusTrap(trapContainer)
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 
   lastButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(durianButton)
 })
 
@@ -167,7 +170,7 @@ it('Should should release the trap when the container is removed from the DOM', 
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -188,6 +191,7 @@ it('Should should release the trap when the container is removed from the DOM', 
 })
 
 it('Should handle dynamic content', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="trapContainer">
@@ -198,7 +202,7 @@ it('Should handle dynamic content', async () => {
       <button id="durian" tabIndex={0}>
         Durian
       </button>
-    </div>
+    </div>,
   )
 
   const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
@@ -208,10 +212,10 @@ it('Should handle dynamic content', async () => {
 
   secondButton.focus()
   trapContainer.removeChild(thirdButton)
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.tab({shift: true})
+  await user.tab({shift: true})
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()

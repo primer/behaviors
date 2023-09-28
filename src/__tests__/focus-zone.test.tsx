@@ -7,9 +7,6 @@ async function nextTick() {
   return new Promise(resolve => setTimeout(resolve, 0))
 }
 
-const moveDown = () => userEvent.type(document.activeElement!, '{arrowdown}')
-const moveUp = () => userEvent.type(document.activeElement!, '{arrowup}')
-
 // Since we use strict `isTabbable` checks within focus trap, we need to mock these
 // properties that Jest does not populate.
 beforeAll(() => {
@@ -30,7 +27,8 @@ beforeAll(() => {
   }
 })
 
-it('Should allow arrow keys to move focus', () => {
+it('Should allow arrow keys to move focus', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0}>Bad Apple</button>
@@ -49,13 +47,14 @@ it('Should allow arrow keys to move focus', () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()
 })
 
-it('Should have one tab-stop inside the focus zone when enabled', () => {
+it('Should have one tab-stop inside the focus zone when enabled', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0}>Bad Apple</button>
@@ -74,20 +73,21 @@ it('Should have one tab-stop inside the focus zone when enabled', () => {
   const controller = focusZone(focusZoneContainer)
 
   one.focus()
-  userEvent.tab()
-  userEvent.tab()
+  await user.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(five)
 
   controller.abort()
   one.focus()
-  userEvent.tab()
-  userEvent.tab()
+  await user.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(three)
 
   controller.abort()
 })
 
-it('Should prevent moving focus outside the zone', () => {
+it('Should prevent moving focus outside the zone', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0}>Bad Apple</button>
@@ -106,22 +106,23 @@ it('Should prevent moving focus outside the zone', () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
-  userEvent.type(secondButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(thirdButton)
 
-  userEvent.type(thirdButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(thirdButton)
 
   controller.abort()
 })
 
-it('Should do focus wrapping correctly', () => {
+it('Should do focus wrapping correctly', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0}>Bad Apple</button>
@@ -140,22 +141,23 @@ it('Should do focus wrapping correctly', () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(document.activeElement).toEqual(thirdButton)
 
-  userEvent.type(thirdButton, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(document.activeElement).toEqual(secondButton)
 
-  userEvent.type(secondButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(thirdButton)
 
-  userEvent.type(thirdButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 })
 
-it('Should call custom getNextFocusable callback', () => {
+it('Should call custom getNextFocusable callback', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0}>Bad Apple</button>
@@ -175,16 +177,17 @@ it('Should call custom getNextFocusable callback', () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(getNextFocusableCallback).toHaveBeenCalledWith('next', firstButton, expect.anything())
 
-  userEvent.type(secondButton, '{home}')
+  await user.keyboard('{home}')
   expect(getNextFocusableCallback).toHaveBeenCalledWith('start', secondButton, expect.anything())
 
   controller.abort()
 })
 
-it('Should focus-in to the most recently-focused element', () => {
+it('Should focus-in to the most recently-focused element', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -206,18 +209,19 @@ it('Should focus-in to the most recently-focused element', () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
   outsideButton.focus()
-  userEvent.tab()
+  await user.tab()
 
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()
 })
 
-it('Should focus-in to the first element when focusInStrategy is "first"', () => {
+it('Should focus-in to the first element when focusInStrategy is "first"', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -239,18 +243,19 @@ it('Should focus-in to the first element when focusInStrategy is "first"', () =>
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
   outsideButton.focus()
-  userEvent.tab()
+  await user.tab()
 
   expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 })
 
-it('Should focus-in to the closest element when focusInStrategy is "closest"', () => {
+it('Should focus-in to the closest element when focusInStrategy is "closest"', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outsideBefore">
@@ -282,23 +287,24 @@ it('Should focus-in to the closest element when focusInStrategy is "closest"', (
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
   outsideBefore.focus()
-  userEvent.tab()
+  await user.tab()
 
   expect(document.activeElement).toEqual(firstButton)
 
   outsideAfter.focus()
-  userEvent.tab({shift: true})
+  await user.tab({shift: true})
 
   expect(document.activeElement).toEqual(thirdButton)
 
   controller.abort()
 })
 
-it('Should call the custom focusInStrategy callback', () => {
+it('Should call the custom focusInStrategy callback', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -322,14 +328,15 @@ it('Should call the custom focusInStrategy callback', () => {
   expect(secondButton.getAttribute('tabindex')).toEqual('0')
 
   outsideButton.focus()
-  userEvent.tab()
+  await user.tab()
   expect(focusInCallback).toHaveBeenCalledWith<[HTMLElement]>(outsideButton)
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()
 })
 
-it('Should respect inputs by not moving focus if key would have some other effect', () => {
+it('Should respect inputs by not moving focus if key would have some other effect', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -349,19 +356,24 @@ it('Should respect inputs by not moving focus if key would have some other effec
   const controller = focusZone(focusZoneContainer, {bindKeys: FocusKeys.ArrowHorizontal | FocusKeys.HomeAndEnd})
 
   firstButton.focus()
-  userEvent.type(firstButton, '{arrowright}')
+
+  await user.keyboard('{arrowright}')
   expect(document.activeElement).toEqual(input)
-  userEvent.type(input, '{arrowleft}')
+
+  await user.keyboard('{arrowleft}')
   expect(document.activeElement).toEqual(input)
-  userEvent.type(input, '{arrowright}')
+
+  await user.keyboard('{arrowright}')
   expect(document.activeElement).toEqual(input)
-  userEvent.type(input, '{arrowright}')
+
+  await user.keyboard('{arrowright}')
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()
 })
 
 it('Should focus-in to the first element if the last-focused element is removed', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -381,7 +393,7 @@ it('Should focus-in to the first element if the last-focused element is removed'
   const controller = focusZone(focusZoneContainer)
 
   firstButton.focus()
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(secondButton)
 
   outsideButton.focus()
@@ -390,16 +402,17 @@ it('Should focus-in to the first element if the last-focused element is removed'
   // The mutation observer fires asynchronously
   await nextTick()
 
-  userEvent.tab()
+  await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  userEvent.type(firstButton, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(thirdButton)
 
   controller.abort()
 })
 
-it('Should call onActiveDescendantChanged properly', () => {
+it('Should call onActiveDescendantChanged properly', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -432,13 +445,13 @@ it('Should call onActiveDescendantChanged properly', () => {
     undefined,
     false,
   )
-  userEvent.type(control, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     secondButton,
     firstButton,
     true,
   )
-  userEvent.type(control, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     secondButton,
@@ -450,13 +463,13 @@ it('Should call onActiveDescendantChanged properly', () => {
     firstButton,
     false,
   )
-  userEvent.type(control, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     secondButton,
     true,
   )
-  userEvent.type(control, '{arrowUp}')
+  await user.keyboard('{arrowUp}')
   expect(activeDescendantChangedCallback).toHaveBeenLastCalledWith<ActiveDescendantChangedCallbackParameters>(
     firstButton,
     firstButton,
@@ -469,7 +482,8 @@ it('Should call onActiveDescendantChanged properly', () => {
   controller.abort()
 })
 
-it('Should set aria-activedescendant correctly', () => {
+it('Should set aria-activedescendant correctly', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <button tabIndex={0} id="outside">
@@ -492,12 +506,12 @@ it('Should set aria-activedescendant correctly', () => {
 
   control.focus()
   expect(control.getAttribute('aria-activedescendant')).toEqual(firstButton.id)
-  userEvent.type(control, '{arrowdown}')
+  await user.keyboard('{arrowdown}')
   expect(control.getAttribute('aria-activedescendant')).toEqual(secondButton.id)
-  userEvent.type(control, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(control.getAttribute('aria-activedescendant')).toEqual(firstButton.id)
   expect(document.activeElement).toEqual(control)
-  userEvent.type(control, '{arrowup}')
+  await user.keyboard('{arrowup}')
   expect(control.getAttribute('aria-activedescendant')).toEqual(firstButton.id)
   outsideButton.focus()
   expect(control.hasAttribute('aria-activedescendant')).toBeFalsy()
@@ -506,6 +520,7 @@ it('Should set aria-activedescendant correctly', () => {
 })
 
 it('Should handle elements being reordered', async () => {
+  const user = userEvent.setup()
   const {container} = render(
     <div>
       <div id="focusZone">
@@ -525,10 +540,13 @@ it('Should handle elements being reordered', async () => {
   firstButton.focus()
   expect(document.activeElement).toEqual(firstButton)
 
-  moveDown()
+  const moveDown = () => user.type(document.activeElement!, '{arrowdown}')
+  const moveUp = () => user.type(document.activeElement!, '{arrowup}')
+
+  await moveDown()
   expect(document.activeElement).toEqual(secondButton)
 
-  moveUp()
+  await moveUp()
   expect(document.activeElement).toEqual(firstButton)
 
   // move secondButton and thirdButton to the end of the zone, in reverse order
@@ -540,13 +558,13 @@ it('Should handle elements being reordered', async () => {
 
   expect(document.activeElement).toEqual(firstButton)
 
-  moveDown()
+  await moveDown()
   expect(document.activeElement).toEqual(fourthButton)
 
-  moveDown()
+  await moveDown()
   expect(document.activeElement).toEqual(thirdButton)
 
-  moveDown()
+  await moveDown()
   expect(document.activeElement).toEqual(secondButton)
 
   controller.abort()

@@ -207,7 +207,7 @@ function isOnTopLayer(element: Element) {
 function getClippingRect(element: Element): BoxPosition {
   let parentNode: typeof element.parentNode = element
   while (parentNode !== null) {
-    if (parentNode === document.body) {
+    if (!(parentNode instanceof Element)) {
       break
     }
     const parentNodeStyle = getComputedStyle(parentNode as Element)

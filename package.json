@@ -30,17 +30,17 @@
     "dist/cjs/focus-trap.js"
   ],
   "scripts": {
-    "lint": "eslint src/",
-    "test": "npm run jest && npm run lint",
-    "test:watch": "jest --watch",
-    "jest": "jest",
     "clean": "rm -rf dist",
-    "prebuild": "npm run clean",
     "build": "npm run build:esm && npm run build:cjs",
     "build:esm": "tsc",
     "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "lint": "eslint src/",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prebuild": "npm run clean",
+    "release": "npm run build && changeset publish",
     "size-limit": "npm run build && size-limit",
-    "release": "npm run build && changeset publish"
+    "type-check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -68,21 +68,23 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.2",
     "@changesets/cli": "^2.18.1",
-    "@github/prettier-config": "0.0.4",
+    "@github/prettier-config": "^0.0.6",
     "@size-limit/preset-small-lib": "^8.2.4",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^27.0.3",
-    "@types/react": "^17.0.37",
-    "esbuild": "^0.15.16",
+    "@types/node": "^18.18.0",
+    "@types/react": "^18.2.23",
+    "esbuild": "^0.19.4",
     "esbuild-jest": "^0.5.0",
-    "eslint": "^8.3.0",
-    "eslint-plugin-github": "^4.3.5",
+    "eslint": "^8.50.0",
+    "eslint-plugin-github": "^4.10.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "jest": "^27.4.3",
-    "prettier": "^2.5.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "prettier": "^3.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "size-limit": "^8.2.4",
-    "typescript": "^4.5.2"
+    "typescript": "^5.2.2"
   }
 }

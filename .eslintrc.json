@@ -5,7 +5,8 @@
   "extends": ["plugin:github/recommended", "plugin:github/browser", "plugin:github/typescript"],
   "rules": {
     "import/extensions": ["error", "always"],
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "import/no-named-as-default": "off"
   },
   "ignorePatterns": ["dist"]
 }

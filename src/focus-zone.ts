@@ -66,7 +66,7 @@ export enum FocusKeys {
     FocusKeys.HomeAndEnd |
     FocusKeys.PageUpDown |
     FocusKeys.WASD |
-    FocusKeys.Tab
+    FocusKeys.Tab,
 }
 
 const KEY_TO_BIT = {
@@ -87,7 +87,7 @@ const KEY_TO_BIT = {
   End: FocusKeys.HomeAndEnd,
   PageUp: FocusKeys.PageUpDown,
   PageDown: FocusKeys.PageUpDown,
-  Backspace: FocusKeys.Backspace
+  Backspace: FocusKeys.Backspace,
 } as {[k in FocusMovementKeys]: FocusKeys}
 
 const KEY_TO_DIRECTION = {
@@ -108,7 +108,7 @@ const KEY_TO_DIRECTION = {
   End: 'end',
   PageUp: 'start',
   PageDown: 'end',
-  Backspace: 'previous'
+  Backspace: 'previous',
 } as {[k in FocusMovementKeys]: Direction}
 
 /**
@@ -195,7 +195,7 @@ export interface FocusZoneSettings {
   onActiveDescendantChanged?: (
     newActiveDescendant: HTMLElement | undefined,
     previousActiveDescendant: HTMLElement | undefined,
-    directlyActivated: boolean
+    directlyActivated: boolean,
   ) => void
 
   /**
@@ -412,7 +412,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     container.setAttribute(hasActiveDescendantAttribute, to.id)
     to.setAttribute(
       isActiveDescendantAttribute,
-      directlyActivated ? activeDescendantActivatedDirectly : activeDescendantActivatedIndirectly
+      directlyActivated ? activeDescendantActivatedDirectly : activeDescendantActivatedIndirectly,
     )
     activeDescendantCallback?.(to, from, directlyActivated)
   }
@@ -534,7 +534,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
   observer.observe(container, {
     subtree: true,
-    childList: true
+    childList: true,
   })
 
   const controller = new AbortController()
@@ -555,7 +555,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         elementIndexFocusedByClick = focusableElements.indexOf(event.target)
       }
     },
-    {signal}
+    {signal},
   )
 
   if (activeDescendantControl) {
@@ -579,7 +579,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
           updateFocusedElement(focusableElement)
         }
       },
-      {signal, capture: true}
+      {signal, capture: true},
     )
 
     // Listeners specifically on the controlling element
@@ -649,7 +649,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         }
         lastKeyboardFocusDirection = undefined
       },
-      {signal}
+      {signal},
     )
   }
 
@@ -666,7 +666,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
           lastKeyboardFocusDirection = getDirection(event)
         }
       },
-      {signal, capture: true}
+      {signal, capture: true},
     )
   }
 
@@ -752,7 +752,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         }
       }
     },
-    {signal}
+    {signal},
   )
   return controller
 }

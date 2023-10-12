@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.3.6
+
+### Patch Changes
+
+- [#208](https://github.com/primer/behaviors/pull/208) [`2042afc`](https://github.com/primer/behaviors/commit/2042afcc44ecfa1eee1e3782e4415074b7b18cd2) Thanks [@EnixCoda](https://github.com/EnixCoda)! - Update `anchored-position.ts` to support handling elements outside of `document.body` in `getClippingRect`
+
 ## 1.3.5
 
 ### Patch Changes

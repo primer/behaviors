@@ -125,7 +125,7 @@ export interface AnchorPosition {
   anchorAlign: AnchorAlignment
 }
 
-interface BoxPosition extends Size, Position {}
+interface BoxPosition extends Size, Position { }
 
 /**
  * Given a floating element and an anchor element, return coordinates for the top-left
@@ -180,31 +180,32 @@ function getPositionedParent(element: Element) {
   return document.body
 }
 
+function isModalDialog(element: Element) {
+  return element.matches('dialog:modal')
+}
+
+function isFullscreen(element: Element) {
+  return element.matches(':fullscreen')
+}
+
+function isPopover(element: Element) {
+  try {
+    return (element.matches(':popover-open') && /native code/.test((document.body as any).showPopover?.toString()))
+  } catch {
+    return false
+  }
+}
+
 /**
  * Returns true if the element is likely to be on the `top-layer`.
  */
 function isOnTopLayer(element: Element) {
-  if (element.tagName === 'DIALOG') {
-    return true
-  }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (element.matches(':popover-open') && /native code/.test((document.body as any).showPopover?.toString())) {
-      return true
-    }
-  } catch {
-    return false
-  }
-  return false
+  return isModalDialog(element) || isFullscreen(element) || isPopover(element)
 }
 
-/**
- * Returns the rectangle (relative to the window) that will clip the given element
- * if it is rendered outside of its bounds.
- * @param element
- * @returns
- */
-function getClippingRect(element: Element): BoxPosition {
+function getClippingParent(element: Element): Element {
+  if (element === document.body) return element;
+
   let parentNode: typeof element.parentNode = element
   while (parentNode !== null) {
     if (!(parentNode instanceof Element)) {
@@ -216,8 +217,17 @@ function getClippingRect(element: Element): BoxPosition {
     }
     parentNode = parentNode.parentNode
   }
-  const clippingNode = parentNode === document.body || !(parentNode instanceof HTMLElement) ? document.body : parentNode
+  return parentNode === document.body || !(parentNode instanceof HTMLElement) ? document.body : parentNode
+}
 
+/**
+ * Returns the rectangle (relative to the window) that will clip the given element
+ * if it is rendered outside of its bounds.
+ * @param element
+ * @returns
+ */
+function getClippingRect(element: Element): BoxPosition {
+  const clippingNode = getClippingParent(element)
   const elemRect = clippingNode.getBoundingClientRect()
   const elemStyle = getComputedStyle(clippingNode)
 
@@ -292,7 +302,7 @@ function pureCalculateAnchoredPosition(
   relativePosition: Position,
   floatingRect: Size,
   anchorRect: BoxPosition,
-  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset}: PositionSettings,
+  { side, align, allowOutOfBounds, anchorOffset, alignmentOffset }: PositionSettings,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
   const relativeViewportRect: BoxPosition = {
@@ -375,7 +385,7 @@ function pureCalculateAnchoredPosition(
     }
   }
 
-  return {...pos, anchorSide, anchorAlign}
+  return { ...pos, anchorSide, anchorAlign }
 }
 
 /**
@@ -467,7 +477,7 @@ function calculatePosition(
     }
   }
 
-  return {top, left}
+  return { top, left }
 }
 
 /**

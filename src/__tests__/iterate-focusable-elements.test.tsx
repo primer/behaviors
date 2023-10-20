@@ -2,6 +2,46 @@ import React from 'react'
 import {iterateFocusableElements} from '../utils/iterate-focusable-elements.js'
 import {render} from '@testing-library/react'
 
+// Since we use strict checks for size and parent, we need to mock these
+// properties that Jest does not populate.
+beforeAll(() => {
+  try {
+    Object.defineProperties(HTMLElement.prototype, {
+      offsetHeight: {
+        get: () => 42,
+      },
+      offsetWidth: {
+        get: () => 42,
+      },
+      getClientRects: {
+        get: () => () => [42],
+      },
+      offsetParent: {
+        get() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          for (let element = this; element; element = element.parentNode) {
+            if (element.style?.display?.toLowerCase() === 'none') {
+              return null
+            }
+          }
+
+          if (this.style?.position?.toLowerCase() === 'fixed') {
+            return null
+          }
+
+          if (this.tagName.toLowerCase() in ['html', 'body']) {
+            return null
+          }
+
+          return this.parentNode
+        },
+      },
+    })
+  } catch {
+    // ignore
+  }
+})
+
 it('Should iterate through focusable elements only', () => {
   const {container} = render(
     <div>
@@ -56,4 +96,31 @@ it('Should iterate through focusable elements in reverse', () => {
   expect(focusable[2].tagName.toLowerCase()).toEqual('button')
   expect(focusable[3].tagName.toLowerCase()).toEqual('input')
   expect(focusable[4].tagName.toLowerCase()).toEqual('textarea')
+})
+
+it('Should ignore hidden elements if strict', async () => {
+  const {container} = render(
+    <div>
+      <button>Apple</button>
+      <button style={{visibility: 'hidden'}}>Banana</button>
+      <button style={{display: 'none'}}>Watermelon</button>
+      <div style={{visibility: 'hidden'}}>
+        <div>
+          <button>Cherry</button>
+        </div>
+      </div>
+      <div style={{display: 'none'}}>
+        <div>
+          <button>Peach</button>
+        </div>
+      </div>
+      <button tabIndex={-1}>Cantaloupe</button>
+    </div>,
+  )
+  const focusable = Array.from(iterateFocusableElements(container as HTMLElement, {strict: true}))
+  expect(focusable.length).toEqual(2)
+  expect(focusable[0].tagName.toLowerCase()).toEqual('button')
+  expect(focusable[0].textContent).toEqual('Apple')
+  expect(focusable[1].tagName.toLowerCase()).toEqual('button')
+  expect(focusable[1].textContent).toEqual('Cantaloupe')
 })

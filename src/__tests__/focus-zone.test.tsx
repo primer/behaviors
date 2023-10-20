@@ -21,6 +21,26 @@ beforeAll(() => {
       getClientRects: {
         get: () => () => [42],
       },
+      offsetParent: {
+        get() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          for (let element = this; element; element = element.parentNode) {
+            if (element.style?.display?.toLowerCase() === 'none') {
+              return null
+            }
+          }
+
+          if (this.style?.position?.toLowerCase() === 'fixed') {
+            return null
+          }
+
+          if (this.tagName.toLowerCase() in ['html', 'body']) {
+            return null
+          }
+
+          return this.parentNode
+        },
+      },
     })
   } catch {
     // ignore
@@ -566,6 +586,66 @@ it('Should handle elements being reordered', async () => {
 
   await moveDown()
   expect(document.activeElement).toEqual(secondButton)
+
+  controller.abort()
+})
+
+it('Should ignore hidden elements if strict', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div id="focusZone">
+      <button>Apple</button>
+      <button style={{visibility: 'hidden'}}>Banana</button>
+      <button style={{display: 'none'}}>Watermelon</button>
+      <div style={{visibility: 'hidden'}}>
+        <div>
+          <button>Cherry</button>
+        </div>
+      </div>
+      <div style={{display: 'none'}}>
+        <div>
+          <button>Peach</button>
+        </div>
+      </div>
+      <button tabIndex={-1}>Cantaloupe</button>
+    </div>,
+  )
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const allButtons = focusZoneContainer.querySelectorAll('button')
+  const firstButton = allButtons[0]
+  const lastButton = allButtons[allButtons.length - 1]
+  const controller = focusZone(focusZoneContainer, {strict: true})
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(lastButton)
+
+  controller.abort()
+})
+
+it('Shoud move to tabbable elements if onlyTabbable', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div id="focusZone">
+      <button>Apple</button>
+      <button tabIndex={-1}>Cherry</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const allButtons = focusZoneContainer.querySelectorAll('button')
+  const firstButton = allButtons[0]
+  const lastButton = allButtons[allButtons.length - 1]
+  const controller = focusZone(focusZoneContainer, {onlyTabbable: true})
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(lastButton)
 
   controller.abort()
 })

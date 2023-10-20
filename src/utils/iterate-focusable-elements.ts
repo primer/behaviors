@@ -98,10 +98,12 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
   // Each of the conditions checked below require a reflow, thus are gated by the `strict`
   // argument. If any are true, the element is not focusable, even if tabindex is set.
   if (strict) {
+    const style = getComputedStyle(elem)
     const sizeInert = elem.offsetWidth === 0 || elem.offsetHeight === 0
-    const visibilityInert = ['hidden', 'collapse'].includes(getComputedStyle(elem).visibility)
+    const visibilityInert = ['hidden', 'collapse'].includes(style.visibility)
+    const displayInert = style.display === 'none' || !elem.offsetParent
     const clientRectsInert = elem.getClientRects().length === 0
-    if (sizeInert || visibilityInert || clientRectsInert) {
+    if (sizeInert || visibilityInert || clientRectsInert || displayInert) {
       return false
     }
   }

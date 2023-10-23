@@ -17,6 +17,26 @@ beforeAll(() => {
       getClientRects: {
         get: () => () => [42],
       },
+      offsetParent: {
+        get() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          for (let element = this; element; element = element.parentNode) {
+            if (element.style?.display?.toLowerCase() === 'none') {
+              return null
+            }
+          }
+
+          if (this.style?.position?.toLowerCase() === 'fixed') {
+            return null
+          }
+
+          if (this.tagName.toLowerCase() in ['html', 'body']) {
+            return null
+          }
+
+          return this.parentNode
+        },
+      },
     })
   } catch {
     // ignore
@@ -40,7 +60,7 @@ it('Should initially focus the first element when activated', () => {
   const controller = focusTrap(trapContainer)
   expect(document.activeElement).toEqual(firstButton)
 
-  controller.abort()
+  controller?.abort()
 })
 
 it('Should initially focus the initialFocus element when specified', () => {
@@ -57,7 +77,7 @@ it('Should initially focus the initialFocus element when specified', () => {
   const controller = focusTrap(trapContainer, secondButton)
   expect(document.activeElement).toEqual(secondButton)
 
-  controller.abort()
+  controller?.abort()
 })
 
 it('Should prevent focus from exiting the trap, returns focus to first element', async () => {
@@ -86,7 +106,7 @@ it('Should prevent focus from exiting the trap, returns focus to first element',
   await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  controller.abort()
+  controller?.abort()
 
   lastButton.focus()
   await user.tab()
@@ -125,7 +145,7 @@ it('Should cycle focus from last element to first element and vice-versa', async
   await user.tab({shift: true})
   expect(document.activeElement).toEqual(lastButton)
 
-  controller.abort()
+  controller?.abort()
 })
 
 it('Should should release the trap when the signal is aborted', async () => {
@@ -154,7 +174,7 @@ it('Should should release the trap when the signal is aborted', async () => {
   await user.tab()
   expect(document.activeElement).toEqual(firstButton)
 
-  controller.abort()
+  controller?.abort()
 
   lastButton.focus()
   await user.tab()
@@ -218,5 +238,5 @@ it('Should handle dynamic content', async () => {
   await user.tab({shift: true})
   expect(document.activeElement).toEqual(secondButton)
 
-  controller.abort()
+  controller?.abort()
 })

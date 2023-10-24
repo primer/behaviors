@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.4.0
+
+### Minor Changes
+
+- [#235](https://github.com/primer/behaviors/pull/235) [`7a7faa9`](https://github.com/primer/behaviors/commit/7a7faa9c604ea23f10edd68ed66c35e790a5dc1a) Thanks [@JelloBagel](https://github.com/JelloBagel)! - Add IterateFocusableElements options to focusZone
+
 ## 1.3.6
 
 ### Patch Changes

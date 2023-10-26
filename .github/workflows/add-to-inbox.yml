@@ -16,14 +16,9 @@ jobs:
         with:
           app-id: ${{ vars.PRIMER_ISSUE_TRIAGE_APP_ID }}
           private-key: ${{ secrets.PRIMER_ISSUE_TRIAGE_APP_PRIVATE_KEY }}
-      - name: Add rails label to issue
+      - name: Add labels to issue
         run: |
-          gh issue edit $ISSUE_URL --add-label rails
-        env:
-          GH_TOKEN: ${{ steps.get-primer-access-token.outputs.token }}
-      - name: Add react label to issue
-        run: |
-          gh issue edit $ISSUE_URL --add-label react
+          gh issue edit $ISSUE_URL --add-label 'rails,react'
         env:
           GH_TOKEN: ${{ steps.get-primer-access-token.outputs.token }}
       - id: get-github-access-token

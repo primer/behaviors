@@ -113,6 +113,10 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
     return true
   }
 
+  if (elem.getAttribute('contenteditable') === 'true' || elem.getAttribute('contenteditable') === 'plaintext-only') {
+    return true
+  }
+
   // One last way `elem.tabIndex` can be wrong.
   if (elem instanceof HTMLAnchorElement && elem.getAttribute('href') == null) {
     return false

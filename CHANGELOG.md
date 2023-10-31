@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.5.0
+
+### Minor Changes
+
+- [#241](https://github.com/primer/behaviors/pull/241) [`cb98837`](https://github.com/primer/behaviors/commit/cb98837982b3b7a2c46a56639116dc80c6071a09) Thanks [@JelloBagel](https://github.com/JelloBagel)! - Add support for contenteditable to iterateFocusableElements
+
 ## 1.4.0
 
 ### Minor Changes

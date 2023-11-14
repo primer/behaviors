@@ -375,7 +375,6 @@ describe('getAnchoredPosition', () => {
     const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
     const settings: Partial<PositionSettings> = {side: 'outside-bottom', align: 'start'}
     const {top, left, anchorSide, anchorAlign} = getAnchoredPosition(float, anchor, settings)
-    // Not really sure what to expect here.
     expect(anchorSide).toEqual('outside-right')
     expect(anchorAlign).toEqual('start')
     expect(top).toEqual(0)

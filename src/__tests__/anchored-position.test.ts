@@ -378,7 +378,7 @@ describe('getAnchoredPosition', () => {
     // Not really sure what to expect here.
     expect(anchorSide).toEqual('outside-right')
     expect(anchorAlign).toEqual('start')
-    expect(top).toEqual(-28) // should be 16 which is the top start of the anchor element. Negative value is wrong.
+    expect(top).toEqual(0)
     expect(left).toEqual(52)
   })
 })

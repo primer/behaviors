@@ -367,7 +367,7 @@ describe('getAnchoredPosition', () => {
     expect(left).toEqual(380) // anchorRect.left + anchorRect.width - parentRect.left - floatingRect.width
   })
 
-  // This test runs for values derived from a real use case https://github.com/github/accessibility-audits/issues/4515 as run on a local storybook.
+  // This test runs for values derived from a real use case https://github.com/github/accessibility-audits/issues/4515 as seen on a local storybook.
   it('should overflow to bottom if the element is too tall to fit on the screen when zoomed', () => {
     const parentRect = makeDOMRect(0, 0, 400, 400)
     const anchorRect = makeDOMRect(16, 16, 32, 32) // left aligned button

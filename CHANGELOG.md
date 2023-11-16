@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.5.1
+
+### Patch Changes
+
+- [#245](https://github.com/primer/behaviors/pull/245) [`caf30c4`](https://github.com/primer/behaviors/commit/caf30c4c8d3f66deb1b5c6b0ea139412973a6b49) Thanks [@pksjce](https://github.com/pksjce)! - When zoomed in, an overlay floating element should anchor itself properly instead of getting the top part cut off in the process
+
 ## 1.5.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@primer/behaviors",
-  "version": "1.3.5",
+  "version": "1.5.1",
   "description": "Shared behaviors for JavaScript components",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -30,17 +30,17 @@
     "dist/cjs/focus-trap.js"
   ],
   "scripts": {
-    "lint": "eslint src/",
-    "test": "npm run jest && npm run lint",
-    "test:watch": "jest --watch",
-    "jest": "jest",
     "clean": "rm -rf dist",
-    "prebuild": "npm run clean",
     "build": "npm run build:esm && npm run build:cjs",
     "build:esm": "tsc",
     "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "lint": "eslint src/",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prebuild": "npm run clean",
+    "release": "npm run build && changeset publish",
     "size-limit": "npm run build && size-limit",
-    "release": "npm run build && changeset publish"
+    "type-check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",

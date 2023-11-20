@@ -366,4 +366,18 @@ describe('getAnchoredPosition', () => {
     expect(top).toEqual(54) // anchorRect.top + anchorRect.height + (settings.anchorOffset ?? 4) - parentRect.top
     expect(left).toEqual(380) // anchorRect.left + anchorRect.width - parentRect.left - floatingRect.width
   })
+
+  // This test runs for values derived from a real use case https://github.com/github/accessibility-audits/issues/4515 as seen on a local storybook.
+  it('should overflow to bottom if the element is too tall to fit on the screen when zoomed', () => {
+    const parentRect = makeDOMRect(0, 0, 400, 400)
+    const anchorRect = makeDOMRect(16, 16, 32, 32) // left aligned button
+    const floatingRect = makeDOMRect(0, 0, 256, 428)
+    const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
+    const settings: Partial<PositionSettings> = {side: 'outside-bottom', align: 'start'}
+    const {top, left, anchorSide, anchorAlign} = getAnchoredPosition(float, anchor, settings)
+    expect(anchorSide).toEqual('outside-right')
+    expect(anchorAlign).toEqual('start')
+    expect(top).toEqual(0)
+    expect(left).toEqual(52)
+  })
 })

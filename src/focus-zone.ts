@@ -1,6 +1,6 @@
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
 import {isMacOS} from './utils/user-agent.js'
-import {IterateFocusableElements, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
+import {IterateFocusableElements, isFocusable, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
 import {uniqueId} from './utils/unique-id.js'
 
 eventListenerSignalPolyfill()
@@ -686,6 +686,40 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     return focusedIndex !== -1 ? focusedIndex : fallbackIndex
   }
 
+  function handleKeydownInteraction(direction: Direction, key: string) {
+    const lastFocusedIndex = getCurrentFocusedIndex()
+    let nextFocusedIndex = lastFocusedIndex
+    if (direction === 'previous') {
+      nextFocusedIndex -= 1
+    } else if (direction === 'start') {
+      nextFocusedIndex = 0
+    } else if (direction === 'next') {
+      nextFocusedIndex += 1
+    } else {
+      // end
+      nextFocusedIndex = focusableElements.length - 1
+    }
+
+    if (nextFocusedIndex < 0) {
+      // Tab should never cause focus to wrap. Use focusTrap for that behavior.
+      if (focusOutBehavior === 'wrap' && key !== 'Tab') {
+        nextFocusedIndex = focusableElements.length - 1
+      } else {
+        nextFocusedIndex = 0
+      }
+    }
+    if (nextFocusedIndex >= focusableElements.length) {
+      if (focusOutBehavior === 'wrap' && key !== 'Tab') {
+        nextFocusedIndex = 0
+      } else {
+        nextFocusedIndex = focusableElements.length - 1
+      }
+    }
+    if (lastFocusedIndex !== nextFocusedIndex) {
+      return focusableElements[nextFocusedIndex]
+    }
+  }
+
   // "keydown" is the event that triggers DOM focus change, so that is what we use here
   keyboardEventRecipient.addEventListener(
     'keydown',
@@ -708,46 +742,23 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             nextElementToFocus = settings.getNextFocusable(direction, document.activeElement ?? undefined, event)
           }
           if (!nextElementToFocus) {
-            const lastFocusedIndex = getCurrentFocusedIndex()
-            let nextFocusedIndex = lastFocusedIndex
-            if (direction === 'previous') {
-              nextFocusedIndex -= 1
-            } else if (direction === 'start') {
-              nextFocusedIndex = 0
-            } else if (direction === 'next') {
-              nextFocusedIndex += 1
-            } else {
-              // end
-              nextFocusedIndex = focusableElements.length - 1
-            }
-
-            if (nextFocusedIndex < 0) {
-              // Tab should never cause focus to wrap. Use focusTrap for that behavior.
-              if (focusOutBehavior === 'wrap' && event.key !== 'Tab') {
-                nextFocusedIndex = focusableElements.length - 1
-              } else {
-                nextFocusedIndex = 0
-              }
-            }
-            if (nextFocusedIndex >= focusableElements.length) {
-              if (focusOutBehavior === 'wrap' && event.key !== 'Tab') {
-                nextFocusedIndex = 0
-              } else {
-                nextFocusedIndex = focusableElements.length - 1
-              }
-            }
-            if (lastFocusedIndex !== nextFocusedIndex) {
-              nextElementToFocus = focusableElements[nextFocusedIndex]
-            }
+            nextElementToFocus = handleKeydownInteraction(direction, event.key)
           }
 
           if (activeDescendantControl) {
             updateFocusedElement(nextElementToFocus || currentFocusedElement, true)
           } else if (nextElementToFocus) {
+            // If for some reason the next element to focus is not focusable (e.g. dynamically hidden), we don't want to attempt to focus it.
+            // Instead, we want to remove that specific element from focus management.
+            if (!isFocusable(nextElementToFocus)) {
+              endFocusManagement(nextElementToFocus)
+              nextElementToFocus = handleKeydownInteraction(direction, event.key)
+            }
+
             lastKeyboardFocusDirection = direction
 
             // updateFocusedElement will be called implicitly when focus moves, as long as the event isn't prevented somehow
-            nextElementToFocus.focus({preventScroll})
+            nextElementToFocus?.focus({preventScroll})
           }
           // Tab should always allow escaping from this container, so only
           // preventDefault if tab key press already resulted in a focus movement

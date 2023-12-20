@@ -1,6 +1,6 @@
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
 import {isMacOS} from './utils/user-agent.js'
-import {IterateFocusableElements, isFocusable, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
+import {IterateFocusableElements, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
 import {uniqueId} from './utils/unique-id.js'
 
 eventListenerSignalPolyfill()
@@ -527,11 +527,25 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
           endFocusManagement(...iterateFocusableElements(removedNode, iterateFocusableElementsOptions))
         }
       }
+      // If an element is hidden or disabled, remove it from the list of focusable elements
+      if (mutation.type === 'attributes' && mutation.oldValue === null) {
+        if (mutation.target instanceof HTMLElement) {
+          endFocusManagement(mutation.target)
+        }
+      }
     }
     for (const mutation of mutations) {
       for (const addedNode of mutation.addedNodes) {
         if (addedNode instanceof HTMLElement) {
           beginFocusManagement(...iterateFocusableElements(addedNode, iterateFocusableElementsOptions))
+        }
+      }
+
+      // Similarly, if an element is un-hidden or "enabled", add it to the list of focusable elements
+      // If `mutation.oldValue` is not null, then we may assume that the element was previously hidden or disabled
+      if (mutation.type === 'attributes' && mutation.oldValue !== null) {
+        if (mutation.target instanceof HTMLElement) {
+          beginFocusManagement(mutation.target)
         }
       }
     }
@@ -540,6 +554,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   observer.observe(container, {
     subtree: true,
     childList: true,
+    attributeFilter: ['hidden', 'disabled'],
+    attributeOldValue: true,
   })
 
   const controller = new AbortController()
@@ -686,40 +702,6 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     return focusedIndex !== -1 ? focusedIndex : fallbackIndex
   }
 
-  function handleKeydownInteraction(direction: Direction, key: string) {
-    const lastFocusedIndex = getCurrentFocusedIndex()
-    let nextFocusedIndex = lastFocusedIndex
-    if (direction === 'previous') {
-      nextFocusedIndex -= 1
-    } else if (direction === 'start') {
-      nextFocusedIndex = 0
-    } else if (direction === 'next') {
-      nextFocusedIndex += 1
-    } else {
-      // end
-      nextFocusedIndex = focusableElements.length - 1
-    }
-
-    if (nextFocusedIndex < 0) {
-      // Tab should never cause focus to wrap. Use focusTrap for that behavior.
-      if (focusOutBehavior === 'wrap' && key !== 'Tab') {
-        nextFocusedIndex = focusableElements.length - 1
-      } else {
-        nextFocusedIndex = 0
-      }
-    }
-    if (nextFocusedIndex >= focusableElements.length) {
-      if (focusOutBehavior === 'wrap' && key !== 'Tab') {
-        nextFocusedIndex = 0
-      } else {
-        nextFocusedIndex = focusableElements.length - 1
-      }
-    }
-    if (lastFocusedIndex !== nextFocusedIndex) {
-      return focusableElements[nextFocusedIndex]
-    }
-  }
-
   // "keydown" is the event that triggers DOM focus change, so that is what we use here
   keyboardEventRecipient.addEventListener(
     'keydown',
@@ -742,23 +724,46 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             nextElementToFocus = settings.getNextFocusable(direction, document.activeElement ?? undefined, event)
           }
           if (!nextElementToFocus) {
-            nextElementToFocus = handleKeydownInteraction(direction, event.key)
+            const lastFocusedIndex = getCurrentFocusedIndex()
+            let nextFocusedIndex = lastFocusedIndex
+            if (direction === 'previous') {
+              nextFocusedIndex -= 1
+            } else if (direction === 'start') {
+              nextFocusedIndex = 0
+            } else if (direction === 'next') {
+              nextFocusedIndex += 1
+            } else {
+              // end
+              nextFocusedIndex = focusableElements.length - 1
+            }
+
+            if (nextFocusedIndex < 0) {
+              // Tab should never cause focus to wrap. Use focusTrap for that behavior.
+              if (focusOutBehavior === 'wrap' && event.key !== 'Tab') {
+                nextFocusedIndex = focusableElements.length - 1
+              } else {
+                nextFocusedIndex = 0
+              }
+            }
+            if (nextFocusedIndex >= focusableElements.length) {
+              if (focusOutBehavior === 'wrap' && event.key !== 'Tab') {
+                nextFocusedIndex = 0
+              } else {
+                nextFocusedIndex = focusableElements.length - 1
+              }
+            }
+            if (lastFocusedIndex !== nextFocusedIndex) {
+              nextElementToFocus = focusableElements[nextFocusedIndex]
+            }
           }
 
           if (activeDescendantControl) {
             updateFocusedElement(nextElementToFocus || currentFocusedElement, true)
           } else if (nextElementToFocus) {
-            // If for some reason the next element to focus is not focusable (e.g. dynamically hidden), we don't want to attempt to focus it.
-            // Instead, we want to remove that specific element from focus management.
-            if (!isFocusable(nextElementToFocus)) {
-              endFocusManagement(nextElementToFocus)
-              nextElementToFocus = handleKeydownInteraction(direction, event.key)
-            }
-
             lastKeyboardFocusDirection = direction
 
             // updateFocusedElement will be called implicitly when focus moves, as long as the event isn't prevented somehow
-            nextElementToFocus?.focus({preventScroll})
+            nextElementToFocus.focus({preventScroll})
           }
           // Tab should always allow escaping from this container, so only
           // preventDefault if tab key press already resulted in a focus movement

@@ -541,7 +541,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         }
       }
 
-      // Similarly, if an element is un-hidden or "enabled", add it to the list of focusable elements
+      // Similarly, if an element is unhidden or "enabled", add it to the list of focusable elements
       // If `mutation.oldValue` is not null, then we may assume that the element was previously hidden or disabled
       if (mutation.type === 'attributes' && mutation.oldValue !== null) {
         if (mutation.target instanceof HTMLElement) {

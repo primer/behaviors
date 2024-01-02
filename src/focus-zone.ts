@@ -1,6 +1,6 @@
 import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listener-signal.js'
 import {isMacOS} from './utils/user-agent.js'
-import {iterateFocusableElements} from './utils/iterate-focusable-elements.js'
+import {IterateFocusableElements, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
 import {uniqueId} from './utils/unique-id.js'
 
 eventListenerSignalPolyfill()
@@ -114,7 +114,7 @@ const KEY_TO_DIRECTION = {
 /**
  * Options that control the behavior of the arrow focus behavior.
  */
-export interface FocusZoneSettings {
+export type FocusZoneSettings = IterateFocusableElements & {
   /**
    * Choose the behavior applied in cases where focus is currently at either the first or
    * last element of the container.
@@ -504,8 +504,13 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     }
   }
 
+  const iterateFocusableElementsOptions: IterateFocusableElements = {
+    reverse: settings?.reverse,
+    strict: settings?.strict,
+    onlyTabbable: settings?.onlyTabbable,
+  }
   // Take all tabbable elements within container under management
-  beginFocusManagement(...iterateFocusableElements(container))
+  beginFocusManagement(...iterateFocusableElements(container, iterateFocusableElementsOptions))
 
   // Open the first tabbable element for tabbing
   const initialElement =
@@ -519,14 +524,14 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     for (const mutation of mutations) {
       for (const removedNode of mutation.removedNodes) {
         if (removedNode instanceof HTMLElement) {
-          endFocusManagement(...iterateFocusableElements(removedNode))
+          endFocusManagement(...iterateFocusableElements(removedNode, iterateFocusableElementsOptions))
         }
       }
     }
     for (const mutation of mutations) {
       for (const addedNode of mutation.addedNodes) {
         if (addedNode instanceof HTMLElement) {
-          beginFocusManagement(...iterateFocusableElements(addedNode))
+          beginFocusManagement(...iterateFocusableElements(addedNode, iterateFocusableElementsOptions))
         }
       }
     }

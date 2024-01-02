@@ -1,5 +1,29 @@
 # @primer/behaviors
 
+## 1.5.1
+
+### Patch Changes
+
+- [#245](https://github.com/primer/behaviors/pull/245) [`caf30c4`](https://github.com/primer/behaviors/commit/caf30c4c8d3f66deb1b5c6b0ea139412973a6b49) Thanks [@pksjce](https://github.com/pksjce)! - When zoomed in, an overlay floating element should anchor itself properly instead of getting the top part cut off in the process
+
+## 1.5.0
+
+### Minor Changes
+
+- [#241](https://github.com/primer/behaviors/pull/241) [`cb98837`](https://github.com/primer/behaviors/commit/cb98837982b3b7a2c46a56639116dc80c6071a09) Thanks [@JelloBagel](https://github.com/JelloBagel)! - Add support for contenteditable to iterateFocusableElements
+
+## 1.4.0
+
+### Minor Changes
+
+- [#235](https://github.com/primer/behaviors/pull/235) [`7a7faa9`](https://github.com/primer/behaviors/commit/7a7faa9c604ea23f10edd68ed66c35e790a5dc1a) Thanks [@JelloBagel](https://github.com/JelloBagel)! - Add IterateFocusableElements options to focusZone
+
+## 1.3.6
+
+### Patch Changes
+
+- [#208](https://github.com/primer/behaviors/pull/208) [`2042afc`](https://github.com/primer/behaviors/commit/2042afcc44ecfa1eee1e3782e4415074b7b18cd2) Thanks [@EnixCoda](https://github.com/EnixCoda)! - Update `anchored-position.ts` to support handling elements outside of `document.body` in `getClippingRect`
+
 ## 1.3.5
 
 ### Patch Changes

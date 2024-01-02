@@ -207,7 +207,7 @@ function isOnTopLayer(element: Element) {
 function getClippingRect(element: Element): BoxPosition {
   let parentNode: typeof element.parentNode = element
   while (parentNode !== null) {
-    if (parentNode === document.body) {
+    if (!(parentNode instanceof Element)) {
       break
     }
     const parentNodeStyle = getComputedStyle(parentNode as Element)
@@ -370,7 +370,8 @@ function pureCalculateAnchoredPosition(
     // likely to be able to scroll.
     if (alternateOrder && positionAttempt < alternateOrder.length) {
       if (pos.top + floatingRect.height > viewportRect.height + relativeViewportRect.top) {
-        pos.top = viewportRect.height + relativeViewportRect.top - floatingRect.height
+        // This prevents top from being a negative value
+        pos.top = Math.max(viewportRect.height + relativeViewportRect.top - floatingRect.height, 0)
       }
     }
   }

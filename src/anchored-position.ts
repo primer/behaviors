@@ -185,7 +185,7 @@ function getPositionedParent(element: Element) {
  */
 function isOnTopLayer(element: Element) {
   if (element.tagName === 'DIALOG') {
-    return true
+    return element.matches(':modal')
   }
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -193,9 +193,9 @@ function isOnTopLayer(element: Element) {
       return true
     }
   } catch {
-    return false
+    // ignore
   }
-  return false
+  return element.matches(':fullscreen')
 }
 
 /**

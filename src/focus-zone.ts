@@ -527,11 +527,25 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
           endFocusManagement(...iterateFocusableElements(removedNode, iterateFocusableElementsOptions))
         }
       }
+      // If an element is hidden or disabled, remove it from the list of focusable elements
+      if (mutation.type === 'attributes' && mutation.oldValue === null) {
+        if (mutation.target instanceof HTMLElement) {
+          endFocusManagement(mutation.target)
+        }
+      }
     }
     for (const mutation of mutations) {
       for (const addedNode of mutation.addedNodes) {
         if (addedNode instanceof HTMLElement) {
           beginFocusManagement(...iterateFocusableElements(addedNode, iterateFocusableElementsOptions))
+        }
+      }
+
+      // Similarly, if an element is unhidden or "enabled", add it to the list of focusable elements
+      // If `mutation.oldValue` is not null, then we may assume that the element was previously hidden or disabled
+      if (mutation.type === 'attributes' && mutation.oldValue !== null) {
+        if (mutation.target instanceof HTMLElement) {
+          beginFocusManagement(mutation.target)
         }
       }
     }
@@ -540,6 +554,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   observer.observe(container, {
     subtree: true,
     childList: true,
+    attributeFilter: ['hidden', 'disabled'],
+    attributeOldValue: true,
   })
 
   const controller = new AbortController()

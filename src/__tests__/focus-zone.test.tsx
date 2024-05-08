@@ -649,3 +649,105 @@ it('Shoud move to tabbable elements if onlyTabbable', async () => {
 
   controller.abort()
 })
+
+it('Should ignore hidden elements after focus zone is enabled', async () => {
+  const user = userEvent.setup()
+  const {container, rerender} = render(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, , thirdButton] = focusZoneContainer.querySelectorAll('button')
+  const controller = focusZone(focusZoneContainer)
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  rerender(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0} hidden>
+        Banana
+      </button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(thirdButton)
+
+  controller.abort()
+})
+
+it('Should respect unhidden elements after focus zone is enabled', async () => {
+  const user = userEvent.setup()
+  const {container, rerender} = render(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0} hidden>
+        Banana
+      </button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton, thirdButton] = focusZoneContainer.querySelectorAll('button')
+  const controller = focusZone(focusZoneContainer)
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(thirdButton)
+
+  rerender(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  await user.keyboard('{arrowup}')
+  expect(document.activeElement).toEqual(secondButton)
+
+  controller.abort()
+})
+
+it('Should ignore disabled elements after focus zone is enabled', async () => {
+  const user = userEvent.setup()
+  const {container, rerender} = render(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, , thirdButton] = focusZoneContainer.querySelectorAll('button')
+  const controller = focusZone(focusZoneContainer)
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  rerender(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0} disabled>
+        Banana
+      </button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(thirdButton)
+
+  controller.abort()
+})

@@ -12,6 +12,11 @@ updates:
     labels:
       - 'dependencies'
       - 'skip changeset'
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
 
   - package-ecosystem: 'npm'
     directory: '/docs'
@@ -30,3 +35,7 @@ updates:
     labels:
       - 'dependencies'
       - 'skip changeset'
+    groups:
+      all:
+        patterns:
+        - "*"

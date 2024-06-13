@@ -1,5 +1,5 @@
 import {FocusKeys, FocusZoneSettings, focusZone} from '../focus-zone.js'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
@@ -745,6 +745,45 @@ it('Should ignore disabled elements after focus zone is enabled', async () => {
       <button tabIndex={0}>Cantaloupe</button>
     </div>,
   )
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(thirdButton)
+
+  controller.abort()
+})
+
+it('Should handle elements being removed if strict', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <button tabIndex={0} id="outside">
+        Outside Apple
+      </button>
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton, thirdButton] = focusZoneContainer.querySelectorAll('button')
+  const outsideButton = container.querySelector<HTMLElement>('#outside')!
+  const controller = focusZone(focusZoneContainer, {strict: true})
+
+  firstButton.focus()
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(secondButton)
+
+  outsideButton.focus()
+  focusZoneContainer.removeChild(secondButton)
+
+  // The mutation observer fires asynchronously
+  await nextTick()
+
+  await user.tab()
+  expect(document.activeElement).toEqual(firstButton)
 
   await user.keyboard('{arrowdown}')
   expect(document.activeElement).toEqual(thirdButton)

@@ -1,5 +1,5 @@
 import {FocusKeys, FocusZoneSettings, focusZone} from '../focus-zone.js'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 

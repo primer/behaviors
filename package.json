@@ -65,7 +65,7 @@
   "size-limit": [
     {
       "limit": "10kb",
-      "path": "dist/esm/index.mjs"
+      "path": "dist/esm/index.js"
     }
   ],
   "devDependencies": {

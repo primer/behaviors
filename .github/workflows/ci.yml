@@ -47,3 +47,5 @@ jobs:
         run: npm ci
       - name: Check TypeScript types
         run: npm run type-check
+      - name: Check published TypeScript types
+        run: npx @arethetypeswrong/cli --pack .

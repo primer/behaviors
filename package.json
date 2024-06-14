@@ -10,7 +10,7 @@
         "import": "./dist/esm/index.d.ts",
         "require": "./dist/cjs/index.d.ts"
       },
-      "import": "./dist/esm/index.js",
+      "import": "./dist/esm/index.mjs",
       "require": "./dist/cjs/index.js"
     },
     "./utils": {
@@ -18,7 +18,7 @@
         "import": "./dist/esm/utils/index.d.ts",
         "require": "./dist/esm/utils/index.d.ts"
       },
-      "import": "./dist/esm/utils/index.js",
+      "import": "./dist/esm/utils/index.mjs",
       "require": "./dist/cjs/utils/index.js"
     }
   },

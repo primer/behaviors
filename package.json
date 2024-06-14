@@ -2,23 +2,24 @@
   "name": "@primer/behaviors",
   "version": "1.5.1",
   "description": "Shared behaviors for JavaScript components",
+  "type": "commonjs",
   "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.mjs",
+  "module": "dist/esm/index.js",
   "exports": {
     ".": {
       "types": {
         "import": "./dist/esm/index.d.ts",
         "require": "./dist/cjs/index.d.ts"
       },
-      "import": "./dist/esm/index.mjs",
+      "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
     "./utils": {
       "types": {
         "import": "./dist/esm/utils/index.d.ts",
-        "require": "./dist/esm/utils/index.d.ts"
+        "require": "./dist/cjs/utils/index.d.ts"
       },
-      "import": "./dist/esm/utils/index.mjs",
+      "import": "./dist/esm/utils/index.js",
       "require": "./dist/cjs/utils/index.js"
     }
   },

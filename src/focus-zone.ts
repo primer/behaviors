@@ -524,7 +524,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     for (const mutation of mutations) {
       for (const removedNode of mutation.removedNodes) {
         if (removedNode instanceof HTMLElement) {
-          endFocusManagement(...iterateFocusableElements(removedNode, iterateFocusableElementsOptions))
+          endFocusManagement(...iterateFocusableElements(removedNode))
         }
       }
       // If an element is hidden or disabled, remove it from the list of focusable elements

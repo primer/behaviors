@@ -2,20 +2,25 @@
   "name": "@primer/behaviors",
   "version": "1.6.0",
   "description": "Shared behaviors for JavaScript components",
+  "type": "commonjs",
   "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "module": "dist/esm/index.mjs",
   "exports": {
     ".": {
-      "module": "./dist/esm/index.js",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/esm/index.d.ts"
+      "types": {
+        "import": "./dist/esm/index.d.ts",
+        "require": "./dist/cjs/index.d.ts"
+      },
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.js"
     },
     "./utils": {
-      "module": "./dist/esm/utils/index.js",
-      "import": "./dist/esm/utils/index.js",
-      "require": "./dist/cjs/utils/index.js",
-      "types": "./dist/esm/utils/index.d.ts"
+      "types": {
+        "import": "./dist/esm/utils/index.d.ts",
+        "require": "./dist/cjs/utils/index.d.ts"
+      },
+      "import": "./dist/esm/utils/index.mjs",
+      "require": "./dist/cjs/utils/index.js"
     }
   },
   "types": "dist/esm/index.d.ts",
@@ -24,16 +29,14 @@
     "utils"
   ],
   "sideEffects": [
-    "dist/esm/focus-zone.js",
-    "dist/esm/focus-trap.js",
+    "dist/esm/focus-zone.mjs",
+    "dist/esm/focus-trap.mjs",
     "dist/cjs/focus-zone.js",
     "dist/cjs/focus-trap.js"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "clean": "rimraf dist",
+    "build": "rollup -c",
     "lint": "eslint src/",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -62,13 +65,15 @@
   "size-limit": [
     {
       "limit": "10kb",
-      "path": "dist/esm/index.js"
+      "path": "dist/esm/index.mjs"
     }
   ],
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.15.3",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.18.1",
     "@github/prettier-config": "^0.0.6",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@size-limit/preset-small-lib": "^11.1.4",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.1",
@@ -85,7 +90,12 @@
     "prettier": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.7",
+    "rollup": "^4.18.0",
     "size-limit": "^11.1.4",
     "typescript": "^5.2.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.18.0"
   }
 }

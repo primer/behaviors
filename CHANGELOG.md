@@ -1,5 +1,15 @@
 # @primer/behaviors
 
+## 1.6.0
+
+### Minor Changes
+
+- [#263](https://github.com/primer/behaviors/pull/263) [`5d7e0b1`](https://github.com/primer/behaviors/commit/5d7e0b1d5411d20ed9710bcec22ce3716132b47f) Thanks [@TylerJDev](https://github.com/TylerJDev)! - Adjusts mutation observer to now track `hidden` and `disabled` attributes being applied or removed.
+
+### Patch Changes
+
+- [#399](https://github.com/primer/behaviors/pull/399) [`3a3cd61`](https://github.com/primer/behaviors/commit/3a3cd6132ad9ebbfa78177f1a2971d4e0c03d5ca) Thanks [@JelloBagel](https://github.com/JelloBagel)! - Fix bug found when removing nodes in a focus zone with strict mode enabled
+
 ## 1.5.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@primer/behaviors",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Shared behaviors for JavaScript components",
   "type": "commonjs",
   "main": "dist/cjs/index.js",
@@ -74,8 +74,8 @@
     "@changesets/cli": "^2.18.1",
     "@github/prettier-config": "^0.0.6",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@size-limit/preset-small-lib": "^8.2.4",
-    "@testing-library/react": "^15.0.2",
+    "@size-limit/preset-small-lib": "^11.1.4",
+    "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.5",
@@ -92,7 +92,7 @@
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.7",
     "rollup": "^4.18.0",
-    "size-limit": "^8.2.4",
+    "size-limit": "^11.1.4",
     "typescript": "^5.2.2"
   }
 }

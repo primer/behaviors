@@ -37,6 +37,7 @@ export default [
       format: 'esm',
       preserveModules: true,
       preserveModulesRoot: 'src',
+      entryFileNames: '[name].mjs',
     },
   },
 

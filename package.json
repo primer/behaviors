@@ -4,14 +4,14 @@
   "description": "Shared behaviors for JavaScript components",
   "type": "commonjs",
   "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "module": "dist/esm/index.mjs",
   "exports": {
     ".": {
       "types": {
         "import": "./dist/esm/index.d.ts",
         "require": "./dist/cjs/index.d.ts"
       },
-      "import": "./dist/esm/index.js",
+      "import": "./dist/esm/index.mjs",
       "require": "./dist/cjs/index.js"
     },
     "./utils": {
@@ -19,7 +19,7 @@
         "import": "./dist/esm/utils/index.d.ts",
         "require": "./dist/cjs/utils/index.d.ts"
       },
-      "import": "./dist/esm/utils/index.js",
+      "import": "./dist/esm/utils/index.mjs",
       "require": "./dist/cjs/utils/index.js"
     }
   },
@@ -29,8 +29,8 @@
     "utils"
   ],
   "sideEffects": [
-    "dist/esm/focus-zone.js",
-    "dist/esm/focus-trap.js",
+    "dist/esm/focus-zone.mjs",
+    "dist/esm/focus-trap.mjs",
     "dist/cjs/focus-zone.js",
     "dist/cjs/focus-trap.js"
   ],

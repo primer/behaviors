@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.7.0
+
+### Minor Changes
+
+- [#400](https://github.com/primer/behaviors/pull/400) [`67215a5`](https://github.com/primer/behaviors/commit/67215a51ce82a967ced2264ba19a28e0d0d43592) Thanks [@joshblack](https://github.com/joshblack)! - Update the output of the package to correctly map "import" conditions to ESM
+
 ## 1.6.0
 
 ### Minor Changes

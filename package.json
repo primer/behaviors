@@ -1,6 +1,6 @@
 {
   "name": "@primer/behaviors",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Shared behaviors for JavaScript components",
   "type": "commonjs",
   "main": "dist/cjs/index.js",

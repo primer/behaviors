@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.7.1
+
+### Patch Changes
+
+- [#421](https://github.com/primer/behaviors/pull/421) [`fd1419a`](https://github.com/primer/behaviors/commit/fd1419aa9fe1b3821903fbb145d76ce5e35e1c9a) Thanks [@joshblack](https://github.com/joshblack)! - Remove optionalDependencies from npm package
+
 ## 1.7.0
 
 ### Minor Changes

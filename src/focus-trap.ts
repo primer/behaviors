@@ -30,6 +30,25 @@ function followSignal(signal: AbortSignal): AbortController {
   return controller
 }
 
+function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
+  const observer = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.addedNodes.length) {
+        // If the first and last children of container aren't sentinels, move them to the start and end
+        const firstChild = container.firstElementChild
+        const lastChild = container.lastElementChild
+
+        if (!firstChild?.classList.contains('sentinel')) container.insertAdjacentElement('afterbegin', sentinels[0])
+        if (!lastChild?.classList.contains('sentinel')) container.insertAdjacentElement('beforeend', sentinels[1])
+      }
+    }
+  })
+
+  observer.observe(container, {childList: true})
+
+  return observer
+}
+
 /**
  * Traps focus within the given container
  * @param container The container in which to trap focus
@@ -66,6 +85,8 @@ export function focusTrap(
   }
   container.prepend(sentinelStart)
   container.append(sentinelEnd)
+
+  const observer = observeFocusTrap(container, [sentinelStart, sentinelEnd])
 
   let lastFocusedChild: HTMLElement | undefined = undefined
   // Ensure focus remains in the trap zone by checking that a given recently-focused
@@ -117,6 +138,7 @@ export function focusTrap(
     if (suspendedTrapIndex >= 0) {
       suspendedTrapStack.splice(suspendedTrapIndex, 1)
     }
+    observer.disconnect()
     tryReactivate()
   })
 

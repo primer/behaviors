@@ -38,8 +38,10 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
         const firstChild = container.firstElementChild
         const lastChild = container.lastElementChild
 
-        if (!firstChild?.classList.contains('sentinel')) container.insertAdjacentElement('afterbegin', sentinels[0])
-        if (!lastChild?.classList.contains('sentinel')) container.insertAdjacentElement('beforeend', sentinels[1])
+        const [sentinelStart, sentinelEnd] = sentinels
+
+        if (!firstChild?.classList.contains('sentinel')) container.insertAdjacentElement('afterbegin', sentinelStart)
+        if (!lastChild?.classList.contains('sentinel')) container.insertAdjacentElement('beforeend', sentinelEnd)
       }
     }
   })

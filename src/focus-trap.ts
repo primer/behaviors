@@ -40,6 +40,7 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
 
         const [sentinelStart, sentinelEnd] = sentinels
 
+        // Adds back sentinel to correct position in the DOM
         if (!firstChild?.classList.contains('sentinel')) container.insertAdjacentElement('afterbegin', sentinelStart)
         if (!lastChild?.classList.contains('sentinel')) container.insertAdjacentElement('beforeend', sentinelEnd)
       }

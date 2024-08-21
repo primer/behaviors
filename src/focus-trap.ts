@@ -31,11 +31,8 @@ function followSignal(signal: AbortSignal): AbortController {
 }
 
 function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
-  console.log('Observe Focus Trap Init')
   const observer = new MutationObserver(mutations => {
-    console.log('New mutation')
     for (const mutation of mutations) {
-      console.log('Mutations:', mutations)
       if (mutation.type === 'childList' && mutation.addedNodes.length) {
         const sentinelChildren = Array.from(
           mutation.addedNodes,
@@ -46,7 +43,6 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
         if (sentinelChildren.length) {
           return
         }
-        console.log('ChildList Mutation')
         // If the first and last children of container aren't sentinels, move them to the start and end
         const firstChild = container.firstElementChild
         const lastChild = container.lastElementChild
@@ -56,11 +52,9 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
         // Adds back sentinel to correct position in the DOM
         if (!firstChild?.classList.contains('sentinel')) {
           container.insertAdjacentElement('afterbegin', sentinelStart)
-          console.log('Adjust sentinel to start')
         }
         if (!lastChild?.classList.contains('sentinel')) {
           container.insertAdjacentElement('beforeend', sentinelEnd)
-          console.log('Adjust sentinel to end')
         }
       }
     }

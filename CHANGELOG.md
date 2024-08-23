@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.7.2
+
+### Patch Changes
+
+- [#429](https://github.com/primer/behaviors/pull/429) [`4b729b0`](https://github.com/primer/behaviors/commit/4b729b084c161e2f81356fe706bf1b8243cf021e) Thanks [@TylerJDev](https://github.com/TylerJDev)! - Adds mutation observer to `focus-trap` to ensure sentinel elements are always in the correct position
+
 ## 1.7.1
 
 ### Patch Changes

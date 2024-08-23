@@ -240,3 +240,91 @@ it('Should handle dynamic content', async () => {
 
   controller?.abort()
 })
+
+it('should keep the sentinel elements at the start/end of the inner container', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <div id="trapContainer">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+      <button id="durian" tabIndex={0}>
+        Durian
+      </button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const [firstButton, secondButton] = trapContainer.querySelectorAll('button')
+  const controller = focusTrap(trapContainer)
+
+  secondButton.focus()
+  await user.tab()
+  await user.tab()
+  expect(document.activeElement).toEqual(firstButton)
+
+  trapContainer.insertAdjacentHTML('afterbegin', '<button id="first" tabindex="0">New first button</button>')
+  const newFirstButton = trapContainer.querySelector('#first')
+
+  const sentinelStart = trapContainer.querySelector('.sentinel')
+
+  await user.tab({shift: true})
+  expect(trapContainer.firstElementChild).toEqual(sentinelStart)
+  expect(document.activeElement).toEqual(newFirstButton)
+
+  trapContainer.insertAdjacentHTML('beforeend', '<button id="last" tabindex="0">New last button</button>')
+  const newLastButton = trapContainer.querySelector('#last')
+
+  const sentinelEnd = trapContainer.querySelector('.sentinel')
+
+  await user.tab({shift: true})
+  expect(trapContainer.lastElementChild).toEqual(sentinelEnd)
+  expect(document.activeElement).toEqual(newLastButton)
+
+  controller?.abort()
+})
+
+it('should remove the mutation observer when the focus trap is released', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <div id="trapContainer">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+      <button id="durian" tabIndex={0}>
+        Durian
+      </button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const [firstButton, secondButton] = trapContainer.querySelectorAll('button')
+  const controller = focusTrap(trapContainer)
+
+  secondButton.focus()
+  await user.tab()
+  await user.tab()
+  expect(document.activeElement).toEqual(firstButton)
+
+  trapContainer.insertAdjacentHTML('afterbegin', '<button id="first" tabindex="0">New first button</button>')
+  const newFirstButton = trapContainer.querySelector('#first')
+
+  const sentinelStart = trapContainer.querySelector('.sentinel')
+
+  await user.tab({shift: true})
+  expect(trapContainer.firstElementChild).toEqual(sentinelStart)
+  expect(document.activeElement).toEqual(newFirstButton)
+
+  controller?.abort()
+
+  trapContainer.insertAdjacentHTML('beforeend', '<button id="last" tabindex="0">New last button</button>')
+  const newLastButton = trapContainer.querySelector('#last')
+
+  await user.tab({shift: true})
+  expect(document.activeElement).not.toEqual(newLastButton)
+  expect(trapContainer.lastElementChild).toEqual(newLastButton)
+})

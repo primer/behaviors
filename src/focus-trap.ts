@@ -30,6 +30,40 @@ function followSignal(signal: AbortSignal): AbortController {
   return controller
 }
 
+function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
+  const observer = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.addedNodes.length) {
+        const sentinelChildren = Array.from(mutation.addedNodes).filter(
+          e => e instanceof HTMLElement && e.classList.contains('sentinel') && e.tagName === 'SPAN',
+        )
+
+        // If any of the added nodes are sentinels, don't do anything
+        if (sentinelChildren.length) {
+          return
+        }
+        // If the first and last children of container aren't sentinels, move them to the start and end
+        const firstChild = container.firstElementChild
+        const lastChild = container.lastElementChild
+
+        const [sentinelStart, sentinelEnd] = sentinels
+
+        // Adds back sentinel to correct position in the DOM
+        if (!firstChild?.classList.contains('sentinel')) {
+          container.insertAdjacentElement('afterbegin', sentinelStart)
+        }
+        if (!lastChild?.classList.contains('sentinel')) {
+          container.insertAdjacentElement('beforeend', sentinelEnd)
+        }
+      }
+    }
+  })
+
+  observer.observe(container, {childList: true})
+
+  return observer
+}
+
 /**
  * Traps focus within the given container
  * @param container The container in which to trap focus
@@ -66,6 +100,8 @@ export function focusTrap(
   }
   container.prepend(sentinelStart)
   container.append(sentinelEnd)
+
+  const observer = observeFocusTrap(container, [sentinelStart, sentinelEnd])
 
   let lastFocusedChild: HTMLElement | undefined = undefined
   // Ensure focus remains in the trap zone by checking that a given recently-focused
@@ -117,6 +153,7 @@ export function focusTrap(
     if (suspendedTrapIndex >= 0) {
       suspendedTrapStack.splice(suspendedTrapIndex, 1)
     }
+    observer.disconnect()
     tryReactivate()
   })
 

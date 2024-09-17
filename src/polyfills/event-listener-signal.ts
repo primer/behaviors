@@ -26,6 +26,9 @@ try {
   window.removeEventListener('test', noop, options)
 } catch (e) {
   /* */
+  if (console) {
+    console.error(e)
+  }
 }
 function featureSupported(): boolean {
   return signalSupported

@@ -24,7 +24,8 @@ try {
   )
   window.addEventListener('test', noop, options)
   window.removeEventListener('test', noop, options)
-} catch (e) { /* @ts-ignore */
+/* @ts-ignore */
+} catch (e) {
   /* */
 }
 function featureSupported(): boolean {

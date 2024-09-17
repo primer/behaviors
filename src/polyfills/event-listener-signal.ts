@@ -24,6 +24,7 @@ try {
   )
   window.addEventListener('test', noop, options)
   window.removeEventListener('test', noop, options)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 } catch (e) {
   /* */
 }

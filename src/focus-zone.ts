@@ -424,7 +424,11 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
     activeDescendantControl?.removeAttribute('aria-activedescendant')
     container.removeAttribute(hasActiveDescendantAttribute)
-    previouslyActiveElement?.removeAttribute(isActiveDescendantAttribute)
+
+    for (const item of container.querySelectorAll(`[${isActiveDescendantAttribute}]`)) {
+      item?.removeAttribute(isActiveDescendantAttribute)
+    }
+
     activeDescendantCallback?.(undefined, previouslyActiveElement, false)
   }
 
@@ -580,13 +584,17 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   )
 
   if (activeDescendantControl) {
-    container.addEventListener('focusin', event => {
-      if (event.target instanceof HTMLElement && focusableElements.includes(event.target)) {
-        // Move focus to the activeDescendantControl if one of the descendants is focused
-        activeDescendantControl.focus({preventScroll})
-        updateFocusedElement(event.target)
-      }
-    })
+    container.addEventListener(
+      'focusin',
+      event => {
+        if (event.target instanceof HTMLElement && focusableElements.includes(event.target)) {
+          // Move focus to the activeDescendantControl if one of the descendants is focused
+          activeDescendantControl.focus({preventScroll})
+          updateFocusedElement(event.target)
+        }
+      },
+      {signal},
+    )
     container.addEventListener(
       'mousemove',
       ({target}) => {
@@ -604,17 +612,25 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     )
 
     // Listeners specifically on the controlling element
-    activeDescendantControl.addEventListener('focusin', () => {
-      // Focus moved into the active descendant input.  Activate current or first descendant.
-      if (!currentFocusedElement) {
-        updateFocusedElement(getFirstFocusableElement())
-      } else {
-        setActiveDescendant(undefined, currentFocusedElement)
-      }
-    })
-    activeDescendantControl.addEventListener('focusout', () => {
-      clearActiveDescendant()
-    })
+    activeDescendantControl.addEventListener(
+      'focusin',
+      () => {
+        // Focus moved into the active descendant input.  Activate current or first descendant.
+        if (!currentFocusedElement) {
+          updateFocusedElement(getFirstFocusableElement())
+        } else {
+          setActiveDescendant(undefined, currentFocusedElement)
+        }
+      },
+      {signal},
+    )
+    activeDescendantControl.addEventListener(
+      'focusout',
+      () => {
+        clearActiveDescendant()
+      },
+      {signal},
+    )
   } else {
     // This is called whenever focus enters an element in the container
     container.addEventListener(

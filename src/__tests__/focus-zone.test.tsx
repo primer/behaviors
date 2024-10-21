@@ -1,4 +1,10 @@
-import {FocusKeys, FocusZoneSettings, focusZone} from '../focus-zone.js'
+import {
+  FocusKeys,
+  FocusZoneSettings,
+  activeDescendantActivatedDirectly,
+  focusZone,
+  isActiveDescendantAttribute,
+} from '../focus-zone.js'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
@@ -431,6 +437,41 @@ it('Should focus-in to the first element if the last-focused element is removed'
   controller.abort()
 })
 
+it('Should clear all active descendants when focus moves outside the zone', async () => {
+  const {container} = render(
+    <div>
+      <button tabIndex={0} id="outside">
+        Bad Apple
+      </button>
+      <input type="text" id="input" tabIndex={0} />
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const control = container.querySelector<HTMLInputElement>('#input')!
+  const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')
+  const outsideButton = container.querySelector<HTMLElement>('#outside')!
+  const controller = focusZone(focusZoneContainer, {activeDescendantControl: control})
+
+  control.focus()
+  const allActiveDescendants = focusZoneContainer.querySelectorAll(`[${isActiveDescendantAttribute}]`)
+  expect(allActiveDescendants.length).toEqual(1)
+  expect(allActiveDescendants[0]).toEqual(firstButton)
+
+  secondButton.setAttribute(isActiveDescendantAttribute, activeDescendantActivatedDirectly)
+  expect(focusZoneContainer.querySelectorAll(`[${isActiveDescendantAttribute}]`).length).toEqual(2)
+
+  outsideButton.focus()
+  expect(focusZoneContainer.querySelectorAll(`[${isActiveDescendantAttribute}]`).length).toEqual(0)
+
+  controller.abort()
+})
+
 it('Should call onActiveDescendantChanged properly', async () => {
   const user = userEvent.setup()
   const {container} = render(
@@ -625,7 +666,7 @@ it('Should ignore hidden elements if strict', async () => {
   controller.abort()
 })
 
-it('Shoud move to tabbable elements if onlyTabbable', async () => {
+it('Should move to tabbable elements if onlyTabbable', async () => {
   const user = userEvent.setup()
   const {container} = render(
     <div id="focusZone">

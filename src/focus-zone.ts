@@ -424,6 +424,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
     activeDescendantControl?.removeAttribute('aria-activedescendant')
     container.removeAttribute(hasActiveDescendantAttribute)
+    previouslyActiveElement?.removeAttribute(isActiveDescendantAttribute)
 
     for (const item of container.querySelectorAll(`[${isActiveDescendantAttribute}]`)) {
       item?.removeAttribute(isActiveDescendantAttribute)

@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.8.0
+
+### Minor Changes
+
+- [#462](https://github.com/primer/behaviors/pull/462) [`62dc90a`](https://github.com/primer/behaviors/commit/62dc90a6464e5d17e955271e9f3b3709982b1643) Thanks [@camertron](https://github.com/camertron)! - Ensure focusZone() clears all potential active descendants
+
 ## 1.7.2
 
 ### Patch Changes

@@ -328,3 +328,42 @@ it('should remove the mutation observer when the focus trap is released', async 
   expect(document.activeElement).not.toEqual(newLastButton)
   expect(trapContainer.lastElementChild).toEqual(newLastButton)
 })
+
+it('Should only have one set of sentinels', async () => {
+  const {container} = render(
+    <div>
+      <div id="trapContainer">
+        <button tabIndex={0}>Apple</button>
+      </div>
+      <button id="durian" tabIndex={0}>
+        Durian
+      </button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const durianButton = container.querySelector<HTMLElement>('#durian')!
+  const firstButton = trapContainer.querySelector('button')!
+
+  focusTrap(trapContainer)
+
+  durianButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  trapContainer.insertAdjacentHTML(
+    'afterbegin',
+    '<div id="newTrapContainer"><button id="newFirst" tabindex="0">New first button</button></div>',
+  )
+
+  const newTrapContainer = trapContainer.querySelector<HTMLElement>('#newTrapContainer')!
+  const newFirstButton = newTrapContainer.querySelector<HTMLElement>('#newFirst')!
+
+  const controller = focusTrap(newTrapContainer)
+  expect(document.activeElement).toEqual(newFirstButton)
+  expect(document.querySelectorAll('.sentinel').length).toEqual(4)
+
+  controller?.abort()
+
+  trapContainer.removeChild(newTrapContainer)
+  expect(document.querySelectorAll('.sentinel').length).toEqual(2)
+})

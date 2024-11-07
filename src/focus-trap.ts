@@ -98,8 +98,15 @@ export function focusTrap(
     const firstFocusableChild = getFocusableChild(container)
     firstFocusableChild?.focus()
   }
-  container.prepend(sentinelStart)
-  container.append(sentinelEnd)
+
+  // If the container already has sentinels as direct children, don't add more.
+  // The mutation observer will take care of moving existing sentinels to the correct position.
+  const existingSentinels = Array.from(container.children).filter(e => e.classList.contains('sentinel'))
+
+  if (!existingSentinels.length) {
+    container.prepend(sentinelStart)
+    container.append(sentinelEnd)
+  }
 
   const observer = observeFocusTrap(container, [sentinelStart, sentinelEnd])
 

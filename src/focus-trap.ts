@@ -101,7 +101,9 @@ export function focusTrap(
 
   // If the container already has sentinels as direct children, don't add more.
   // The mutation observer will take care of moving existing sentinels to the correct position.
-  const existingSentinels = Array.from(container.children).filter(e => e.classList.contains('sentinel'))
+  const existingSentinels = Array.from(container.children).filter(
+    e => e.classList.contains('sentinel') && e.tagName === 'SPAN',
+  )
 
   if (!existingSentinels.length) {
     container.prepend(sentinelStart)

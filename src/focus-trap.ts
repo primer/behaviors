@@ -115,23 +115,38 @@ export function focusTrap(
         lastFocusedChild = focusedElement
         return
       } else {
+        const focusDelay = suspendedTrapStack.length > 0 ? 50 : undefined
+
         if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
-          lastFocusedChild.focus()
+          handleFocus(lastFocusedChild, focusDelay)
           return
         } else if (initialFocus && container.contains(initialFocus)) {
-          initialFocus.focus()
+          handleFocus(initialFocus, focusDelay)
           return
         } else {
           const firstFocusableChild = getFocusableChild(container)
-          firstFocusableChild?.focus()
+          handleFocus(firstFocusableChild, focusDelay)
           return
         }
       }
     }
   }
 
-  const wrappingController = followSignal(signal)
+  function handleFocus(focusTarget: HTMLElement | undefined, delay?: number) {
+    if (!focusTarget) return
 
+    if (delay) {
+      setTimeout(() => {
+        focusTarget.focus()
+      }, delay)
+
+      return
+    }
+
+    focusTarget.focus()
+  }
+
+  const wrappingController = followSignal(signal)
   if (activeTrap) {
     const suspendedTrap = activeTrap
     activeTrap.container.setAttribute('data-focus-trap', 'suspended')

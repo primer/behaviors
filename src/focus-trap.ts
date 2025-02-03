@@ -139,8 +139,6 @@ export function focusTrap(
       setTimeout(() => {
         focusTarget.focus()
       }, delay)
-
-      return
     }
 
     focusTarget.focus()

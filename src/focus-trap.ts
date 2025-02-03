@@ -115,7 +115,7 @@ export function focusTrap(
         lastFocusedChild = focusedElement
         return
       } else {
-        const focusDelay = suspendedTrapStack.length > 0 ? 50 : undefined
+        const focusDelay = suspendedTrapStack.length > 0 ? 100 : undefined
 
         if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
           handleFocus(lastFocusedChild, focusDelay)

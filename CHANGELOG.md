@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.8.1
+
+### Patch Changes
+
+- [#473](https://github.com/primer/behaviors/pull/473) [`d88c043`](https://github.com/primer/behaviors/commit/d88c043aa38e1f83a3bb168f8eda2338858c6587) Thanks [@TylerJDev](https://github.com/TylerJDev)! - Prevent duplicate sentinels from being added if some already exist in the container of the focus trap.
+
 ## 1.8.0
 
 ### Minor Changes

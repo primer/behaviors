@@ -538,7 +538,7 @@ it('Should call onActiveDescendantChanged properly', async () => {
   )
   activeDescendantChangedCallback.mockReset()
   fireEvent.mouseMove(firstButton)
-  expect(activeDescendantChangedCallback).not.toBeCalled()
+  expect(activeDescendantChangedCallback).not.toHaveBeenCalled()
 
   controller.abort()
 })

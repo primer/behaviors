@@ -380,4 +380,29 @@ describe('getAnchoredPosition', () => {
     expect(top).toEqual(0)
     expect(left).toEqual(52)
   })
+
+  it('should render below anchor at bottom of viewport when there is scrollable space below', () => {
+    // Simulate an anchor at the bottom of the visible viewport
+    const anchorRect = makeDOMRect(100, 950, 50, 50) // anchor near bottom of 1000px viewport
+    const floatingRect = makeDOMRect(NaN, NaN, 200, 150) // overlay that would extend below viewport
+
+    // Set up DOM elements without a clipping parent (simulating body scroll)
+    document.body.innerHTML = '<div id="float"></div><div id="anchor"></div>'
+    const float = document.querySelector('#float')!
+    const anchor = document.querySelector('#anchor')!
+    float.getBoundingClientRect = () => floatingRect
+    anchor.getBoundingClientRect = () => anchorRect
+
+    // Body has large height (scrollable content), but viewport is smaller
+    document.body.getBoundingClientRect = () => makeDOMRect(0, 0, 1920, 2000) // scrollable body
+    Object.defineProperty(window, 'innerHeight', {get: () => 1000}) // viewport height
+
+    const settings: Partial<PositionSettings> = {side: 'outside-bottom', align: 'start'}
+    const {top, left, anchorSide} = getAnchoredPosition(float, anchor, settings)
+
+    // Should keep the requested bottom side, allowing the overlay to extend below viewport
+    expect(anchorSide).toEqual('outside-top')
+    expect(top).toEqual(850) // anchorRect.top + anchorRect.height + anchorOffset (4)
+    expect(left).toEqual(100) // anchorRect.left
+  })
 })

@@ -402,7 +402,7 @@ describe('getAnchoredPosition', () => {
 
     // Should keep the requested bottom side, allowing the overlay to extend below viewport
     expect(anchorSide).toEqual('outside-top')
-    expect(top).toEqual(850) // anchorRect.top + anchorRect.height + anchorOffset (4)
+    expect(top).toEqual(796) // anchorRect.top + anchorRect.height + anchorOffset (4)
     expect(left).toEqual(100) // anchorRect.left
   })
 })

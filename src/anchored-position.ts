@@ -233,11 +233,11 @@ function getClippingRect(element: Element): BoxPosition {
     left: elemRect.left + borderLeft,
     width: elemRect.width - borderRight - borderLeft,
 
-    // If the clipping node is document.body, it can expand to the full height of the window
-    height: Math.max(
-      elemRect.height - borderTop - borderBottom,
-      clippingNode === document.body ? window.innerHeight : -Infinity,
-    ),
+    // If the clipping node is document.body, use the viewport height instead of body height
+    height:
+      clippingNode === document.body
+        ? window.innerHeight
+        : Math.max(elemRect.height - borderTop - borderBottom, -Infinity),
   }
 }
 

@@ -400,9 +400,9 @@ describe('getAnchoredPosition', () => {
     const settings: Partial<PositionSettings> = {side: 'outside-bottom', align: 'start'}
     const {top, left, anchorSide} = getAnchoredPosition(float, anchor, settings)
 
-    // Should keep the requested bottom side, allowing the overlay to extend below viewport
+    // Should flip to top side to avoid rendering below viewport, even with scrollable space
     expect(anchorSide).toEqual('outside-top')
-    expect(top).toEqual(796) // anchorRect.top + anchorRect.height + anchorOffset (4)
+    expect(top).toEqual(796) // anchorRect.top - floatingRect.height - anchorOffset (4) = 950 - 150 - 4
     expect(left).toEqual(100) // anchorRect.left
   })
 })

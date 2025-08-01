@@ -90,12 +90,12 @@ export interface PositionSettings {
 
   /**
    * If true, accounts for scroll position when determining if the floating element
-   * would render out of view. This addresses the issue where getAnchoredPosition 
+   * would render out of view. This addresses the issue where getAnchoredPosition
    * fails when scroll position causes the element to render outside the visible viewport.
-   * 
+   *
    * When enabled, the positioning algorithm considers the current scroll position
    * to ensure the floating element remains visible within the scrolled viewport.
-   * 
+   *
    * @see https://github.com/github/primer/issues/5358
    */
   enableAnchoredPositionViewportFix?: boolean
@@ -286,7 +286,8 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
       settings.alignmentOffset ??
       (align !== 'center' && side.startsWith('inside') ? positionDefaults.alignmentOffset : 0),
     allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds,
-    enableAnchoredPositionViewportFix: settings.enableAnchoredPositionViewportFix ?? positionDefaults.enableAnchoredPositionViewportFix,
+    enableAnchoredPositionViewportFix:
+      settings.enableAnchoredPositionViewportFix ?? positionDefaults.enableAnchoredPositionViewportFix,
   }
 }
 
@@ -322,7 +323,7 @@ function pureCalculateAnchoredPosition(
     // Get the current scroll position
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || 0
-    
+
     // Adjust the relative viewport rect to represent the actual visible area
     // considering the current scroll position
     relativeViewportRect = {

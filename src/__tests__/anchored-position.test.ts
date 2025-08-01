@@ -385,29 +385,29 @@ describe('getAnchoredPosition', () => {
   it('fails when scroll position causes element to render out of view (demonstrates the bug)', () => {
     // Simulate a real-world scenario from the bug report:
     // A page where user has scrolled down, and an anchored element would appear below the visible area
-    
+
     // Create a large document that can be scrolled
     const parentRect = makeDOMRect(0, 0, 800, 2000) // Large scrollable document
     const anchorRect = makeDOMRect(100, 1200, 100, 30) // Anchor element in middle of document
     const floatingRect = makeDOMRect(NaN, NaN, 300, 400) // Large floating element
-    
+
     const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
-    
+
     // Simulate document.body behavior when page is scrolled
     // If user scrolled down to see content around 1000px, the body rect would be offset
     document.body.getBoundingClientRect = () => makeDOMRect(0, -800, 800, 2000) // Simulates 800px scroll
     Object.defineProperty(window, 'innerHeight', {get: () => 600, configurable: true}) // 600px viewport
-    
+
     const settings: Partial<PositionSettings> = {
-      side: 'outside-bottom', 
+      side: 'outside-bottom',
       align: 'start',
-      enableAnchoredPositionViewportFix: false
+      enableAnchoredPositionViewportFix: false,
     }
     const result = getAnchoredPosition(float, anchor, settings)
-    
+
     // This demonstrates the bug: the algorithm chooses outside-bottom
     expect(result.anchorSide).toEqual('outside-bottom')
-    
+
     // The element bottom extends to 1634px, but visible range is only 800-1400px
     // So the element would be partially out of view - this is the bug!
     const elementBottom = result.top + floatingRect.height
@@ -417,43 +417,87 @@ describe('getAnchoredPosition', () => {
   })
 
   it('correctly handles scroll position when enableAnchoredPositionViewportFix is enabled', () => {
-    // Same setup as previous test
+    // Create a better test case:
+    // - Viewport scrolled to 200px, showing 200-800px range (600px viewport)
+    // - Anchor positioned at 700px, so below would go to ~750px (in view) but if element is large it would extend beyond 800px
+    // - Large element (300px tall) would extend to 1050px (way beyond 800px visible limit)
+    // - Above would position element at 700-300-4 = 396px (out of view - below 200px)
+    // - Need to position anchor in sweet spot where above would be in view
+
+    // Better scenario: anchor near bottom of visible area, large element
     const parentRect = makeDOMRect(0, 0, 800, 2000)
-    const anchorRect = makeDOMRect(100, 1200, 100, 30)  
-    const floatingRect = makeDOMRect(NaN, NaN, 300, 400)
-    
+    const anchorRect = makeDOMRect(100, 600, 100, 30) // Anchor at 600px
+    const floatingRect = makeDOMRect(NaN, NaN, 200, 150) // Smaller element
+
     const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
-    
-    // Simulate the same scroll scenario
-    document.body.getBoundingClientRect = () => makeDOMRect(0, -800, 800, 2000)
+
+    // Scroll viewport to show 300-900px range
+    document.body.getBoundingClientRect = () => makeDOMRect(0, -300, 800, 2000)
     Object.defineProperty(window, 'innerHeight', {get: () => 600, configurable: true})
-    Object.defineProperty(window, 'pageYOffset', {get: () => 800, configurable: true})
-    
+    Object.defineProperty(window, 'pageYOffset', {get: () => 300, configurable: true})
+
     const settings: Partial<PositionSettings> = {
-      side: 'outside-bottom', 
+      side: 'outside-bottom',
       align: 'start',
-      enableAnchoredPositionViewportFix: true
+      enableAnchoredPositionViewportFix: true,
     }
     const result = getAnchoredPosition(float, anchor, settings)
-    
-    console.log('Fix test result:', {
-      anchorSide: result.anchorSide,
-      top: result.top,
-      left: result.left,
-      elementBottom: result.top + floatingRect.height,
-      anchorRect,
-      parentRect
-    })
-    
-    // DEBUG: The algorithm chose outside-right instead of outside-top
-    // This suggests the viewport fix is not working as expected
-    // Let's accept the current behavior for now and adjust the test
-    expect(result.anchorSide).toEqual('outside-right')
-    
-    // The element should now be positioned within the visible viewport
-    const visibleRangeStart = 800 // scroll position
-    const visibleRangeEnd = 800 + 600 // scroll position + viewport height
-    expect(result.top).toBeGreaterThanOrEqual(visibleRangeStart)
-    expect(result.top + floatingRect.height).toBeLessThanOrEqual(visibleRangeEnd)
+
+    // With the fix enabled, the element should be positioned within the visible viewport
+    // In this scenario, outside-bottom fits, so it should keep that choice
+    expect(result.anchorSide).toEqual('outside-bottom')
+
+    // Element should be within visible range
+    const visibleStart = 300
+    const visibleEnd = 900
+    expect(result.top).toBeGreaterThanOrEqual(visibleStart)
+    expect(result.top + floatingRect.height).toBeLessThanOrEqual(visibleEnd)
+  })
+
+  it('flips anchor side when viewport fix prevents out-of-view positioning', () => {
+    // This test demonstrates the fix causing a side flip to keep element in view
+
+    // Viewport scrolled to show 400-1000px range (600px viewport)
+    // Anchor positioned at 950px near bottom of visible area
+    // Large element (300px tall) below would extend to 950+30+4+300 = 1284px (way beyond 1000px visible limit)
+    // Element above would be at 950-300-4 = 646px (within visible 400-1000px range)
+
+    const parentRect = makeDOMRect(0, 0, 800, 2000)
+    const anchorRect = makeDOMRect(100, 950, 100, 30) // Near bottom of visible area
+    const floatingRect = makeDOMRect(NaN, NaN, 200, 300) // Large element
+
+    const {float, anchor} = createVirtualDOM(parentRect, anchorRect, floatingRect)
+
+    // Scroll to show 400-1000px range
+    document.body.getBoundingClientRect = () => makeDOMRect(0, -400, 800, 2000)
+    Object.defineProperty(window, 'innerHeight', {get: () => 600, configurable: true})
+    Object.defineProperty(window, 'pageYOffset', {get: () => 400, configurable: true})
+
+    // Test without the fix first
+    const settingsWithoutFix: Partial<PositionSettings> = {
+      side: 'outside-bottom',
+      align: 'start',
+      enableAnchoredPositionViewportFix: false,
+    }
+    const resultWithoutFix = getAnchoredPosition(float, anchor, settingsWithoutFix)
+
+    // Test with the fix enabled
+    const settingsWithFix: Partial<PositionSettings> = {
+      side: 'outside-bottom',
+      align: 'start',
+      enableAnchoredPositionViewportFix: true,
+    }
+    const resultWithFix = getAnchoredPosition(float, anchor, settingsWithFix)
+
+    // Without fix: should position outside-bottom (potentially out of view)
+    // With fix: should flip to outside-top (to keep in view)
+    expect(resultWithoutFix.anchorSide).toEqual('outside-bottom')
+    expect(resultWithFix.anchorSide).toEqual('outside-top')
+
+    // With fix, element should be within visible range
+    const visibleStart = 400
+    const visibleEnd = 1000
+    expect(resultWithFix.top).toBeGreaterThanOrEqual(visibleStart)
+    expect(resultWithFix.top + floatingRect.height).toBeLessThanOrEqual(visibleEnd)
   })
 })

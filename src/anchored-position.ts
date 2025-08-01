@@ -87,6 +87,18 @@ export interface PositionSettings {
    * this direction.
    */
   allowOutOfBounds: boolean
+
+  /**
+   * If true, accounts for scroll position when determining if the floating element
+   * would render out of view. This addresses the issue where getAnchoredPosition 
+   * fails when scroll position causes the element to render outside the visible viewport.
+   * 
+   * When enabled, the positioning algorithm considers the current scroll position
+   * to ensure the floating element remains visible within the scrolled viewport.
+   * 
+   * @see https://github.com/github/primer/issues/5358
+   */
+  enableAnchoredPositionViewportFix?: boolean
 }
 
 // For each outside anchor position, list the order of alternate positions to try in
@@ -254,6 +266,7 @@ const positionDefaults: PositionSettings = {
   alignmentOffset: 4,
 
   allowOutOfBounds: false,
+  enableAnchoredPositionViewportFix: false,
 }
 
 /**
@@ -273,6 +286,7 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
       settings.alignmentOffset ??
       (align !== 'center' && side.startsWith('inside') ? positionDefaults.alignmentOffset : 0),
     allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds,
+    enableAnchoredPositionViewportFix: settings.enableAnchoredPositionViewportFix ?? positionDefaults.enableAnchoredPositionViewportFix,
   }
 }
 
@@ -292,14 +306,31 @@ function pureCalculateAnchoredPosition(
   relativePosition: Position,
   floatingRect: Size,
   anchorRect: BoxPosition,
-  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset}: PositionSettings,
+  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset, enableAnchoredPositionViewportFix}: PositionSettings,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
-  const relativeViewportRect: BoxPosition = {
+  let relativeViewportRect: BoxPosition = {
     top: viewportRect.top - relativePosition.top,
     left: viewportRect.left - relativePosition.left,
     width: viewportRect.width,
     height: viewportRect.height,
+  }
+
+  // When enableAnchoredPositionViewportFix is true, adjust the viewport rect to account for scroll position
+  // This fixes the issue where elements can be positioned out of the visible viewport
+  if (enableAnchoredPositionViewportFix) {
+    // Get the current scroll position
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || 0
+    
+    // Adjust the relative viewport rect to represent the actual visible area
+    // considering the current scroll position
+    relativeViewportRect = {
+      top: scrollTop - relativePosition.top,
+      left: scrollLeft - relativePosition.left,
+      width: window.innerWidth || document.documentElement.clientWidth,
+      height: window.innerHeight || document.documentElement.clientHeight,
+    }
   }
 
   let pos = calculatePosition(floatingRect, anchorRect, side, align, anchorOffset, alignmentOffset)

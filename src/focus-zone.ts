@@ -2,7 +2,7 @@ import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listene
 import {isMacOS} from './utils/user-agent.js'
 import {IterateFocusableElements, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
 import {uniqueId} from './utils/unique-id.js'
-import {isEditableElement} from './utils/is-editable-elements.js'
+import {isEditableElement} from './utils/is-editable-element.js'
 
 eventListenerSignalPolyfill()
 

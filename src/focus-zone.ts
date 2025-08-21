@@ -2,6 +2,7 @@ import {polyfill as eventListenerSignalPolyfill} from './polyfills/event-listene
 import {isMacOS} from './utils/user-agent.js'
 import {IterateFocusableElements, iterateFocusableElements} from './utils/iterate-focusable-elements.js'
 import {uniqueId} from './utils/unique-id.js'
+import {isEditableElement} from './utils/is-editable-elements.js'
 
 eventListenerSignalPolyfill()
 
@@ -267,22 +268,16 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
   // its function to move focus rather than type a <TAB> character.
   const keyLength = [...key].length
 
-  const isTextInput =
-    (activeElement instanceof HTMLInputElement && activeElement.type === 'text') ||
-    activeElement instanceof HTMLTextAreaElement
+  const isEditable = isEditableElement(activeElement)
 
   // If we would normally type a character into an input, ignore
   // Also, Home and End keys should never affect focus when in a text input
-  if (isTextInput && (keyLength === 1 || key === 'Home' || key === 'End')) {
+  if (isEditable && (keyLength === 1 || key === 'Home' || key === 'End')) {
     return true
   }
 
-  // Some situations we want to ignore with <select> elements
+  // Some situations we specifically want to ignore with <select> elements
   if (activeElement instanceof HTMLSelectElement) {
-    // Regular typeable characters change the selection, so ignore those
-    if (keyLength === 1) {
-      return true
-    }
     // On macOS, bare ArrowDown opens the select, so ignore that
     if (key === 'ArrowDown' && isMacOS() && !keyboardEvent.metaKey) {
       return true
@@ -293,16 +288,15 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
     }
   }
 
-  // Ignore page up and page down for textareas
-  if (activeElement instanceof HTMLTextAreaElement && (key === 'PageUp' || key === 'PageDown')) {
-    return true
-  }
-
-  if (isTextInput) {
-    const textInput = activeElement as HTMLInputElement | HTMLTextAreaElement
-    const cursorAtStart = textInput.selectionStart === 0 && textInput.selectionEnd === 0
+  if (isEditable) {
+    // An editable element might not be an input element if it is a `contenteditable` element, but it's significantly
+    // harder and less reliable to get the caret position for those elements, so for them we just always ignore arrows
+    const isInputElement = activeElement instanceof HTMLTextAreaElement || activeElement instanceof HTMLInputElement
+    const cursorAtStart = isInputElement && activeElement.selectionStart === 0 && activeElement.selectionEnd === 0
     const cursorAtEnd =
-      textInput.selectionStart === textInput.value.length && textInput.selectionEnd === textInput.value.length
+      isInputElement &&
+      activeElement.selectionStart === activeElement.value.length &&
+      activeElement.selectionEnd === activeElement.value.length
 
     // When in a text area or text input, only move focus left/right if at beginning/end of the field
     if (key === 'ArrowLeft' && !cursorAtStart) {
@@ -312,8 +306,15 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
       return true
     }
 
-    // When in a text area, only move focus up/down if at beginning/end of the field
-    if (textInput instanceof HTMLTextAreaElement) {
+    const isContentEditable = activeElement instanceof HTMLElement && activeElement.isContentEditable
+
+    // When in multiline inputs
+    if (activeElement instanceof HTMLTextAreaElement || isContentEditable) {
+      // Always ignore page up/down
+      if (key === 'PageUp' || key === 'PageDown') {
+        return true
+      }
+      // Only move focus up/down if at beginning/end of the field
       if (key === 'ArrowUp' && !cursorAtStart) {
         return true
       }

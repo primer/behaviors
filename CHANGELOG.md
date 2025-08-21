@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.8.2
+
+### Patch Changes
+
+- [#594](https://github.com/primer/behaviors/pull/594) [`5cd0b90`](https://github.com/primer/behaviors/commit/5cd0b909270231f125847affe0fd788d7bf678d8) Thanks [@iansan5653](https://github.com/iansan5653)! - Respect `contenteditable` elements when checking for editability in `focus-zone` behavior
+
 ## 1.8.1
 
 ### Patch Changes

@@ -82,7 +82,6 @@ export function focusTrap(
   container.setAttribute('data-focus-trap', 'active')
   const sentinelStart = document.createElement('span')
   sentinelStart.setAttribute('class', 'sentinel')
-  sentinelStart.setAttribute('tabindex', '0')
   sentinelStart.setAttribute('aria-hidden', 'true')
   sentinelStart.onfocus = () => {
     const lastFocusableChild = getFocusableChild(container, true)

@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.8.3
+
+### Patch Changes
+
+- [#597](https://github.com/primer/behaviors/pull/597) [`43f432a`](https://github.com/primer/behaviors/commit/43f432ad873b25fc5adef318383c0f7d743c78e1) Thanks [@iansan5653](https://github.com/iansan5653)! - Expose `isEditableElement` util
+
 ## 1.8.2
 
 ### Patch Changes

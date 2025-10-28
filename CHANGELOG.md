@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.8.4
+
+### Patch Changes
+
+- [#623](https://github.com/primer/behaviors/pull/623) [`f539ae5`](https://github.com/primer/behaviors/commit/f539ae53d10c0cdf6c68b7a89cf623c1fbb20195) Thanks [@iansan5653](https://github.com/iansan5653)! - Fix cursor position checks to exclude `select` elements
+
 ## 1.8.3
 
 ### Patch Changes

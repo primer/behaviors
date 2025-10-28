@@ -269,6 +269,7 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
   const keyLength = [...key].length
 
   const isEditable = isEditableElement(activeElement)
+  const isSelect = activeElement instanceof HTMLSelectElement
 
   // If we would normally type a character into an input, ignore
   // Also, Home and End keys should never affect focus when in a text input
@@ -277,7 +278,7 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
   }
 
   // Some situations we specifically want to ignore with <select> elements
-  if (activeElement instanceof HTMLSelectElement) {
+  if (isSelect) {
     // On macOS, bare ArrowDown opens the select, so ignore that
     if (key === 'ArrowDown' && isMacOS() && !keyboardEvent.metaKey) {
       return true
@@ -286,9 +287,10 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
     if (key === 'ArrowDown' && !isMacOS() && keyboardEvent.altKey) {
       return true
     }
+    return false
   }
 
-  if (isEditable) {
+  if (isEditable && !isSelect) {
     // An editable element might not be an input element if it is a `contenteditable` element, but it's significantly
     // harder and less reliable to get the caret position for those elements, so for them we just always ignore arrows
     const isInputElement = activeElement instanceof HTMLTextAreaElement || activeElement instanceof HTMLInputElement

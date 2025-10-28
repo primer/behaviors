@@ -398,6 +398,48 @@ it('Should respect inputs by not moving focus if key would have some other effec
   controller.abort()
 })
 
+it('Should allow left/right arrow keys to navigate focus with select elements', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <select tabIndex={0}>
+          <option value="banana">Banana</option>
+          <option value="cherry">Cherry</option>
+        </select>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')!
+  const select = focusZoneContainer.querySelector<HTMLSelectElement>('select')!
+  const controller = focusZone(focusZoneContainer, {bindKeys: FocusKeys.ArrowHorizontal | FocusKeys.HomeAndEnd})
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  // Moving right should focus the select element
+  await user.keyboard('{arrowright}')
+  expect(document.activeElement).toEqual(select)
+
+  // Moving right again should focus the next button
+  await user.keyboard('{arrowright}')
+  expect(document.activeElement).toEqual(secondButton)
+
+  // Moving left should focus the select element again
+  await user.keyboard('{arrowleft}')
+  expect(document.activeElement).toEqual(select)
+
+  // Moving left again should focus the first button
+  await user.keyboard('{arrowleft}')
+  expect(document.activeElement).toEqual(firstButton)
+
+  controller.abort()
+})
+
 it('Should focus-in to the first element if the last-focused element is removed', async () => {
   const user = userEvent.setup()
   const {container} = render(

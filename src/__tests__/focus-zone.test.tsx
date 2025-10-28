@@ -398,6 +398,61 @@ it('Should respect inputs by not moving focus if key would have some other effec
   controller.abort()
 })
 
+// TODO: this test should pass
+it.skip('Should not capture arrow keys when select dropdown is open', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <select tabIndex={0}>
+          <option value="banana">Banana</option>
+          <option value="cherry">Cherry</option>
+          <option value="durian">Durian</option>
+        </select>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')!
+  const select = focusZoneContainer.querySelector<HTMLSelectElement>('select')!
+  const controller = focusZone(focusZoneContainer, {bindKeys: FocusKeys.ArrowVertical | FocusKeys.HomeAndEnd})
+
+  // Navigate to the select element
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(select)
+  expect(select.value).toEqual('banana') // Should start with first option
+
+  // Open the select dropdown by pressing Enter or Space
+  await user.keyboard('{enter}')
+
+  // Now test that arrow keys work for dropdown navigation and don't move focus away from select
+  // Note: In testing environments, the actual dropdown behavior might be limited,
+  // but we can verify that focus stays on the select element
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(select)
+
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(select)
+
+  await user.keyboard('{arrowup}')
+  expect(document.activeElement).toEqual(select)
+
+  // Close the dropdown (Escape typically closes it)
+  await user.keyboard('{escape}')
+
+  // After closing, the vertical arrow keys should work for focus zone navigation again
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(secondButton)
+
+  controller.abort()
+})
+
 it('Should focus-in to the first element if the last-focused element is removed', async () => {
   const user = userEvent.setup()
   const {container} = render(

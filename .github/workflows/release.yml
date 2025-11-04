@@ -1,12 +1,23 @@
 name: Release
+
 on:
   push:
-    branches:
-      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+  checks: write
+  statuses: write
+
 jobs:
-  release:
-    name: Release
+  release-main:
+    name: Main
     runs-on: ubuntu-latest
+    if: ${{ github.repository == 'primer/behaviors' && github.ref_name == 'main' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -18,7 +29,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
@@ -30,6 +41,21 @@ jobs:
           title: Release Tracking
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: npm run release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GPR_AUTH_TOKEN_SHARED }}
-          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN_SHARED }}
+
+  release-canary:
+    name: Canary
+    if: ${{ github.repository == 'primer/behaviors' && github.ref_name != 'main' && github.ref_name != 'changeset-release/main' }}
+    uses: primer/.github/.github/workflows/release_canary.yml@v2.2.1
+    with:
+      install: npm i
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
+      npm_token: ${{ secrets.NPM_AUTH_TOKEN_SHARED }}
+
+  release-candidate:
+    name: Candidate
+    if: ${{ github.repository == 'primer/behaviors' && github.ref_name == 'changeset-release/main' }}
+    uses: primer/.github/.github/workflows/release_candidate.yml@v2.2.1
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
+      npm_token: ${{ secrets.NPM_AUTH_TOKEN_SHARED }}

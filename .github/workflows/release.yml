@@ -45,17 +45,15 @@ jobs:
   release-canary:
     name: Canary
     if: ${{ github.repository == 'primer/behaviors' && github.ref_name != 'main' && github.ref_name != 'changeset-release/main' }}
-    uses: primer/.github/.github/workflows/release_canary.yml@v2.2.1
+    uses: primer/.github/.github/workflows/release_canary.yml@v2.3.0
     with:
       install: npm i
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-      npm_token: ${{ secrets.NPM_AUTH_TOKEN_SHARED }}
 
   release-candidate:
     name: Candidate
     if: ${{ github.repository == 'primer/behaviors' && github.ref_name == 'changeset-release/main' }}
-    uses: primer/.github/.github/workflows/release_candidate.yml@v2.2.1
+    uses: primer/.github/.github/workflows/release_candidate.yml@v2.3.0
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-      npm_token: ${{ secrets.NPM_AUTH_TOKEN_SHARED }}

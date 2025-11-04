@@ -41,7 +41,9 @@ jobs:
           title: Release Tracking
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: npm run release
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
   release-canary:
     name: Canary
     if: ${{ github.repository == 'primer/behaviors' && github.ref_name != 'main' && github.ref_name != 'changeset-release/main' }}

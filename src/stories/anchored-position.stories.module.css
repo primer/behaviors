@@ -1,0 +1,85 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.infoSection {
+  flex: 1;
+}
+
+.infoSection h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #24292f;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+}
+
+.details dt {
+  font-weight: 600;
+  color: #57606a;
+}
+
+.details dd {
+  margin: 0;
+  color: #24292f;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background-color: #f6f8fa;
+  border: 2px solid #0969da;
+  border-radius: 6px;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ddf4ff;
+  border: 2px solid #0969da;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #0969da;
+  z-index: 1;
+}
+
+.floating {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 2px solid #d0d7de;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-weight: 600;
+  color: #24292f;
+  z-index: 2;
+}

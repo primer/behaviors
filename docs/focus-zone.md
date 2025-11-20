@@ -86,4 +86,4 @@ The `focusZone` function takes the following arguments.
 
 ## Best practices
 
-We highly recommend reading [Section 6: Developing a Keyboard Interface](https://www.w3.org/TR/wai-aria-practices-1.1/#keyboard) from the WAI-ARIA Authoring Practices document. |
+We highly recommend reading [Section 6: Developing a Keyboard Interface](https://www.w3.org/TR/wai-aria-practices-1.1/#keyboard) from the WAI-ARIA Authoring Practices document.

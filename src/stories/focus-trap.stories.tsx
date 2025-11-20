@@ -73,11 +73,11 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
       </div>
       <div
         ref={trapRef}
-        className={clsx(styles.trapContainer, {
+        className={clsx(styles.content, {
           [styles.active]: isActive,
         })}
       >
-        <h3>Focus Trap Container</h3>
+        <h1>Focus Trap Container</h1>
         <p className={clsx('sb-instructions', isActive && 'active')}>
           {isActive ? 'Focus is trapped!' : 'Activate the trap, then try to focus elements outside this area.'}
         </p>

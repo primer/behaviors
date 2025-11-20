@@ -106,7 +106,7 @@ const AnchoredPositionDemo: React.FC<{args: AnchoredPositionArgs}> = ({args}) =>
     <div className={styles.demo}>
       <div className={styles.info}>
         <div className={styles.infoSection}>
-          <h4>Calculated Position</h4>
+          <h1>Calculated Position</h1>
           {position && (
             <dl className={styles.details}>
               <dt>Top:</dt>
@@ -121,7 +121,7 @@ const AnchoredPositionDemo: React.FC<{args: AnchoredPositionArgs}> = ({args}) =>
           )}
         </div>
       </div>
-      <div ref={containerRef} className={styles.container}>
+      <div ref={containerRef} className={styles.viewport}>
         <div
           ref={anchorRef}
           className={styles.anchor}

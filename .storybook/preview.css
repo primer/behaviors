@@ -1,31 +1,24 @@
 :root {
-  /* Text */
   --sb-fg-default: #1f2328;
   --sb-fg-muted: #656d76;
 
-  /* Backgrounds */
   --sb-canvas-default: #ffffff;
   --sb-canvas-subtle: #f6f8fa;
   --sb-canvas-inset: #eff2f5;
 
-  /* Borders */
   --sb-border-default: #d1d9e0;
 
-  /* Accent (Blue) */
   --sb-accent-fg: #0969da;
   --sb-accent-subtle: #dff7ff;
   --sb-accent-muted: rgba(9, 105, 218, 0.1);
 
-  /* Success (Green) */
   --sb-success-emphasis: #1f883d;
   --sb-success-subtle: #dafbe1;
 
-  /* Typography */
   --sb-text-body-size-medium: 0.875rem;
   --sb-text-body-size-small: 0.8125rem;
   --sb-text-title-size-small: 1.125rem;
 
-  /* Size */
   --sb-borderRadius-small: 4px;
   --sb-borderRadius-medium: 6px;
 }
@@ -70,7 +63,6 @@ html {
   border-radius: var(--sb-borderRadius-small);
   font-size: var(--sb-text-body-size-medium);
   font-weight: 500;
-  color: var(--sb-fg-muted);
 }
 
 .sb-status.active {
@@ -131,17 +123,13 @@ html {
   margin: 0;
 }
 
-.sb-list.horizontal {
-  flex-direction: row;
-}
-
 .sb-instructions {
+  width: 100%;
   margin: 0 0 1rem 0;
   padding: 0.75rem;
   background: var(--sb-canvas-default);
   border-radius: var(--sb-borderRadius-small);
   font-size: var(--sb-text-body-size-medium);
-  color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-default);
   border-left: 3px solid var(--sb-border-default);
   transition: border-color 0.2s;

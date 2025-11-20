@@ -143,14 +143,14 @@ export const VerticalList: Story = {
   render: args => (
     <FocusZoneFrame args={args}>
       {(zoneRef, isActive) => (
-        <div ref={zoneRef} className={clsx(styles.zone, isActive && styles.active)}>
-          <h3>Vertical List</h3>
+        <div ref={zoneRef} className={clsx(styles.content, isActive && styles.active)}>
+          <h1>Vertical List</h1>
           <p className={clsx('sb-instructions', isActive && 'active')}>
             {isActive
               ? 'Use arrow keys (or configured keys) to move focus. Tab moves out of the zone.'
               : 'Activate the zone to enable keyboard navigation.'}
           </p>
-          <div className={styles.list}>
+          <div className={styles.verticalList}>
             <button>Item 1</button>
             <button>Item 2</button>
             <button>Item 3</button>
@@ -172,14 +172,14 @@ export const HorizontalList: Story = {
   render: args => (
     <FocusZoneFrame args={args}>
       {(zoneRef, isActive) => (
-        <div ref={zoneRef} className={`${styles.zone} ${isActive ? styles.active : ''}`}>
-          <h3>Horizontal List</h3>
+        <div ref={zoneRef} className={`${styles.content} ${isActive ? styles.active : ''}`}>
+          <h1>Horizontal List</h1>
           <p className={clsx('sb-instructions', isActive && 'active')}>
             {isActive
               ? 'Use arrow keys (or configured keys) to move focus. Tab moves out of the zone.'
               : 'Activate the zone to enable keyboard navigation.'}
           </p>
-          <div className={styles.horizontalButtons}>
+          <div className={styles.horizontalList}>
             <button>Button 1</button>
             <button>Button 2</button>
             <button>Button 3</button>

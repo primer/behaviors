@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {getAnchoredPosition, type AnchorSide, type AnchorAlignment, type PositionSettings} from '../anchored-position'
 import styles from './anchored-position.stories.module.css'
 
-interface AnchoredPositionArgs extends Partial<PositionSettings> {
+type AnchoredPositionArgs = Partial<PositionSettings> & {
   floatingWidth: number
   floatingHeight: number
   anchorWidth: number
@@ -13,13 +13,6 @@ interface AnchoredPositionArgs extends Partial<PositionSettings> {
 const meta: Meta<AnchoredPositionArgs> = {
   render: (args: AnchoredPositionArgs) => <AnchoredPositionDemo args={args} />,
   title: 'Behaviors/Anchored Position',
-  parameters: {
-    docs: {
-      description: {
-        component: `The \`getAnchoredPosition\` behavior calculates the position of a "floating" element that is anchored to another DOM element. This is useful for implementing overlay UI, such as dialogs, popovers, tooltips, toasts, and dropdown-style menus.\n\nThe algorithm attempts to find the most suitable position for the floating element based on the passed-in settings, ensuring it doesn't overflow the container's bounding box.`,
-      },
-    },
-  },
   argTypes: {
     side: {
       control: 'select',
@@ -34,72 +27,31 @@ const meta: Meta<AnchoredPositionArgs> = {
         'inside-right',
         'inside-center',
       ] as AnchorSide[],
-      description: 'The side of the anchor element to position the floating element',
-      table: {
-        type: {summary: 'AnchorSide'},
-        defaultValue: {summary: 'outside-bottom'},
-      },
     },
     align: {
       control: 'radio',
       options: ['start', 'center', 'end'] as AnchorAlignment[],
-      description: 'How to align the floating element with the anchor element',
-      table: {
-        type: {summary: 'AnchorAlignment'},
-        defaultValue: {summary: 'start'},
-      },
     },
     anchorOffset: {
-      control: {type: 'number', min: -20, max: 40, step: 2},
-      description: 'The number of pixels between the anchor edge and the floating element',
-      table: {
-        type: {summary: 'number'},
-        defaultValue: {summary: '4'},
-      },
+      control: {type: 'number', step: 4},
     },
     alignmentOffset: {
-      control: {type: 'number', min: -20, max: 40, step: 2},
-      description: 'Additional offset to move the floating element from the aligning edge',
-      table: {
-        type: {summary: 'number'},
-        defaultValue: {summary: '0 or 4'},
-      },
+      control: {type: 'number', step: 4},
     },
     allowOutOfBounds: {
       control: 'boolean',
-      description: 'Allow the floating element to overflow the container bounds',
-      table: {
-        type: {summary: 'boolean'},
-        defaultValue: {summary: 'false'},
-      },
     },
     floatingWidth: {
-      control: {type: 'number', min: 50, max: 300, step: 10},
-      description: 'Width of the floating element (for demo purposes)',
-      table: {
-        category: 'Demo Settings',
-      },
+      control: {type: 'number', step: 10},
     },
     floatingHeight: {
-      control: {type: 'number', min: 50, max: 300, step: 10},
-      description: 'Height of the floating element (for demo purposes)',
-      table: {
-        category: 'Demo Settings',
-      },
+      control: {type: 'number', step: 10},
     },
     anchorWidth: {
-      control: {type: 'number', min: 50, max: 200, step: 10},
-      description: 'Width of the anchor element (for demo purposes)',
-      table: {
-        category: 'Demo Settings',
-      },
+      control: {type: 'number', step: 10},
     },
     anchorHeight: {
-      control: {type: 'number', min: 50, max: 200, step: 10},
-      description: 'Height of the anchor element (for demo purposes)',
-      table: {
-        category: 'Demo Settings',
-      },
+      control: {type: 'number', step: 10},
     },
   },
 }

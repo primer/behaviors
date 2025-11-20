@@ -7,13 +7,7 @@ import styles from './scroll-into-view.stories.module.css'
 const meta: Meta<ScrollIntoViewOptions> = {
   render: (args: ScrollIntoViewOptions) => <ScrollDemo options={args} />,
   title: 'Behaviors/Scroll Into View',
-  parameters: {
-    docs: {
-      description: {
-        component: `The \`scrollIntoView\` behavior is used to scroll an element into view within a specific \`viewingArea\` element. This behaves similarly to the browser's [\`element.scrollIntoView\` method](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView), but restricts the scrolling to a specific viewing area. This is useful if you want to trigger scrolling in an overlay or section without causing the whole page to scroll.`,
-      },
-    },
-  },
+
   argTypes: {
     direction: {
       control: 'radio',

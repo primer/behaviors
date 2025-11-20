@@ -7,7 +7,7 @@
 .zone {
   padding: 1.5rem;
   border: 2px solid var(--sb-border-default);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   background: var(--sb-canvas-default);
   transition: all 0.2s ease;
 }
@@ -20,7 +20,7 @@
 
 .zone h3 {
   margin: 0 0 0.75rem;
-  font-size: 1.125rem;
+  font-size: var(--sb-text-title-size-small);
 }
 
 .list {
@@ -42,9 +42,9 @@
   padding: 0.75rem 1rem;
   background: var(--sb-canvas-default);
   border: 1px solid var(--sb-border-default);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--sb-text-body-size-medium);
 }
 
 .list button:hover {
@@ -62,16 +62,16 @@
   gap: 0.5rem;
   padding: 0.5rem;
   background: var(--sb-canvas-default);
-  border-radius: 4px;
+  border-radius: var(--sb-borderRadius-small);
 }
 
 .horizontalButtons button {
   padding: 0.75rem 1rem;
   background: var(--sb-canvas-default);
   border: 1px solid var(--sb-border-default);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--sb-text-body-size-medium);
 }
 
 .horizontalButtons button:hover {

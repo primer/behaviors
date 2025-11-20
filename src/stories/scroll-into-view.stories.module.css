@@ -12,7 +12,7 @@
 
 .viewingArea {
   border: 2px solid var(--sb-accent-fg);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   width: 100%;
   overflow: auto;
   padding: 1rem;
@@ -56,7 +56,7 @@
   padding: 1rem;
   background-color: var(--sb-canvas-default);
   border: 2px solid var(--sb-border-default);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
 
   &.active {
     background-color: var(--sb-accent-subtle);

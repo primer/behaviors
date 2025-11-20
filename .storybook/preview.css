@@ -19,6 +19,15 @@
   /* Success (Green) */
   --sb-success-emphasis: #1f883d;
   --sb-success-subtle: #dafbe1;
+
+  /* Typography */
+  --sb-text-body-size-medium: 0.875rem;
+  --sb-text-body-size-small: 0.8125rem;
+  --sb-text-title-size-small: 1.125rem;
+
+  /* Size */
+  --sb-borderRadius-small: 4px;
+  --sb-borderRadius-medium: 6px;
 }
 
 html {
@@ -50,7 +59,7 @@ html {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--sb-canvas-subtle);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -58,8 +67,8 @@ html {
 .sb-status {
   padding: 0.25rem 0.5rem;
   background: var(--sb-canvas-default);
-  border-radius: 4px;
-  font-size: 0.875rem;
+  border-radius: var(--sb-borderRadius-small);
+  font-size: var(--sb-text-body-size-medium);
   font-weight: 500;
   color: var(--sb-fg-muted);
 }
@@ -72,7 +81,7 @@ html {
 .sb-container {
   padding: 2rem;
   border: 2px dashed var(--sb-border-default);
-  border-radius: 6px;
+  border-radius: var(--sb-borderRadius-medium);
   background: var(--sb-canvas-default);
   transition: border-color 0.2s;
 }
@@ -87,8 +96,8 @@ html {
   padding: 0.5rem 1rem;
   background: var(--sb-canvas-default);
   border: 1px solid var(--sb-border-default);
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border-radius: var(--sb-borderRadius-medium);
+  font-size: var(--sb-text-body-size-medium);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -130,8 +139,8 @@ html {
   margin: 0 0 1rem 0;
   padding: 0.75rem;
   background: var(--sb-canvas-default);
-  border-radius: 4px;
-  font-size: 0.875rem;
+  border-radius: var(--sb-borderRadius-small);
+  font-size: var(--sb-text-body-size-medium);
   color: var(--sb-fg-muted);
   border: 1px solid var(--sb-border-default);
   border-left: 3px solid var(--sb-border-default);

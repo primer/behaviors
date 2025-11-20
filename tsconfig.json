@@ -9,7 +9,7 @@
     "outDir": "dist/esm",
     "removeComments": true,
     "preserveConstEnums": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true
   },
   "exclude": ["src/__tests__", "src/stories", "dist"]

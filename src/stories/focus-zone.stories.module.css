@@ -4,59 +4,32 @@
   gap: 1rem;
 }
 
-.zone {
+.content {
   padding: 1.5rem;
   border: 2px solid var(--sb-border-default);
   border-radius: var(--sb-borderRadius-medium);
   background: var(--sb-canvas-default);
   transition: all 0.2s ease;
+
+  &.active {
+    border-color: var(--sb-accent-fg);
+    background: var(--sb-accent-subtle);
+    box-shadow: 0 0 0 3px var(--sb-accent-muted);
+  }
 }
 
-.zone.active {
-  border-color: var(--sb-accent-fg);
-  background: var(--sb-accent-subtle);
-  box-shadow: 0 0 0 3px var(--sb-accent-muted);
-}
-
-.zone h3 {
+h1 {
   margin: 0 0 0.75rem;
   font-size: var(--sb-text-title-size-small);
 }
 
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.verticalList {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.list li {
-  margin: 0;
-}
-
-.list button {
-  width: 100%;
-  text-align: left;
-  padding: 0.75rem 1rem;
-  background: var(--sb-canvas-default);
-  border: 1px solid var(--sb-border-default);
-  border-radius: var(--sb-borderRadius-medium);
-  cursor: pointer;
-  font-size: var(--sb-text-body-size-medium);
-}
-
-.list button:hover {
-  background: var(--sb-canvas-subtle);
-}
-
-.list button:focus {
-  outline: 2px solid var(--sb-accent-fg);
-  outline-offset: -2px;
-}
-
-.horizontalButtons {
+.horizontalList {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
   gap: 0.5rem;
@@ -65,20 +38,26 @@
   border-radius: var(--sb-borderRadius-small);
 }
 
-.horizontalButtons button {
+.verticalList button,
+.horizontalList button {
   padding: 0.75rem 1rem;
   background: var(--sb-canvas-default);
   border: 1px solid var(--sb-border-default);
   border-radius: var(--sb-borderRadius-medium);
   cursor: pointer;
   font-size: var(--sb-text-body-size-medium);
+
+  &:hover {
+    background: var(--sb-canvas-subtle);
+  }
+
+  &:focus {
+    outline: 2px solid var(--sb-accent-fg);
+    outline-offset: -2px;
+  }
 }
 
-.horizontalButtons button:hover {
-  background: var(--sb-canvas-subtle);
-}
-
-.horizontalButtons button:focus {
-  outline: 2px solid var(--sb-accent-fg);
-  outline-offset: -2px;
+.verticalList button {
+  width: 100%;
+  text-align: left;
 }

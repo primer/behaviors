@@ -1,7 +1,7 @@
 .demo {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
 .info {
@@ -18,7 +18,7 @@
   flex: 1;
 }
 
-.infoSection h4 {
+h1 {
   margin: 0 0 0.5rem 0;
   font-size: var(--sb-text-body-size-medium);
   font-weight: 600;
@@ -34,17 +34,17 @@
   font-size: var(--sb-text-body-size-small);
 }
 
-.details dt {
+dt {
   font-weight: 600;
   color: var(--sb-fg-muted);
 }
 
-.details dd {
+dd {
   margin: 0;
   color: var(--sb-fg-default);
 }
 
-.container {
+.viewport {
   position: relative;
   width: 100%;
   height: 500px;

@@ -11,12 +11,12 @@
 }
 
 .viewingArea {
-  border: 2px solid #0969da;
+  border: 2px solid var(--sb-accent-fg);
   border-radius: 6px;
   width: 100%;
   overflow: auto;
   padding: 1rem;
-  background-color: #f6f8fa;
+  background-color: var(--sb-canvas-subtle);
   box-sizing: border-box;
 
   &.vertical {
@@ -54,13 +54,13 @@
 .item {
   font-family: sans-serif;
   padding: 1rem;
-  background-color: #ffffff;
-  border: 2px solid #d0d7de;
+  background-color: var(--sb-canvas-default);
+  border: 2px solid var(--sb-border-default);
   border-radius: 6px;
 
   &.active {
-    background-color: #ddf4ff;
-    border: 2px solid #0969da;
+    background-color: var(--sb-accent-subtle);
+    border: 2px solid var(--sb-accent-fg);
     font-weight: bold;
   }
 }

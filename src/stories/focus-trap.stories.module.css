@@ -1,0 +1,58 @@
+.trapContainer {
+  padding: 1.5rem;
+  border: 2px solid var(--sb-border-default);
+  border-radius: 6px;
+  background: var(--sb-canvas-default);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.trapContainer.active {
+  border-color: var(--sb-accent-fg);
+  background: var(--sb-accent-subtle);
+  box-shadow: 0 0 0 3px var(--sb-accent-muted);
+}
+
+.trapContainer h3 {
+  font-size: 1.125rem;
+  margin: 0 0 0.75rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-end: 1rem;
+}
+
+.buttons:last-child {
+  margin-bottom: 0;
+}
+
+.inputGroup {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  border-radius: 4px;
+  margin-block-end: 1rem;
+}
+
+.inputGroup input[type='text'] {
+  grid-column: 1 / -1;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--sb-border-default);
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.inputGroup input[type='checkbox'] {
+  margin: 0;
+}
+
+.inputGroup label {
+  margin: 0;
+  font-size: 0.875rem;
+}

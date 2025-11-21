@@ -41,11 +41,11 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
       initialFocus = buttonRefs.current[args.initialFocusIndex] || undefined
     }
 
-    const controller = args.autoCloseSeconds ? new AbortController() : undefined
-
-    if (controller) {
-      controllerRef.current = focusTrap(trapRef.current, initialFocus, controller.signal)
-      setTimeLeft(args.autoCloseSeconds!)
+    if (args.autoCloseSeconds) {
+      const controller = new AbortController()
+      focusTrap(trapRef.current, initialFocus, controller.signal)
+      controllerRef.current = controller
+      setTimeLeft(args.autoCloseSeconds)
     } else {
       controllerRef.current = focusTrap(trapRef.current, initialFocus)
     }

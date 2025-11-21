@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import React, {useRef} from 'react'
-import clsx from 'clsx/lite'
-import {scrollIntoView, ScrollIntoViewOptions} from '../scroll-into-view'
+import clsx from 'clsx'
+import {scrollIntoView, type ScrollIntoViewOptions} from '../scroll-into-view'
 import styles from './scroll-into-view.stories.module.css'
 
 const meta: Meta<ScrollIntoViewOptions> = {

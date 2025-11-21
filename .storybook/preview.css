@@ -1,0 +1,140 @@
+:root {
+  --sb-fg-default: #1f2328;
+  --sb-fg-muted: #656d76;
+
+  --sb-canvas-default: #ffffff;
+  --sb-canvas-subtle: #f6f8fa;
+  --sb-canvas-inset: #eff2f5;
+
+  --sb-border-default: #d1d9e0;
+
+  --sb-accent-fg: #0969da;
+  --sb-accent-subtle: #dff7ff;
+  --sb-accent-muted: rgba(9, 105, 218, 0.1);
+
+  --sb-success-emphasis: #1f883d;
+  --sb-success-subtle: #dafbe1;
+
+  --sb-text-body-size-medium: 0.875rem;
+  --sb-text-body-size-small: 0.8125rem;
+  --sb-text-title-size-small: 1.125rem;
+
+  --sb-borderRadius-small: 4px;
+  --sb-borderRadius-medium: 6px;
+}
+
+html {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--sb-fg-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button:focus {
+  outline: 2px solid var(--sb-accent-fg);
+  outline-offset: 2px;
+}
+
+/* Storybook Demo Utilities */
+
+.sb-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.sb-controls {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--sb-canvas-subtle);
+  border-radius: var(--sb-borderRadius-medium);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sb-status {
+  padding: 0.25rem 0.5rem;
+  background: var(--sb-canvas-default);
+  border-radius: var(--sb-borderRadius-small);
+  font-size: var(--sb-text-body-size-medium);
+  font-weight: 500;
+}
+
+.sb-status.active {
+  background: var(--sb-success-subtle);
+  color: var(--sb-success-emphasis);
+}
+
+.sb-container {
+  padding: 2rem;
+  border: 2px dashed var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  background: var(--sb-canvas-default);
+  transition: border-color 0.2s;
+}
+
+.sb-container.active {
+  border-color: var(--sb-accent-fg);
+  border-style: solid;
+  background: var(--sb-canvas-subtle);
+}
+
+.sb-button {
+  padding: 0.5rem 1rem;
+  background: var(--sb-canvas-default);
+  border: 1px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  font-size: var(--sb-text-body-size-medium);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sb-button:hover {
+  background: var(--sb-canvas-subtle);
+  border-color: var(--sb-accent-fg);
+}
+
+.sb-button:active {
+  background: var(--sb-canvas-inset);
+}
+
+.sb-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sb-instructions {
+  width: 100%;
+  margin-block-end: 1rem;
+  padding: 0.75rem;
+  background: var(--sb-canvas-default);
+  border-radius: var(--sb-borderRadius-small);
+  font-size: var(--sb-text-body-size-medium);
+  border: 1px solid var(--sb-border-default);
+  border-left: 3px solid var(--sb-border-default);
+  transition: border-color 0.2s;
+}
+
+.sb-instructions.active {
+  border-color: var(--sb-accent-fg);
+}

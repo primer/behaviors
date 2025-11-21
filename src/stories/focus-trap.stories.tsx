@@ -6,6 +6,7 @@ import styles from './focus-trap.stories.module.css'
 
 type FocusTrapArgs = {
   initialFocusIndex: number
+  autoCloseSeconds?: number
 }
 
 const meta: Meta<FocusTrapArgs> = {
@@ -25,7 +26,9 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
   const trapRef = useRef<HTMLDivElement>(null)
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([])
   const [isActive, setIsActive] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(args.autoCloseSeconds || 0)
   const controllerRef = useRef<AbortController | undefined>(undefined)
+  const timerRef = useRef<number | undefined>(undefined)
 
   const activateTrap = () => {
     if (isActive || !trapRef.current) {
@@ -38,7 +41,27 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
       initialFocus = buttonRefs.current[args.initialFocusIndex] || undefined
     }
 
-    controllerRef.current = focusTrap(trapRef.current, initialFocus)
+    const controller = args.autoCloseSeconds ? new AbortController() : undefined
+
+    if (controller) {
+      controllerRef.current = focusTrap(trapRef.current, initialFocus, controller.signal)
+      setTimeLeft(args.autoCloseSeconds!)
+
+      timerRef.current = window.setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            controller.abort()
+            setIsActive(false)
+            if (timerRef.current) clearInterval(timerRef.current)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } else {
+      controllerRef.current = focusTrap(trapRef.current, initialFocus)
+    }
+
     setIsActive(true)
   }
 
@@ -48,12 +71,19 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
       controllerRef.current = undefined
       setIsActive(false)
     }
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = undefined
+    }
   }
 
   useEffect(() => {
     return () => {
       if (controllerRef.current) {
         controllerRef.current.abort()
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
       }
     }
   }, [])
@@ -69,6 +99,7 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
         </button>
         <span className="sb-status">
           Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+          {args.autoCloseSeconds && isActive && <> (closing in {timeLeft}s...)</>}
         </span>
       </div>
       <div
@@ -115,5 +146,12 @@ export const BasicTrap: Story = {
 export const CustomInitialFocus: Story = {
   args: {
     initialFocusIndex: 2,
+  },
+}
+
+export const ExternalAbortSignal: Story = {
+  args: {
+    initialFocusIndex: 0,
+    autoCloseSeconds: 5,
   },
 }

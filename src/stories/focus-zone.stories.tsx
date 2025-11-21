@@ -19,7 +19,7 @@ type BindKeysOption =
 type FocusZoneArgs = {
   bindKeys: BindKeysOption[]
   focusOutBehavior: 'stop' | 'wrap'
-  focusInStrategy: 'first' | 'previous'
+  focusInStrategy: 'first' | 'previous' | 'closest'
 }
 
 const meta: Meta<FocusZoneArgs> = {
@@ -46,7 +46,7 @@ const meta: Meta<FocusZoneArgs> = {
     },
     focusInStrategy: {
       control: 'radio',
-      options: ['first', 'previous'],
+      options: ['first', 'previous', 'closest'],
     },
   },
 }
@@ -130,6 +130,7 @@ const FocusZoneFrame: React.FC<FocusZoneFrameProps> = ({args, children}) => {
       </div>
 
       <div className={styles.container}>{children(zoneRef, isActive)}</div>
+      <button>Trailing button</button>
     </div>
   )
 }
@@ -146,9 +147,13 @@ export const VerticalList: Story = {
         <div ref={zoneRef} className={clsx(styles.content, isActive && styles.active)}>
           <h1>Vertical List</h1>
           <p className={clsx('sb-instructions', isActive && 'active')}>
-            {isActive
-              ? 'Use arrow keys (or configured keys) to move focus. Tab moves out of the zone.'
-              : 'Activate the zone to enable keyboard navigation.'}
+            {isActive ? (
+              <>
+                Use arrow keys (or configured keys) to move focus. <kbd>Tab</kbd> moves out of the zone.
+              </>
+            ) : (
+              'Activate the zone to enable keyboard navigation.'
+            )}
           </p>
           <div className={styles.verticalList}>
             <button>Item 1</button>
@@ -175,9 +180,13 @@ export const HorizontalList: Story = {
         <div ref={zoneRef} className={`${styles.content} ${isActive ? styles.active : ''}`}>
           <h1>Horizontal List</h1>
           <p className={clsx('sb-instructions', isActive && 'active')}>
-            {isActive
-              ? 'Use arrow keys (or configured keys) to move focus. Tab moves out of the zone.'
-              : 'Activate the zone to enable keyboard navigation.'}
+            {isActive ? (
+              <>
+                Use arrow keys (or configured keys) to move focus. <kbd>Tab</kbd> moves out of the zone.
+              </>
+            ) : (
+              'Activate the zone to enable keyboard navigation.'
+            )}
           </p>
           <div className={styles.horizontalList}>
             <button>Button 1</button>
@@ -190,4 +199,357 @@ export const HorizontalList: Story = {
       )}
     </FocusZoneFrame>
   ),
+}
+
+export const ClosestStrategy: Story = {
+  args: {
+    bindKeys: ['Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'closest',
+  },
+  render: args => (
+    <FocusZoneFrame args={args}>
+      {(zoneRef, isActive) => (
+        <div ref={zoneRef} className={clsx(styles.content, isActive && styles.active)}>
+          <h1>Closest Strategy</h1>
+          <p className={clsx('sb-instructions', isActive && 'active')}>
+            {isActive ? (
+              'The "closest" strategy focuses the first item when tabbing forward, or the last item when shift-tabbing backward. Try it!'
+            ) : (
+              <>
+                Activate the zone, then use <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> from outside elements to
+                see closest strategy in action.
+              </>
+            )}
+          </p>
+          <div className={styles.verticalList}>
+            <button>First Item</button>
+            <button>Second Item</button>
+            <button>Third Item</button>
+            <button>Fourth Item</button>
+            <button>Last Item</button>
+          </div>
+        </div>
+      )}
+    </FocusZoneFrame>
+  ),
+}
+
+export const GridNavigation: Story = {
+  args: {
+    bindKeys: ['Arrow Horizontal', 'Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'previous',
+  },
+  render: () => {
+    const [isActive, setIsActive] = useState(false)
+    const gridRef = useRef<HTMLDivElement>(null)
+    const [controller, setController] = useState<AbortController | undefined>(undefined)
+
+    const activateZone = () => {
+      if (!gridRef.current || controller) return
+
+      const getNextFocusable = (
+        direction: 'previous' | 'next' | 'start' | 'end',
+        from: Element | undefined,
+        event: KeyboardEvent,
+      ): HTMLElement | undefined => {
+        if (!from || !gridRef.current) return undefined
+
+        const buttons = Array.from(gridRef.current.querySelectorAll('button'))
+        const currentIndex = buttons.indexOf(from as HTMLButtonElement)
+        if (currentIndex === -1) return undefined
+
+        const cols = 4
+        const rows = Math.ceil(buttons.length / cols)
+        const currentRow = Math.floor(currentIndex / cols)
+        const currentCol = currentIndex % cols
+
+        let newIndex: number | undefined = currentIndex
+
+        const key = event.key
+
+        if (key === 'ArrowLeft' && currentCol > 0) {
+          newIndex = currentIndex - 1
+        } else if (key === 'ArrowRight' && currentCol < cols - 1 && currentIndex + 1 < buttons.length) {
+          newIndex = currentIndex + 1
+        } else if (key === 'ArrowUp' && currentRow > 0) {
+          newIndex = currentIndex - cols
+        } else if (key === 'ArrowDown' && currentRow < rows - 1 && currentIndex + cols < buttons.length) {
+          newIndex = currentIndex + cols
+        }
+
+        return buttons[newIndex]
+      }
+
+      setController(
+        focusZone(gridRef.current, {
+          bindKeys: FocusKeys.ArrowAll,
+          focusOutBehavior: 'stop',
+          focusInStrategy: 'previous',
+          getNextFocusable,
+        }),
+      )
+      setIsActive(true)
+    }
+
+    const deactivateZone = () => {
+      if (controller) {
+        controller.abort()
+        setController(undefined)
+        setIsActive(false)
+      }
+    }
+
+    useEffect(() => {
+      return () => {
+        if (controller) controller.abort()
+      }
+    }, [controller])
+
+    return (
+      <div className="sb-demo">
+        <div className="sb-controls">
+          <button onClick={activateZone} disabled={isActive}>
+            Activate Focus Zone
+          </button>
+          <button onClick={deactivateZone} disabled={!isActive}>
+            Deactivate Focus Zone
+          </button>
+          <span className="sb-status">
+            Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+          </span>
+        </div>
+        <div className={styles.container}>
+          <div ref={gridRef} className={clsx(styles.content, isActive && styles.active)}>
+            <h1>2D Grid Navigation</h1>
+            <p className={clsx('sb-instructions', isActive && 'active')}>
+              {isActive ? (
+                <>
+                  Use arrow keys to navigate the grid in 2D. Custom <code>getNextFocusable</code> callback enables this
+                  behavior.
+                </>
+              ) : (
+                'Activate to enable 2D grid navigation with arrow keys.'
+              )}
+            </p>
+            <div className={styles.grid}>
+              {Array.from({length: 12}, (_, i) => (
+                <button key={i}>Cell {i + 1}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+}
+
+export const FilteredElements: Story = {
+  args: {
+    bindKeys: ['Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'previous',
+  },
+  render: () => {
+    const [isActive, setIsActive] = useState(false)
+    const [skipDisabled, setSkipDisabled] = useState(true)
+    const listRef = useRef<HTMLDivElement>(null)
+    const [controller, setController] = useState<AbortController | undefined>(undefined)
+
+    const activateZone = () => {
+      if (!listRef.current || controller) return
+
+      const focusableElementFilter = skipDisabled
+        ? (element: HTMLElement) => !element.hasAttribute('disabled')
+        : undefined
+
+      setController(
+        focusZone(listRef.current, {
+          bindKeys: FocusKeys.ArrowVertical | FocusKeys.HomeAndEnd,
+          focusOutBehavior: 'stop',
+          focusInStrategy: 'previous',
+          focusableElementFilter,
+        }),
+      )
+      setIsActive(true)
+    }
+
+    const deactivateZone = () => {
+      if (controller) {
+        controller.abort()
+        setController(undefined)
+        setIsActive(false)
+      }
+    }
+
+    useEffect(() => {
+      return () => {
+        if (controller) controller.abort()
+      }
+    }, [controller])
+
+    useEffect(() => {
+      if (isActive) {
+        deactivateZone()
+        activateZone()
+      }
+    }, [skipDisabled])
+
+    return (
+      <div className="sb-demo">
+        <div className="sb-controls">
+          <button onClick={activateZone} disabled={isActive}>
+            Activate Focus Zone
+          </button>
+          <button onClick={deactivateZone} disabled={!isActive}>
+            Deactivate Focus Zone
+          </button>
+          <label>
+            <input
+              type="checkbox"
+              checked={skipDisabled}
+              onChange={e => setSkipDisabled(e.target.checked)}
+              disabled={isActive}
+            />
+            Skip disabled items
+          </label>
+          <span className="sb-status">
+            Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+          </span>
+        </div>
+        <div className={styles.container}>
+          <div ref={listRef} className={clsx(styles.content, isActive && styles.active)}>
+            <h1>Filtered Elements</h1>
+            <p className={clsx('sb-instructions', isActive && 'active')}>
+              {isActive ? (
+                skipDisabled ? (
+                  'Arrow keys skip disabled items using focusableElementFilter callback.'
+                ) : (
+                  'Arrow keys include disabled items (filter disabled).'
+                )
+              ) : (
+                <>
+                  Toggle the filter and activate to see how <code>focusableElementFilter</code> works.
+                </>
+              )}
+            </p>
+            <div className={styles.verticalList}>
+              <button>Item 1</button>
+              <button>Item 2</button>
+              <button disabled>Item 3 (Disabled)</button>
+              <button>Item 4</button>
+              <button disabled>Item 5 (Disabled)</button>
+              <button>Item 6</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+}
+
+export const ActiveDescendant: Story = {
+  args: {
+    bindKeys: ['Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'previous',
+  },
+  render: () => {
+    const [isActive, setIsActive] = useState(false)
+    const [activeIndex, setActiveIndex] = useState<number | null>(null)
+    const controlRef = useRef<HTMLDivElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
+    const [controller, setController] = useState<AbortController | undefined>(undefined)
+
+    const activateZone = () => {
+      if (!listRef.current || !controlRef.current || controller) return
+
+      const onActiveDescendantChanged = (
+        newActiveDescendant: HTMLElement | undefined,
+        previousActiveDescendant: HTMLElement | undefined,
+      ) => {
+        if (previousActiveDescendant) {
+          previousActiveDescendant.classList.remove(styles.activeDescendant)
+        }
+
+        if (newActiveDescendant) {
+          newActiveDescendant.classList.add(styles.activeDescendant)
+          const index = Array.from(listRef.current!.children).indexOf(newActiveDescendant)
+          setActiveIndex(index)
+        } else {
+          setActiveIndex(null)
+        }
+      }
+
+      setController(
+        focusZone(listRef.current, {
+          bindKeys: FocusKeys.ArrowVertical | FocusKeys.HomeAndEnd,
+          focusOutBehavior: 'stop',
+          focusInStrategy: 'previous',
+          activeDescendantControl: controlRef.current,
+          onActiveDescendantChanged,
+        }),
+      )
+      setIsActive(true)
+
+      controlRef.current.focus()
+    }
+
+    const deactivateZone = () => {
+      if (controller) {
+        controller.abort()
+        setController(undefined)
+        setIsActive(false)
+        setActiveIndex(null)
+      }
+    }
+
+    useEffect(() => {
+      return () => {
+        if (controller) controller.abort()
+      }
+    }, [controller])
+
+    return (
+      <div className="sb-demo">
+        <div className="sb-controls">
+          <button onClick={activateZone} disabled={isActive}>
+            Activate Focus Zone
+          </button>
+          <button onClick={deactivateZone} disabled={!isActive}>
+            Deactivate Focus Zone
+          </button>
+          <span className="sb-status">
+            Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+            {activeIndex !== null && ` | Active: Item ${activeIndex + 1}`}
+          </span>
+        </div>
+        <div className={styles.container}>
+          <div className={clsx(styles.content, isActive && styles.active)}>
+            <h1>Active Descendant Mode</h1>
+            <p className={clsx('sb-instructions', isActive && 'active')}>
+              {isActive ? (
+                <>
+                  DOM focus stays on the control. Arrow keys change <code>aria-activedescendant</code>. Notice the
+                  highlighted item changes without focus ring movement.
+                </>
+              ) : (
+                'Activate to see Active Descendant mode - an alternative focus management pattern for accessibility.'
+              )}
+            </p>
+            <div ref={controlRef} tabIndex={0} className={styles.activeDescendantControl} aria-label="Listbox control">
+              <div ref={listRef} role="listbox" className={styles.activeDescendantList}>
+                {Array.from({length: 5}, (_, i) => (
+                  <div key={i} role="option" id={`option-${i}`} tabIndex={-1} className={styles.activeDescendantItem}>
+                    Option {i + 1}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
 }

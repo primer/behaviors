@@ -38,6 +38,11 @@ html {
   box-sizing: border-box;
 }
 
+button:focus {
+  outline: 2px solid var(--sb-accent-fg);
+  outline-offset: 2px;
+}
+
 /* Storybook Demo Utilities */
 
 .sb-demo {
@@ -100,11 +105,6 @@ html {
   border-color: var(--sb-accent-fg);
 }
 
-.sb-button:focus-visible {
-  outline: 2px solid var(--sb-accent-fg);
-  outline-offset: 2px;
-}
-
 .sb-button:active {
   background: var(--sb-canvas-inset);
 }
@@ -125,7 +125,7 @@ html {
 
 .sb-instructions {
   width: 100%;
-  margin: 0 0 1rem 0;
+  margin-block-end: 1rem;
   padding: 0.75rem;
   background: var(--sb-canvas-default);
   border-radius: var(--sb-borderRadius-small);

@@ -362,7 +362,7 @@ export const FilteredElements: Story = {
 
       const focusableElementFilter = skipEvenItems
         ? (element: HTMLElement) => {
-            const index = Number(element.dataset.index)
+            const index = Number(element.getAttribute('data-index'))
             if (Number.isNaN(index)) return true
             return (index + 1) % 2 !== 0
           }

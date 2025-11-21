@@ -50,14 +50,69 @@ h1 {
   &:hover {
     background: var(--sb-canvas-subtle);
   }
-
-  &:focus {
-    outline: 2px solid var(--sb-accent-fg);
-    outline-offset: -2px;
-  }
 }
 
 .verticalList button {
   width: 100%;
   text-align: left;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+
+  button {
+    padding: 1rem;
+    background: var(--sb-canvas-default);
+    border: 1px solid var(--sb-border-default);
+    border-radius: var(--sb-borderRadius-medium);
+    cursor: pointer;
+    font-size: var(--sb-text-body-size-medium);
+    min-height: 60px;
+
+    &:hover {
+      background: var(--sb-canvas-subtle);
+    }
+  }
+}
+
+.activeDescendantControl {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  background: var(--sb-canvas-default);
+
+  &:focus {
+    outline: 2px solid var(--sb-accent-fg);
+    outline-offset: 2px;
+    border-color: var(--sb-accent-fg);
+  }
+}
+
+.activeDescendantList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activeDescendantItem {
+  padding: 0.75rem 1rem;
+  background: var(--sb-canvas-default);
+  border: 1px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-small);
+  cursor: pointer;
+  font-size: var(--sb-text-body-size-medium);
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--sb-canvas-subtle);
+  }
+
+  &.activeDescendant {
+    background: var(--sb-accent-subtle);
+    border-color: var(--sb-accent-fg);
+    font-weight: 600;
+  }
 }

@@ -353,15 +353,19 @@ export const FilteredElements: Story = {
   },
   render: () => {
     const [isActive, setIsActive] = useState(false)
-    const [skipDisabled, setSkipDisabled] = useState(true)
+    const [skipEvenItems, setSkipEvenItems] = useState(true)
     const listRef = useRef<HTMLDivElement>(null)
     const [controller, setController] = useState<AbortController | undefined>(undefined)
 
     const activateZone = () => {
       if (!listRef.current || controller) return
 
-      const focusableElementFilter = skipDisabled
-        ? (element: HTMLElement) => !element.hasAttribute('disabled')
+      const focusableElementFilter = skipEvenItems
+        ? (element: HTMLElement) => {
+            const index = Number(element.dataset.index)
+            if (Number.isNaN(index)) return true
+            return (index + 1) % 2 !== 0
+          }
         : undefined
 
       setController(
@@ -394,7 +398,7 @@ export const FilteredElements: Story = {
         deactivateZone()
         activateZone()
       }
-    }, [skipDisabled])
+    }, [skipEvenItems])
 
     return (
       <div className="sb-demo">
@@ -408,11 +412,11 @@ export const FilteredElements: Story = {
           <label>
             <input
               type="checkbox"
-              checked={skipDisabled}
-              onChange={e => setSkipDisabled(e.target.checked)}
+              checked={skipEvenItems}
+              onChange={e => setSkipEvenItems(e.target.checked)}
               disabled={isActive}
             />
-            Skip disabled items
+            Skip even-numbered items
           </label>
           <span className="sb-status">
             Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
@@ -423,10 +427,10 @@ export const FilteredElements: Story = {
             <h1>Filtered Elements</h1>
             <p className={clsx('sb-instructions', isActive && 'active')}>
               {isActive ? (
-                skipDisabled ? (
-                  'Arrow keys skip disabled items using focusableElementFilter callback.'
+                skipEvenItems ? (
+                  'Arrow keys skip even-numbered items using focusableElementFilter callback.'
                 ) : (
-                  'Arrow keys include disabled items (filter disabled).'
+                  'Arrow keys include every item (no filter).'
                 )
               ) : (
                 <>
@@ -435,12 +439,20 @@ export const FilteredElements: Story = {
               )}
             </p>
             <div className={styles.verticalList}>
-              <button>Item 1</button>
-              <button>Item 2</button>
-              <button disabled>Item 3 (Disabled)</button>
-              <button>Item 4</button>
-              <button disabled>Item 5 (Disabled)</button>
-              <button>Item 6</button>
+              {Array.from({length: 6}, (_, i) => {
+                const isEvenItem = (i + 1) % 2 === 0
+                const isFilteredOut = skipEvenItems && isEvenItem
+                return (
+                  <button
+                    key={i}
+                    data-index={i}
+                    tabIndex={isFilteredOut ? -1 : undefined}
+                    aria-disabled={isFilteredOut ? true : undefined}
+                  >
+                    Item {i + 1}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>

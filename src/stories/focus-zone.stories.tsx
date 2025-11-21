@@ -105,7 +105,7 @@ const FocusZoneFrame: React.FC<FocusZoneFrameProps> = ({args, children}) => {
     return () => {
       deactivateZone()
     }
-  }, [controller])
+  }, [])
 
   useEffect(() => {
     if (args && isActive && zoneRef.current) {

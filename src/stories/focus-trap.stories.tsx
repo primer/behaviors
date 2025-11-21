@@ -46,18 +46,6 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
     if (controller) {
       controllerRef.current = focusTrap(trapRef.current, initialFocus, controller.signal)
       setTimeLeft(args.autoCloseSeconds!)
-
-      timerRef.current = window.setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            controller.abort()
-            setIsActive(false)
-            if (timerRef.current) clearInterval(timerRef.current)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
     } else {
       controllerRef.current = focusTrap(trapRef.current, initialFocus)
     }
@@ -78,12 +66,30 @@ const FocusTrapDemo: React.FC<{args: FocusTrapArgs}> = ({args}) => {
   }
 
   useEffect(() => {
+    if (isActive && args.autoCloseSeconds) {
+      timerRef.current = window.setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            deactivateTrap()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = undefined
+      }
+    }
+  }, [isActive, args.autoCloseSeconds])
+
+  useEffect(() => {
     return () => {
       if (controllerRef.current) {
         controllerRef.current.abort()
-      }
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
       }
     }
   }, [])

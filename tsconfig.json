@@ -12,6 +12,5 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*", ".storybook/**/*"],
   "exclude": ["src/__tests__", "dist"]
 }

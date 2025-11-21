@@ -18,7 +18,7 @@
   flex: 1;
 }
 
-h1 {
+.infoSection h1 {
   margin: 0 0 0.5rem;
   font-size: var(--sb-text-body-size-medium);
   font-weight: 600;
@@ -34,12 +34,12 @@ h1 {
   font-size: var(--sb-text-body-size-small);
 }
 
-dt {
+.details dt {
   font-weight: 600;
   color: var(--sb-fg-muted);
 }
 
-dd {
+.details dd {
   margin: 0;
   color: var(--sb-fg-default);
 }

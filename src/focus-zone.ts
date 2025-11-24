@@ -233,7 +233,7 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * When `true` (default), moving the mouse over a focusable element will make it the current active descendant.
    * When `false`, moving the mouse will have no effect on the current active descendant value.
    */
-  selectOnHover?: boolean
+  activeOnHover?: boolean
 }
 
 function getDirection(keyboardEvent: KeyboardEvent) {
@@ -368,7 +368,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const focusInStrategy = settings?.focusInStrategy ?? 'previous'
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
-  const selectOnHover = settings?.selectOnHover ?? true
+  const activeOnHover = settings?.activeOnHover ?? true
   let currentFocusedElement: HTMLElement | undefined
   const preventScroll = settings?.preventScroll ?? false
 
@@ -606,7 +606,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       },
       {signal},
     )
-    if (selectOnHover) {
+    if (activeOnHover) {
       container.addEventListener(
         'mousemove',
         ({target}) => {

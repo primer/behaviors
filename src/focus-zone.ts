@@ -228,6 +228,12 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * no scrolling will occur.
    */
   preventScroll?: boolean
+  /**
+   * Choose the behavior between selecting a focused element on mouse hover.
+   * When `true` (default), moving the mouse over a focusable element will make it the current active descendant.
+   * When `false`, moving the mouse will have no effect on the current active descendant value.
+   */
+  selectOnHover?: boolean
 }
 
 function getDirection(keyboardEvent: KeyboardEvent) {
@@ -362,6 +368,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const focusInStrategy = settings?.focusInStrategy ?? 'previous'
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
+  const selectOnHover = settings?.selectOnHover ?? true
   let currentFocusedElement: HTMLElement | undefined
   const preventScroll = settings?.preventScroll ?? false
 
@@ -599,21 +606,23 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       },
       {signal},
     )
-    container.addEventListener(
-      'mousemove',
-      ({target}) => {
-        if (!(target instanceof Node)) {
-          return
-        }
+    if (selectOnHover) {
+      container.addEventListener(
+        'mousemove',
+        ({target}) => {
+          if (!(target instanceof Node)) {
+            return
+          }
 
-        const focusableElement = focusableElements.find(element => element.contains(target))
+          const focusableElement = focusableElements.find(element => element.contains(target))
 
-        if (focusableElement) {
-          updateFocusedElement(focusableElement)
-        }
-      },
-      {signal, capture: true},
-    )
+          if (focusableElement) {
+            updateFocusedElement(focusableElement)
+          }
+        },
+        {signal, capture: true},
+      )
+    }
 
     // Listeners specifically on the controlling element
     activeDescendantControl.addEventListener(

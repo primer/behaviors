@@ -229,7 +229,7 @@ export type FocusZoneSettings = IterateFocusableElements & {
    */
   preventScroll?: boolean
   /**
-   * Choose the behavior between selecting a focused element on mouse hover.
+   * Controls whether a focusable element is selected when hovered with the mouse.
    * When `true` (default), moving the mouse over a focusable element will make it the current active descendant.
    * When `false`, moving the mouse will have no effect on the current active descendant value.
    */

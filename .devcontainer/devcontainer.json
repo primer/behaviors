@@ -1,7 +1,15 @@
 {
   "name": "Primer Components",
-  "image": "mcr.microsoft.com/vscode/devcontainers/typescript-node:16",
-  "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint", "orta.vscode-jest"],
+  "image": "mcr.microsoft.com/vscode/devcontainers/typescript-node:20",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "orta.vscode-jest"
+      ]
+    }
+  },
   "forwardPorts": [8000],
   "postCreateCommand": ["/bin/bash", "-c", "npm install"],
   "remoteUser": "node"

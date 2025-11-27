@@ -7,10 +7,10 @@ Shared behaviors for JavaScript components
 
 ## Documentation
 
-* [Anchored Position](/docs/anchored-position.md)
-* [Focus Trap](/docs/focus-trap.md)
-* [Focus Zone](/docs/focus-zone.md)
-* [Scroll Into View](/docs/scroll-into-view.md)
+- [Anchored Position](/docs/anchored-position.md)
+- [Focus Trap](/docs/focus-trap.md)
+- [Focus Zone](/docs/focus-zone.md)
+- [Scroll Into View](/docs/scroll-into-view.md)
 
 ## Installation
 
@@ -18,8 +18,14 @@ Shared behaviors for JavaScript components
 npm install @primer/behaviors
 ```
 
-or 
+or
 
 ```bash
 yarn add @primer/behaviors
+```
+
+## Storybook
+
+```bash
+npm run storybook
 ```

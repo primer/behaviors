@@ -1,0 +1,118 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.content {
+  padding: 1.5rem;
+  border: 2px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  background: var(--sb-canvas-default);
+  transition: all 0.2s ease;
+
+  &.active {
+    border-color: var(--sb-accent-fg);
+    background: var(--sb-accent-subtle);
+    box-shadow: 0 0 0 3px var(--sb-accent-muted);
+  }
+}
+
+.content h1 {
+  margin: 0 0 0.75rem;
+  font-size: var(--sb-text-title-size-small);
+}
+
+.verticalList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.horizontalList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--sb-canvas-default);
+  border-radius: var(--sb-borderRadius-small);
+}
+
+.verticalList button,
+.horizontalList button {
+  padding: 0.75rem 1rem;
+  background: var(--sb-canvas-default);
+  border: 1px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  cursor: pointer;
+  font-size: var(--sb-text-body-size-medium);
+
+  &:hover {
+    background: var(--sb-canvas-subtle);
+  }
+}
+
+.verticalList button {
+  width: 100%;
+  text-align: left;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+
+  button {
+    padding: 1rem;
+    background: var(--sb-canvas-default);
+    border: 1px solid var(--sb-border-default);
+    border-radius: var(--sb-borderRadius-medium);
+    cursor: pointer;
+    font-size: var(--sb-text-body-size-medium);
+    min-height: 60px;
+
+    &:hover {
+      background: var(--sb-canvas-subtle);
+    }
+  }
+}
+
+.activeDescendantControl {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-medium);
+  background: var(--sb-canvas-default);
+
+  &:focus {
+    outline: 2px solid var(--sb-accent-fg);
+    outline-offset: 2px;
+    border-color: var(--sb-accent-fg);
+  }
+}
+
+.activeDescendantList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activeDescendantItem {
+  padding: 0.75rem 1rem;
+  background: var(--sb-canvas-default);
+  border: 1px solid var(--sb-border-default);
+  border-radius: var(--sb-borderRadius-small);
+  cursor: pointer;
+  font-size: var(--sb-text-body-size-medium);
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--sb-canvas-subtle);
+  }
+
+  &.activeDescendant {
+    background: var(--sb-accent-subtle);
+    border-color: var(--sb-accent-fg);
+    font-weight: 600;
+  }
+}

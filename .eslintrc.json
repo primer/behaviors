@@ -2,9 +2,14 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": ["github"],
-  "extends": ["plugin:github/recommended", "plugin:github/browser", "plugin:github/typescript"],
+  "extends": [
+    "plugin:github/recommended",
+    "plugin:github/browser",
+    "plugin:github/typescript",
+    "plugin:storybook/recommended"
+  ],
   "rules": {
-    "import/extensions": ["error", "always"],
+    "import/extensions": "off",
     "import/no-unresolved": "off",
     "import/no-named-as-default": "off"
   },

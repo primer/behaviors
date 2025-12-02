@@ -14,13 +14,17 @@ const external = Array.from(dependencies).map(name => {
   return new RegExp(`^${name}(/.*)?`)
 })
 
+const tsPluginBaseOptions = {
+  exclude: ['src/stories/**/*'],
+}
+
 export default [
   // ESM
   {
     input: ['src/index.ts', 'src/utils/index.ts'],
     external,
     plugins: [
-      typescript(),
+      typescript(tsPluginBaseOptions),
       {
         id: 'emit-package-json-file',
         generateBundle() {
@@ -47,6 +51,7 @@ export default [
     external,
     plugins: [
       typescript({
+        ...tsPluginBaseOptions,
         outDir: 'dist/cjs',
       }),
     ],

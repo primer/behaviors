@@ -230,8 +230,8 @@ export type FocusZoneSettings = IterateFocusableElements & {
   preventScroll?: boolean
   /**
    * Controls whether a focusable element is selected when hovered with the mouse.
-   * When `true` (default), moving the mouse over a focusable element will make it the current active descendant.
-   * When `false`, moving the mouse will have no effect on the current active descendant value.
+   * When `false` (default), moving the mouse over a focusable element will make it the current active descendant.
+   * When `true`, moving the mouse will have no effect on the current active descendant value.
    */
   ignoreHoverEvents?: boolean
 }
@@ -368,7 +368,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const focusInStrategy = settings?.focusInStrategy ?? 'previous'
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
-  const ignoreHoverEvents = settings?.ignoreHoverEvents ?? true
+  const ignoreHoverEvents = settings?.ignoreHoverEvents ?? false
   let currentFocusedElement: HTMLElement | undefined
   const preventScroll = settings?.preventScroll ?? false
 
@@ -606,7 +606,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       },
       {signal},
     )
-    if (ignoreHoverEvents) {
+    if (!ignoreHoverEvents) {
       container.addEventListener(
         'mousemove',
         ({target}) => {

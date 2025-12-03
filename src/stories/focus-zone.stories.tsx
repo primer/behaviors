@@ -19,7 +19,7 @@ type BindKeysOption =
 type FocusZoneArgs = {
   bindKeys: BindKeysOption[]
   focusOutBehavior: 'stop' | 'wrap'
-  focusInStrategy: 'first' | 'previous' | 'closest'
+  focusInStrategy: 'first' | 'previous' | 'closest' | 'initial'
 }
 
 const meta: Meta<FocusZoneArgs> = {
@@ -46,7 +46,7 @@ const meta: Meta<FocusZoneArgs> = {
     },
     focusInStrategy: {
       control: 'radio',
-      options: ['first', 'previous', 'closest'],
+      options: ['first', 'previous', 'closest', 'initial'],
     },
   },
 }

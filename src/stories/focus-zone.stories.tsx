@@ -139,7 +139,7 @@ export const VerticalList: Story = {
   args: {
     bindKeys: ['Arrow Vertical'],
     focusOutBehavior: 'stop',
-    focusInStrategy: 'previous',
+    focusInStrategy: 'initial',
   },
   render: args => (
     <FocusZoneFrame args={args}>
@@ -570,7 +570,7 @@ export const ActiveDescendantWithInput: Story = {
   args: {
     bindKeys: ['Arrow Vertical'],
     focusOutBehavior: 'stop',
-    focusInStrategy: 'previous',
+    focusInStrategy: 'initial',
   },
   render: () => {
     const [isActive, setIsActive] = useState(false)

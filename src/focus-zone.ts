@@ -218,7 +218,12 @@ export type FocusZoneSettings = IterateFocusableElements & {
    *
    * For more information, @see https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_general_within
    */
-  focusInStrategy?: 'first' | 'closest' | 'previous' | ((previousFocusedElement: Element) => HTMLElement | undefined)
+  focusInStrategy?:
+    | 'first'
+    | 'closest'
+    | 'previous'
+    | 'initial'
+    | ((previousFocusedElement: Element) => HTMLElement | undefined)
 
   /**
    * A boolean value indicating whether or not the browser should scroll the
@@ -452,7 +457,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       element.setAttribute('tabindex', '-1')
     }
 
-    if (!currentFocusedElement) {
+    if (!currentFocusedElement && focusInStrategy !== 'initial') {
       updateFocusedElement(getFirstFocusableElement())
     }
   }
@@ -523,7 +528,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   // Open the first tabbable element for tabbing
   const initialElement =
     typeof focusInStrategy === 'function' ? focusInStrategy(document.body) : getFirstFocusableElement()
-  updateFocusedElement(initialElement)
+  if (focusInStrategy !== 'initial') updateFocusedElement(initialElement)
 
   // If the DOM structure of the container changes, make sure we keep our state up-to-date
   // with respect to the focusable elements cache and its order
@@ -621,7 +626,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       () => {
         // Focus moved into the active descendant input.  Activate current or first descendant.
         if (!currentFocusedElement) {
-          updateFocusedElement(getFirstFocusableElement())
+          if (focusInStrategy !== 'initial') updateFocusedElement(getFirstFocusableElement())
         } else {
           setActiveDescendant(undefined, currentFocusedElement)
         }
@@ -713,7 +718,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
   function getCurrentFocusedIndex() {
     if (!currentFocusedElement) {
-      return 0
+      return focusInStrategy === 'initial' ? -1 : 0
     }
 
     const focusedIndex = focusableElements.indexOf(currentFocusedElement)

@@ -873,3 +873,44 @@ it('Should handle elements being removed if strict', async () => {
 
   controller.abort()
 })
+
+it('Should not set initial focus via active descendant when focusInStrategy is "initial"', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <button tabIndex={0} id="outside">
+        Bad Apple
+      </button>
+      <input id="control" defaultValue="control input" tabIndex={0} />
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton, thirdButton] = focusZoneContainer.querySelectorAll('button')
+  const outsideButton = container.querySelector<HTMLElement>('#outside')!
+  const control = container.querySelector<HTMLElement>('#control')!
+  const controller = focusZone(focusZoneContainer, {
+    activeDescendantControl: control,
+    focusInStrategy: 'initial',
+    focusOutBehavior: 'wrap',
+  })
+
+  control.focus()
+  expect(control.getAttribute('aria-activedescendant')).toEqual(null)
+  await user.keyboard('{arrowdown}')
+  expect(control.getAttribute('aria-activedescendant')).toEqual(firstButton.id)
+  await user.keyboard('{arrowup}')
+  expect(control.getAttribute('aria-activedescendant')).toEqual(thirdButton.id)
+  expect(document.activeElement).toEqual(control)
+  await user.keyboard('{arrowup}')
+  expect(control.getAttribute('aria-activedescendant')).toEqual(secondButton.id)
+  outsideButton.focus()
+  expect(control.hasAttribute('aria-activedescendant')).toBeFalsy()
+
+  controller.abort()
+})

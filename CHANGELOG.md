@@ -1,5 +1,13 @@
 # @primer/behaviors
 
+## 1.9.0
+
+### Minor Changes
+
+- [#648](https://github.com/primer/behaviors/pull/648) [`0cd03c3`](https://github.com/primer/behaviors/commit/0cd03c35af58dfe2b02f3a068a1bbbd29c6461fa) Thanks [@TylerJDev](https://github.com/TylerJDev)! - FocusZone: Introduce a new focusInStrategy option, "initial," to allow disabling the default behavior of focusing on the first item when the focus zone becomes active.
+
+- [#641](https://github.com/primer/behaviors/pull/641) [`cd90185`](https://github.com/primer/behaviors/commit/cd90185640272559b59ccd77613ed63f79bda1c9) Thanks [@TylerJDev](https://github.com/TylerJDev)! - FocusZone: Add setting `ignoreHoverEvents` which provides a configurable setting to disable selection on mouse hover
+
 ## 1.8.4
 
 ### Patch Changes

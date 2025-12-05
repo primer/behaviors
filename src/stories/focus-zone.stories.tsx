@@ -19,7 +19,7 @@ type BindKeysOption =
 type FocusZoneArgs = {
   bindKeys: BindKeysOption[]
   focusOutBehavior: 'stop' | 'wrap'
-  focusInStrategy: 'first' | 'previous' | 'closest'
+  focusInStrategy: 'first' | 'previous' | 'closest' | 'initial'
 }
 
 const meta: Meta<FocusZoneArgs> = {
@@ -46,7 +46,7 @@ const meta: Meta<FocusZoneArgs> = {
     },
     focusInStrategy: {
       control: 'radio',
-      options: ['first', 'previous', 'closest'],
+      options: ['first', 'previous', 'closest', 'initial'],
     },
   },
 }
@@ -139,7 +139,7 @@ export const VerticalList: Story = {
   args: {
     bindKeys: ['Arrow Vertical'],
     focusOutBehavior: 'stop',
-    focusInStrategy: 'previous',
+    focusInStrategy: 'initial',
   },
   render: args => (
     <FocusZoneFrame args={args}>
@@ -557,6 +557,124 @@ export const ActiveDescendant: Story = {
                     Option {i + 1}
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+}
+
+export const ActiveDescendantWithInput: Story = {
+  args: {
+    bindKeys: ['Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'initial',
+  },
+  render: () => {
+    const [isActive, setIsActive] = useState(false)
+    const [activeIndex, setActiveIndex] = useState<number | null>(null)
+    const controlRef = useRef<HTMLInputElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
+    const [controller, setController] = useState<AbortController | undefined>(undefined)
+
+    const activateZone = () => {
+      if (!listRef.current || !controlRef.current || controller) return
+
+      const onActiveDescendantChanged = (
+        newActiveDescendant: HTMLElement | undefined,
+        previousActiveDescendant: HTMLElement | undefined,
+      ) => {
+        if (previousActiveDescendant) {
+          previousActiveDescendant.classList.remove(styles.activeDescendant)
+        }
+
+        if (newActiveDescendant) {
+          newActiveDescendant.classList.add(styles.activeDescendant)
+          const index = Array.from(listRef.current!.children).indexOf(newActiveDescendant)
+          setActiveIndex(index)
+        } else {
+          setActiveIndex(null)
+        }
+      }
+
+      setController(
+        focusZone(listRef.current, {
+          bindKeys: FocusKeys.ArrowVertical | FocusKeys.HomeAndEnd,
+          focusOutBehavior: 'wrap',
+          focusInStrategy: 'initial',
+          activeDescendantControl: controlRef.current,
+          onActiveDescendantChanged,
+        }),
+      )
+      setIsActive(true)
+
+      controlRef.current.focus()
+    }
+
+    const deactivateZone = () => {
+      if (controller) {
+        controller.abort()
+        setController(undefined)
+        setIsActive(false)
+        setActiveIndex(null)
+      }
+    }
+
+    useEffect(() => {
+      return () => {
+        if (controller) controller.abort()
+      }
+    }, [controller])
+
+    useEffect(() => {
+      activateZone()
+    }, [])
+
+    return (
+      <div className="sb-demo">
+        <div className="sb-controls">
+          <button onClick={activateZone} disabled={isActive}>
+            Activate Focus Zone
+          </button>
+          <button onClick={deactivateZone} disabled={!isActive}>
+            Deactivate Focus Zone
+          </button>
+          <span className="sb-status">
+            Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+            {activeIndex !== null && ` | Active: Item ${activeIndex + 1}`}
+          </span>
+        </div>
+        <div className={styles.container}>
+          <div className={clsx(styles.content, isActive && styles.active)}>
+            <h1>Active Descendant Mode</h1>
+            <p className={clsx('sb-instructions', isActive && 'active')}>
+              {isActive ? (
+                <>
+                  DOM focus stays on the control. Arrow keys change <code>aria-activedescendant</code>. Notice the
+                  highlighted item changes without focus ring movement.
+                </>
+              ) : (
+                'Activate to see Active Descendant mode - an alternative focus management pattern for accessibility.'
+              )}
+            </p>
+            <div>
+              <input
+                type="text"
+                role="combobox"
+                aria-label="Navigate Items"
+                className={styles.activeDescendantInput}
+                ref={controlRef}
+              />
+              <div className={styles.activeDescendantControl} aria-label="Listbox control">
+                <div ref={listRef} role="listbox" className={styles.activeDescendantList}>
+                  {Array.from({length: 5}, (_, i) => (
+                    <div key={i} role="option" id={`option-${i}`} tabIndex={-1} className={styles.activeDescendantItem}>
+                      Option {i + 1}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -210,6 +210,11 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * The "closest" strategy works like "first", except either the first or the last element
    * of the container will be focused, depending on the direction from which focus comes.
    *
+   * If set to "initial", focus will be kept on the initializing element when the focus zone is
+   * activated. This is useful when using an active descendant focus model, where aria-activedescendant
+   * should not be set until the user starts navigating within the focus zone. This will only work when
+   * "activeDescendantControl" is also set.
+   *
    * If a function is provided, this function should return the HTMLElement intended
    * to receive focus. This is useful if you want to focus the currently "selected"
    * item or element.
@@ -218,7 +223,12 @@ export type FocusZoneSettings = IterateFocusableElements & {
    *
    * For more information, @see https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_general_within
    */
-  focusInStrategy?: 'first' | 'closest' | 'previous' | ((previousFocusedElement: Element) => HTMLElement | undefined)
+  focusInStrategy?:
+    | 'first'
+    | 'closest'
+    | 'previous'
+    | 'initial'
+    | ((previousFocusedElement: Element) => HTMLElement | undefined)
 
   /**
    * A boolean value indicating whether or not the browser should scroll the
@@ -371,6 +381,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const ignoreHoverEvents = settings?.ignoreHoverEvents ?? false
   let currentFocusedElement: HTMLElement | undefined
   const preventScroll = settings?.preventScroll ?? false
+  const preventInitialFocus = focusInStrategy === 'initial' && settings?.activeDescendantControl
 
   function getFirstFocusableElement() {
     return focusableElements[0] as HTMLElement | undefined
@@ -459,7 +470,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       element.setAttribute('tabindex', '-1')
     }
 
-    if (!currentFocusedElement) {
+    if (!currentFocusedElement && !preventInitialFocus) {
       updateFocusedElement(getFirstFocusableElement())
     }
   }
@@ -530,7 +541,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   // Open the first tabbable element for tabbing
   const initialElement =
     typeof focusInStrategy === 'function' ? focusInStrategy(document.body) : getFirstFocusableElement()
-  updateFocusedElement(initialElement)
+  if (!preventInitialFocus) updateFocusedElement(initialElement)
 
   // If the DOM structure of the container changes, make sure we keep our state up-to-date
   // with respect to the focusable elements cache and its order
@@ -630,7 +641,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       () => {
         // Focus moved into the active descendant input.  Activate current or first descendant.
         if (!currentFocusedElement) {
-          updateFocusedElement(getFirstFocusableElement())
+          if (!preventInitialFocus) updateFocusedElement(getFirstFocusableElement())
         } else {
           setActiveDescendant(undefined, currentFocusedElement)
         }
@@ -722,7 +733,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
   function getCurrentFocusedIndex() {
     if (!currentFocusedElement) {
-      return 0
+      return preventInitialFocus ? -1 : 0
     }
 
     const focusedIndex = focusableElements.indexOf(currentFocusedElement)

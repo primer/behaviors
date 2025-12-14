@@ -1,5 +1,5 @@
 ---
-"@primer/behaviors": patch
+'@primer/behaviors': patch
 ---
 
 Optimize DOM operations for better web vitals (INP, CLS, FID)

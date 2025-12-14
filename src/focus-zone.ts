@@ -628,6 +628,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const signal = settings?.abortSignal ?? controller.signal
 
   signal.addEventListener('abort', () => {
+    // Clean up: disconnect observer to prevent memory leak
+    observer.disconnect()
     // Clean up any modifications
     endFocusManagement(...focusableElements)
   })

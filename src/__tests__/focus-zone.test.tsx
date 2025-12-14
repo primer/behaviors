@@ -917,7 +917,6 @@ it('Should not set initial focus via active descendant when focusInStrategy is "
 })
 
 it('Should not respond to DOM changes after abort is called', async () => {
-  const user = userEvent.setup()
   const {container, rerender} = render(
     <div id="focusZone">
       <button tabIndex={0}>Apple</button>

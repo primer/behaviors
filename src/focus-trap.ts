@@ -80,14 +80,15 @@ export function focusTrap(
   const signal = abortSignal ?? controller.signal
 
   container.setAttribute('data-focus-trap', 'active')
-  
+
   // Create sentinels outside DOM first to batch operations
   const sentinelStart = document.createElement('span')
   sentinelStart.className = 'sentinel'
   sentinelStart.tabIndex = 0
   sentinelStart.setAttribute('aria-hidden', 'true')
   // Use inline style to prevent layout shift - sentinels should be invisible
-  sentinelStart.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
+  sentinelStart.style.cssText =
+    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelStart.onfocus = () => {
     const lastFocusableChild = getFocusableChild(container, true)
     lastFocusableChild?.focus()
@@ -98,7 +99,8 @@ export function focusTrap(
   sentinelEnd.tabIndex = 0
   sentinelEnd.setAttribute('aria-hidden', 'true')
   // Use inline style to prevent layout shift - sentinels should be invisible
-  sentinelEnd.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
+  sentinelEnd.style.cssText =
+    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelEnd.onfocus = () => {
     // If the end sentinel was focused, move focus to the start
     const firstFocusableChild = getFocusableChild(container)

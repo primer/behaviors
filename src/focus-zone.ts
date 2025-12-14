@@ -665,7 +665,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             updateFocusedElement(focusableElement)
           }
         },
-        {signal, capture: true, passive: true},
+        {signal, capture: true},
       )
     }
 

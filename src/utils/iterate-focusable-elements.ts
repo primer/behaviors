@@ -102,16 +102,16 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
     const offsetWidth = elem.offsetWidth
     const offsetHeight = elem.offsetHeight
     const offsetParent = elem.offsetParent
-    
+
     // Fast fail on zero dimensions before calling expensive getComputedStyle
     if (offsetWidth === 0 || offsetHeight === 0) return false
     if (!offsetParent) return false
-    
+
     // getComputedStyle is expensive - only call if we passed the cheaper checks
     const style = getComputedStyle(elem)
     if (style.display === 'none') return false
     if (style.visibility === 'hidden' || style.visibility === 'collapse') return false
-    
+
     // getClientRects is expensive - check last
     if (elem.getClientRects().length === 0) return false
   }

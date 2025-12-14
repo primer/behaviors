@@ -170,7 +170,7 @@ export function getAnchoredPosition(
  */
 function getPositionedParent(element: Element) {
   if (isOnTopLayer(element)) return document.body
-  
+
   let parentNode = element.parentNode
   while (parentNode !== null && parentNode !== document.body) {
     if (parentNode instanceof HTMLElement) {
@@ -212,7 +212,7 @@ function getClippingRect(element: Element): BoxPosition {
   // Find the first ancestor with overflow !== 'visible'
   let clippingNode: HTMLElement = document.body
   let parentNode: typeof element.parentNode = element
-  
+
   while (parentNode !== null && parentNode !== document.body) {
     if (parentNode instanceof HTMLElement) {
       // Only call getComputedStyle once per element
@@ -228,7 +228,7 @@ function getClippingRect(element: Element): BoxPosition {
   // Batch all reads from the clipping node together
   const elemRect = clippingNode.getBoundingClientRect()
   const elemStyle = getComputedStyle(clippingNode)
-  
+
   // Parse all border values in one batch
   const borderTop = parseInt(elemStyle.borderTopWidth, 10) || 0
   const borderLeft = parseInt(elemStyle.borderLeftWidth, 10) || 0

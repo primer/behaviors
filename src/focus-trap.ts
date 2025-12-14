@@ -80,19 +80,25 @@ export function focusTrap(
   const signal = abortSignal ?? controller.signal
 
   container.setAttribute('data-focus-trap', 'active')
+  
+  // Create sentinels outside DOM first to batch operations
   const sentinelStart = document.createElement('span')
-  sentinelStart.setAttribute('class', 'sentinel')
-  sentinelStart.setAttribute('tabindex', '0')
+  sentinelStart.className = 'sentinel'
+  sentinelStart.tabIndex = 0
   sentinelStart.setAttribute('aria-hidden', 'true')
+  // Use inline style to prevent layout shift - sentinels should be invisible
+  sentinelStart.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelStart.onfocus = () => {
     const lastFocusableChild = getFocusableChild(container, true)
     lastFocusableChild?.focus()
   }
 
   const sentinelEnd = document.createElement('span')
-  sentinelEnd.setAttribute('class', 'sentinel')
-  sentinelEnd.setAttribute('tabindex', '0')
+  sentinelEnd.className = 'sentinel'
+  sentinelEnd.tabIndex = 0
   sentinelEnd.setAttribute('aria-hidden', 'true')
+  // Use inline style to prevent layout shift - sentinels should be invisible
+  sentinelEnd.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelEnd.onfocus = () => {
     // If the end sentinel was focused, move focus to the start
     const firstFocusableChild = getFocusableChild(container)
@@ -101,11 +107,10 @@ export function focusTrap(
 
   // If the container already has sentinels as direct children, don't add more.
   // The mutation observer will take care of moving existing sentinels to the correct position.
-  const existingSentinels = Array.from(container.children).filter(
-    e => e.classList.contains('sentinel') && e.tagName === 'SPAN',
-  )
+  // Use :scope > to only check direct children, avoiding deep DOM traversal
+  const hasExistingSentinels = container.querySelector(':scope > span.sentinel') !== null
 
-  if (!existingSentinels.length) {
+  if (!hasExistingSentinels) {
     container.prepend(sentinelStart)
     container.append(sentinelEnd)
   }

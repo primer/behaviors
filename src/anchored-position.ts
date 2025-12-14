@@ -170,10 +170,14 @@ export function getAnchoredPosition(
  */
 function getPositionedParent(element: Element) {
   if (isOnTopLayer(element)) return document.body
+  
   let parentNode = element.parentNode
-  while (parentNode !== null) {
-    if (parentNode instanceof HTMLElement && getComputedStyle(parentNode).position !== 'static') {
-      return parentNode
+  while (parentNode !== null && parentNode !== document.body) {
+    if (parentNode instanceof HTMLElement) {
+      // Check position property - exit early if not static
+      if (getComputedStyle(parentNode).position !== 'static') {
+        return parentNode
+      }
     }
     parentNode = parentNode.parentNode
   }
@@ -205,34 +209,36 @@ function isOnTopLayer(element: Element) {
  * @returns
  */
 function getClippingRect(element: Element): BoxPosition {
+  // Find the first ancestor with overflow !== 'visible'
+  let clippingNode: HTMLElement = document.body
   let parentNode: typeof element.parentNode = element
-  while (parentNode !== null) {
-    if (!(parentNode instanceof Element)) {
-      break
-    }
-    const parentNodeStyle = getComputedStyle(parentNode as Element)
-    if (parentNodeStyle.overflow !== 'visible') {
-      break
+  
+  while (parentNode !== null && parentNode !== document.body) {
+    if (parentNode instanceof HTMLElement) {
+      // Only call getComputedStyle once per element
+      const overflow = getComputedStyle(parentNode).overflow
+      if (overflow !== 'visible') {
+        clippingNode = parentNode
+        break
+      }
     }
     parentNode = parentNode.parentNode
   }
-  const clippingNode = parentNode === document.body || !(parentNode instanceof HTMLElement) ? document.body : parentNode
 
+  // Batch all reads from the clipping node together
   const elemRect = clippingNode.getBoundingClientRect()
   const elemStyle = getComputedStyle(clippingNode)
-
-  const [borderTop, borderLeft, borderRight, borderBottom] = [
-    elemStyle.borderTopWidth,
-    elemStyle.borderLeftWidth,
-    elemStyle.borderRightWidth,
-    elemStyle.borderBottomWidth,
-  ].map(v => parseInt(v, 10) || 0)
+  
+  // Parse all border values in one batch
+  const borderTop = parseInt(elemStyle.borderTopWidth, 10) || 0
+  const borderLeft = parseInt(elemStyle.borderLeftWidth, 10) || 0
+  const borderRight = parseInt(elemStyle.borderRightWidth, 10) || 0
+  const borderBottom = parseInt(elemStyle.borderBottomWidth, 10) || 0
 
   return {
     top: elemRect.top + borderTop,
     left: elemRect.left + borderLeft,
     width: elemRect.width - borderRight - borderLeft,
-
     // If the clipping node is document.body, it can expand to the full height of the window
     height: Math.max(
       elemRect.height - borderTop - borderBottom,

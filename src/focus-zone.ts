@@ -246,12 +246,21 @@ export type FocusZoneSettings = IterateFocusableElements & {
   ignoreHoverEvents?: boolean
 }
 
+// Cache the result to avoid repeated userAgent parsing
+let cachedIsMac: boolean | undefined
+function getIsMac(): boolean {
+  if (cachedIsMac === undefined) {
+    cachedIsMac = isMacOS()
+  }
+  return cachedIsMac
+}
+
 function getDirection(keyboardEvent: KeyboardEvent) {
   const direction = KEY_TO_DIRECTION[keyboardEvent.key as keyof typeof KEY_TO_DIRECTION]
   if (keyboardEvent.key === 'Tab' && keyboardEvent.shiftKey) {
     return 'previous'
   }
-  const isMac = isMacOS()
+  const isMac = getIsMac()
   if ((isMac && keyboardEvent.metaKey) || (!isMac && keyboardEvent.ctrlKey)) {
     if (keyboardEvent.key === 'ArrowLeft' || keyboardEvent.key === 'ArrowUp') {
       return 'start'
@@ -447,8 +456,11 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     container.removeAttribute(hasActiveDescendantAttribute)
     previouslyActiveElement?.removeAttribute(isActiveDescendantAttribute)
 
-    for (const item of container.querySelectorAll(`[${isActiveDescendantAttribute}]`)) {
-      item?.removeAttribute(isActiveDescendantAttribute)
+    // Clear any other elements that may have the attribute (edge case: multiple elements marked)
+    const items = container.querySelectorAll(`[${isActiveDescendantAttribute}]`)
+    // Use for loop instead of for...of to avoid iterator overhead
+    for (let i = 0; i < items.length; i++) {
+      items[i].removeAttribute(isActiveDescendantAttribute)
     }
 
     activeDescendantCallback?.(undefined, previouslyActiveElement, false)
@@ -546,34 +558,56 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   // If the DOM structure of the container changes, make sure we keep our state up-to-date
   // with respect to the focusable elements cache and its order
   const observer = new MutationObserver(mutations => {
-    // Perform all removals first, in case element order has simply changed
+    // Collect all elements to process in batches to minimize DOM operations
+    const elementsToRemove: HTMLElement[] = []
+    const elementsToAdd: HTMLElement[] = []
+    const attributeRemovals: HTMLElement[] = []
+    const attributeAdditions: HTMLElement[] = []
+
+    // First pass: collect all elements (read phase)
     for (const mutation of mutations) {
-      for (const removedNode of mutation.removedNodes) {
-        if (removedNode instanceof HTMLElement) {
-          endFocusManagement(...iterateFocusableElements(removedNode))
+      if (mutation.type === 'childList') {
+        for (const removedNode of mutation.removedNodes) {
+          if (removedNode instanceof HTMLElement) {
+            elementsToRemove.push(removedNode)
+          }
         }
-      }
-      // If an element is hidden or disabled, remove it from the list of focusable elements
-      if (mutation.type === 'attributes' && mutation.oldValue === null) {
-        if (mutation.target instanceof HTMLElement) {
-          endFocusManagement(mutation.target)
+        for (const addedNode of mutation.addedNodes) {
+          if (addedNode instanceof HTMLElement) {
+            elementsToAdd.push(addedNode)
+          }
+        }
+      } else if (mutation.type === 'attributes' && mutation.target instanceof HTMLElement) {
+        // If oldValue is null, element was unhidden/enabled -> now hidden/disabled
+        if (mutation.oldValue === null) {
+          attributeRemovals.push(mutation.target)
+        } else {
+          // If oldValue is not null, element was hidden/disabled -> now unhidden/enabled
+          attributeAdditions.push(mutation.target)
         }
       }
     }
-    for (const mutation of mutations) {
-      for (const addedNode of mutation.addedNodes) {
-        if (addedNode instanceof HTMLElement) {
-          beginFocusManagement(...iterateFocusableElements(addedNode, iterateFocusableElementsOptions))
-        }
-      }
 
-      // Similarly, if an element is unhidden or "enabled", add it to the list of focusable elements
-      // If `mutation.oldValue` is not null, then we may assume that the element was previously hidden or disabled
-      if (mutation.type === 'attributes' && mutation.oldValue !== null) {
-        if (mutation.target instanceof HTMLElement) {
-          beginFocusManagement(mutation.target)
-        }
+    // Second pass: perform all removals first (write phase)
+    if (elementsToRemove.length > 0) {
+      const toRemove = elementsToRemove.flatMap(node => [...iterateFocusableElements(node)])
+      if (toRemove.length > 0) {
+        endFocusManagement(...toRemove)
       }
+    }
+    if (attributeRemovals.length > 0) {
+      endFocusManagement(...attributeRemovals)
+    }
+
+    // Third pass: perform all additions
+    if (elementsToAdd.length > 0) {
+      const toAdd = elementsToAdd.flatMap(node => [...iterateFocusableElements(node, iterateFocusableElementsOptions)])
+      if (toAdd.length > 0) {
+        beginFocusManagement(...toAdd)
+      }
+    }
+    if (attributeAdditions.length > 0) {
+      beginFocusManagement(...attributeAdditions)
     }
   })
 
@@ -631,7 +665,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             updateFocusedElement(focusableElement)
           }
         },
-        {signal, capture: true},
+        {signal, capture: true, passive: true},
       )
     }
 

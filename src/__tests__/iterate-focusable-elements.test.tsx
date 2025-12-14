@@ -25,7 +25,8 @@ beforeAll(() => {
             }
           }
 
-          if (this.style?.position?.toLowerCase() === 'fixed') {
+          const position = this.style?.position?.toLowerCase()
+          if (position === 'fixed' || position === 'sticky') {
             return null
           }
 
@@ -212,6 +213,18 @@ describe('isFocusable', () => {
     )
     const focusable = isFocusable(container.firstChild as HTMLElement, true)
     expect(focusable).toBeFalsy()
+  })
+
+  it('position: fixed elements are focusable in strict mode', async () => {
+    const {container} = render(<button style={{position: 'fixed', top: 0, left: 0}}>Fixed Button</button>)
+    const focusable = isFocusable(container.firstChild as HTMLElement, true)
+    expect(focusable).toBeTruthy()
+  })
+
+  it('position: sticky elements are focusable in strict mode', async () => {
+    const {container} = render(<button style={{position: 'sticky', top: 0}}>Sticky Button</button>)
+    const focusable = isFocusable(container.firstChild as HTMLElement, true)
+    expect(focusable).toBeTruthy()
   })
 })
 

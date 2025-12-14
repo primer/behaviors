@@ -558,55 +558,61 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   // If the DOM structure of the container changes, make sure we keep our state up-to-date
   // with respect to the focusable elements cache and its order
   const observer = new MutationObserver(mutations => {
-    // Collect all elements to process in batches to minimize DOM operations
-    const elementsToRemove: HTMLElement[] = []
-    const elementsToAdd: HTMLElement[] = []
-    const attributeRemovals: HTMLElement[] = []
-    const attributeAdditions: HTMLElement[] = []
+    // Use Sets to automatically deduplicate elements that appear in multiple mutations
+    const elementsToRemove = new Set<HTMLElement>()
+    const elementsToAdd = new Set<HTMLElement>()
+    const attributeRemovals = new Set<HTMLElement>()
+    const attributeAdditions = new Set<HTMLElement>()
 
     // First pass: collect all elements (read phase)
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
         for (const removedNode of mutation.removedNodes) {
           if (removedNode instanceof HTMLElement) {
-            elementsToRemove.push(removedNode)
+            elementsToRemove.add(removedNode)
           }
         }
         for (const addedNode of mutation.addedNodes) {
           if (addedNode instanceof HTMLElement) {
-            elementsToAdd.push(addedNode)
+            elementsToAdd.add(addedNode)
           }
         }
       } else if (mutation.type === 'attributes' && mutation.target instanceof HTMLElement) {
-        // If oldValue is null, element was unhidden/enabled -> now hidden/disabled
-        if (mutation.oldValue === null) {
-          attributeRemovals.push(mutation.target)
+        const attributeName = mutation.attributeName
+        // hasAttribute is O(1) and doesn't cause reflow - safe to call in loop
+        const hasAttribute = attributeName ? mutation.target.hasAttribute(attributeName) : false
+
+        if (hasAttribute) {
+          // Attribute is now present (hidden/disabled) - element should be removed from focusables
+          attributeRemovals.add(mutation.target)
         } else {
-          // If oldValue is not null, element was hidden/disabled -> now unhidden/enabled
-          attributeAdditions.push(mutation.target)
+          // Attribute was removed (unhidden/enabled) - element should be added to focusables
+          attributeAdditions.add(mutation.target)
         }
       }
     }
 
-    // Second pass: perform all removals first (write phase)
-    if (elementsToRemove.length > 0) {
-      const toRemove = elementsToRemove.flatMap(node => [...iterateFocusableElements(node)])
+    // Second pass: perform all removals (write phase)
+    if (elementsToRemove.size > 0) {
+      const toRemove = [...elementsToRemove].flatMap(node => [...iterateFocusableElements(node)])
       if (toRemove.length > 0) {
         endFocusManagement(...toRemove)
       }
     }
-    if (attributeRemovals.length > 0) {
+    if (attributeRemovals.size > 0) {
       endFocusManagement(...attributeRemovals)
     }
 
-    // Third pass: perform all additions
-    if (elementsToAdd.length > 0) {
-      const toAdd = elementsToAdd.flatMap(node => [...iterateFocusableElements(node, iterateFocusableElementsOptions)])
+    // Second pass (continued): perform all additions
+    if (elementsToAdd.size > 0) {
+      const toAdd = [...elementsToAdd].flatMap(node => [
+        ...iterateFocusableElements(node, iterateFocusableElementsOptions),
+      ])
       if (toAdd.length > 0) {
         beginFocusManagement(...toAdd)
       }
     }
-    if (attributeAdditions.length > 0) {
+    if (attributeAdditions.size > 0) {
       beginFocusManagement(...attributeAdditions)
     }
   })

@@ -18,7 +18,11 @@ let activeTrap: FocusTrapMetadata | undefined = undefined
 const SR_ONLY_STYLES =
   'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
 
-function createSentinel(onFocus: () => void): HTMLSpanElement {
+interface CreateSentinelOptions {
+  onFocus: () => void
+}
+
+function createSentinel({onFocus}: CreateSentinelOptions): HTMLSpanElement {
   const sentinel = document.createElement('span')
   sentinel.setAttribute('class', 'sentinel')
   sentinel.setAttribute('tabindex', '0')
@@ -95,15 +99,19 @@ export function focusTrap(
   container.setAttribute('data-focus-trap', 'active')
 
   // Create sentinels outside DOM first to batch operations
-  const sentinelStart = createSentinel(() => {
-    const lastFocusableChild = getFocusableChild(container, true)
-    lastFocusableChild?.focus()
+  const sentinelStart = createSentinel({
+    onFocus: () => {
+      const lastFocusableChild = getFocusableChild(container, true)
+      lastFocusableChild?.focus()
+    },
   })
 
-  const sentinelEnd = createSentinel(() => {
-    // If the end sentinel was focused, move focus to the start
-    const firstFocusableChild = getFocusableChild(container)
-    firstFocusableChild?.focus()
+  const sentinelEnd = createSentinel({
+    onFocus: () => {
+      // If the end sentinel was focused, move focus to the start
+      const firstFocusableChild = getFocusableChild(container)
+      firstFocusableChild?.focus()
+    },
   })
 
   // If the container already has sentinels as direct children, don't add more.

@@ -667,6 +667,14 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
             return
           }
 
+          // First check if target is directly a focusable element (common case)
+          const targetIndex = target instanceof HTMLElement ? focusableElements.indexOf(target) : -1
+          if (targetIndex >= 0) {
+            updateFocusedElement(focusableElements[targetIndex])
+            return
+          }
+
+          // Fall back to checking if target is contained by a focusable element
           const focusableElement = focusableElements.find(element => element.contains(target))
 
           if (focusableElement) {

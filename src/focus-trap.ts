@@ -34,13 +34,11 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
       if (mutation.type === 'childList' && mutation.addedNodes.length) {
-        const sentinelChildren = Array.from(mutation.addedNodes).filter(
-          e => e instanceof HTMLElement && e.classList.contains('sentinel') && e.tagName === 'SPAN',
-        )
-
-        // If any of the added nodes are sentinels, don't do anything
-        if (sentinelChildren.length) {
-          return
+        // Check if any added nodes are sentinels - use loop to avoid Array.from allocation
+        for (const node of mutation.addedNodes) {
+          if (node instanceof HTMLElement && node.tagName === 'SPAN' && node.classList.contains('sentinel')) {
+            return
+          }
         }
         // If the first and last children of container aren't sentinels, move them to the start and end
         const firstChild = container.firstElementChild

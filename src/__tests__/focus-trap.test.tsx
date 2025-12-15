@@ -367,3 +367,27 @@ it('Should only have one set of sentinels', async () => {
   trapContainer.removeChild(newTrapContainer)
   expect(document.querySelectorAll('.sentinel').length).toEqual(2)
 })
+
+it('Should apply sr-only styles to sentinels to prevent layout shift', () => {
+  const {container} = render(
+    <div id="trapContainer">
+      <button tabIndex={0}>Apple</button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const controller = focusTrap(trapContainer)
+
+  const sentinels = trapContainer.querySelectorAll<HTMLElement>('.sentinel')
+  expect(sentinels.length).toEqual(2)
+
+  // Verify both sentinels have sr-only styles to prevent CLS
+  for (const sentinel of sentinels) {
+    expect(sentinel.style.position).toEqual('absolute')
+    expect(sentinel.style.width).toEqual('1px')
+    expect(sentinel.style.height).toEqual('1px')
+    expect(sentinel.style.overflow).toEqual('hidden')
+  }
+
+  controller?.abort()
+})

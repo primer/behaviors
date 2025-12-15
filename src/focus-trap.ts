@@ -81,8 +81,8 @@ export function focusTrap(
 
   // Create sentinels outside DOM first to batch operations
   const sentinelStart = document.createElement('span')
-  sentinelStart.className = 'sentinel'
-  sentinelStart.tabIndex = 0
+  sentinelStart.setAttribute('class', 'sentinel')
+  sentinelStart.setAttribute('tabindex', '0')
   sentinelStart.setAttribute('aria-hidden', 'true')
   // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
   // Without these styles, sentinels could briefly affect layout before CSS loads.
@@ -94,8 +94,8 @@ export function focusTrap(
   }
 
   const sentinelEnd = document.createElement('span')
-  sentinelEnd.className = 'sentinel'
-  sentinelEnd.tabIndex = 0
+  sentinelEnd.setAttribute('class', 'sentinel')
+  sentinelEnd.setAttribute('tabindex', '0')
   sentinelEnd.setAttribute('aria-hidden', 'true')
   // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
   sentinelEnd.style.cssText =

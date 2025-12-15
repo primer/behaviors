@@ -84,7 +84,8 @@ export function focusTrap(
   sentinelStart.className = 'sentinel'
   sentinelStart.tabIndex = 0
   sentinelStart.setAttribute('aria-hidden', 'true')
-  // Use inline style to prevent layout shift - sentinels should be invisible
+  // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
+  // Without these styles, sentinels could briefly affect layout before CSS loads.
   sentinelStart.style.cssText =
     'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelStart.onfocus = () => {
@@ -96,7 +97,7 @@ export function focusTrap(
   sentinelEnd.className = 'sentinel'
   sentinelEnd.tabIndex = 0
   sentinelEnd.setAttribute('aria-hidden', 'true')
-  // Use inline style to prevent layout shift - sentinels should be invisible
+  // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
   sentinelEnd.style.cssText =
     'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
   sentinelEnd.onfocus = () => {

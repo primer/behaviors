@@ -77,7 +77,8 @@ export function getFocusableChild(container: HTMLElement, lastChild = false) {
   return iterateFocusableElements(container, {reverse: lastChild, strict: true, onlyTabbable: true}).next().value
 }
 
-// Set of tags that can have the disabled attribute
+// PERFORMANCE: Use Set for O(1) lookup instead of Array.includes() which is O(n).
+// This is called for every element during focus zone initialization and DOM mutations.
 const DISABLEABLE_TAGS = new Set(['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'OPTGROUP', 'OPTION', 'FIELDSET'])
 
 /**
@@ -97,8 +98,9 @@ export function isFocusable(elem: HTMLElement, strict = false): boolean {
   // Each of the conditions checked below require a reflow, thus are gated by the `strict`
   // argument. If any are true, the element is not focusable, even if tabindex is set.
   if (strict) {
-    // Batch all reflow-causing reads together to minimize layout thrashing
-    // Read all layout properties in one batch before any conditional logic
+    // PERFORMANCE: Batch all reflow-causing reads together to minimize layout thrashing.
+    // Reading offsetWidth/Height/Parent together allows the browser to compute layout once.
+    // DO NOT interleave these reads with conditional logic or DOM writes.
     const offsetWidth = elem.offsetWidth
     const offsetHeight = elem.offsetHeight
     const offsetParent = elem.offsetParent

@@ -246,7 +246,8 @@ export type FocusZoneSettings = IterateFocusableElements & {
   ignoreHoverEvents?: boolean
 }
 
-// Cache the result to avoid repeated userAgent parsing
+// PERFORMANCE: Cache the result to avoid repeated userAgent regex parsing on every keydown.
+// This is called frequently in keyboard event handlers.
 let cachedIsMac: boolean | undefined
 function getIsMac(): boolean {
   if (cachedIsMac === undefined) {
@@ -287,18 +288,18 @@ function getDirection(keyboardEvent: KeyboardEvent) {
 function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: Element | null) {
   const key = keyboardEvent.key
 
-  // Get the number of characters in `key`, accounting for double-wide UTF-16 chars. If keyLength
-  // is 1, we can assume it's a "printable" character. Otherwise it's likely a control character.
-  // One exception is the Tab key, which is technically printable, but browsers generally assign
-  // its function to move focus rather than type a <TAB> character.
-  const keyLength = [...key].length
+  // PERFORMANCE: Check if key is a single printable character without allocating an array.
+  // Using key.length instead of [...key].length avoids creating an intermediate array on every keydown.
+  // Keys like 'ArrowUp' have length > 1. Surrogate pairs (emoji) have length 2 in UTF-16.
+  const isSingleChar =
+    key.length === 1 || (key.length === 2 && key.charCodeAt(0) >= 0xd800 && key.charCodeAt(0) <= 0xdbff)
 
   const isEditable = isEditableElement(activeElement)
   const isSelect = activeElement instanceof HTMLSelectElement
 
   // If we would normally type a character into an input, ignore
   // Also, Home and End keys should never affect focus when in a text input
-  if (isEditable && (keyLength === 1 || key === 'Home' || key === 'End')) {
+  if (isEditable && (isSingleChar || key === 'Home' || key === 'End')) {
     return true
   }
 
@@ -555,8 +556,11 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     typeof focusInStrategy === 'function' ? focusInStrategy(document.body) : getFirstFocusableElement()
   if (!preventInitialFocus) updateFocusedElement(initialElement)
 
-  // If the DOM structure of the container changes, make sure we keep our state up-to-date
-  // with respect to the focusable elements cache and its order
+  // PERFORMANCE: MutationObserver callback is batched by the browser, but we further optimize by:
+  // 1. Using Sets to deduplicate elements that appear in multiple mutations
+  // 2. Separating read phase (collecting elements) from write phase (DOM modifications)
+  // 3. Processing all removals before additions to handle element reordering efficiently
+  // This prevents layout thrashing when many mutations occur in a single frame.
   const observer = new MutationObserver(mutations => {
     // Use Sets to automatically deduplicate elements that appear in multiple mutations
     const elementsToRemove = new Set<HTMLElement>()
@@ -651,7 +655,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     container.addEventListener(
       'focusin',
       event => {
-        if (event.target instanceof HTMLElement && focusableElements.includes(event.target)) {
+        if (event.target instanceof HTMLElement && focusableElements.indexOf(event.target) >= 0) {
           // Move focus to the activeDescendantControl if one of the descendants is focused
           activeDescendantControl.focus({preventScroll})
           updateFocusedElement(event.target)
@@ -661,20 +665,24 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     )
     if (!ignoreHoverEvents) {
       container.addEventListener(
+        // PERFORMANCE: This handler fires on every mouse movement, so optimizations here directly impact INP.
+        // We check indexOf first (fast equality check) before falling back to .find() with .contains() (DOM traversal).
         'mousemove',
         ({target}) => {
           if (!(target instanceof Node)) {
             return
           }
 
-          // First check if target is directly a focusable element (common case)
+          // PERFORMANCE: First check if target is directly a focusable element (common case).
+          // indexOf uses strict equality which is O(n) but very fast per comparison.
           const targetIndex = target instanceof HTMLElement ? focusableElements.indexOf(target) : -1
           if (targetIndex >= 0) {
             updateFocusedElement(focusableElements[targetIndex])
             return
           }
 
-          // Fall back to checking if target is contained by a focusable element
+          // Fall back to checking if target is contained by a focusable element.
+          // This requires DOM traversal via .contains() which is more expensive.
           const focusableElement = focusableElements.find(element => element.contains(target))
 
           if (focusableElement) {

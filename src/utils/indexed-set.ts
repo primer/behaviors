@@ -6,19 +6,19 @@
  * Trade-off: Slightly more memory (Set overhead) and must call proper methods to stay in sync.
  */
 export class IndexedSet<T> {
-  #items: T[] = []
-  #itemSet = new Set<T>()
+  private _items: T[] = []
+  private _itemSet = new Set<T>()
 
   /**
    * Insert elements at a specific index. If index is omitted, appends to end.
    */
   insertAt(index: number, ...elements: T[]): void {
-    const newElements = elements.filter(e => !this.#itemSet.has(e))
+    const newElements = elements.filter(e => !this._itemSet.has(e))
     if (newElements.length === 0) return
 
-    this.#items.splice(index, 0, ...newElements)
+    this._items.splice(index, 0, ...newElements)
     for (const element of newElements) {
-      this.#itemSet.add(element)
+      this._itemSet.add(element)
     }
   }
 
@@ -26,13 +26,13 @@ export class IndexedSet<T> {
    * Remove an element by reference. Returns true if element was found and removed.
    */
   delete(element: T): boolean {
-    if (!this.#itemSet.has(element)) return false
+    if (!this._itemSet.has(element)) return false
 
-    const index = this.#items.indexOf(element)
+    const index = this._items.indexOf(element)
     if (index >= 0) {
-      this.#items.splice(index, 1)
+      this._items.splice(index, 1)
     }
-    this.#itemSet.delete(element)
+    this._itemSet.delete(element)
     return true
   }
 
@@ -40,7 +40,7 @@ export class IndexedSet<T> {
    * O(1) membership check.
    */
   has(element: T): boolean {
-    return this.#itemSet.has(element)
+    return this._itemSet.has(element)
   }
 
   /**
@@ -48,43 +48,43 @@ export class IndexedSet<T> {
    * Note: This is O(n) but first does O(1) membership check to fast-fail.
    */
   indexOf(element: T): number {
-    if (!this.#itemSet.has(element)) return -1
-    return this.#items.indexOf(element)
+    if (!this._itemSet.has(element)) return -1
+    return this._items.indexOf(element)
   }
 
   /**
    * Get element at index.
    */
   get(index: number): T | undefined {
-    return this.#items[index]
+    return this._items[index]
   }
 
   /**
    * Get the number of elements.
    */
   get size(): number {
-    return this.#items.length
+    return this._items.length
   }
 
   /**
    * Iterate over elements in order.
    */
   [Symbol.iterator](): Iterator<T> {
-    return this.#items[Symbol.iterator]()
+    return this._items[Symbol.iterator]()
   }
 
   /**
    * Clear all elements.
    */
   clear(): void {
-    this.#items = []
-    this.#itemSet.clear()
+    this._items = []
+    this._itemSet.clear()
   }
 
   /**
    * Find an element matching a predicate. Returns undefined if not found.
    */
   find(predicate: (element: T) => boolean): T | undefined {
-    return this.#items.find(predicate)
+    return this._items.find(predicate)
   }
 }

@@ -651,6 +651,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     observer.disconnect()
     // Clean up any modifications
     endFocusManagement(...focusableElements)
+    focusableElements.clear()
   })
 
   let elementIndexFocusedByClick: number | undefined = undefined

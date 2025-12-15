@@ -9,5 +9,5 @@ Optimize DOM operations for better web vitals (INP, CLS, FID)
 - Optimize `getClippingRect()` and `getPositionedParent()` with early exits
 - Batch MutationObserver DOM operations (read phase, then write phase)
 - Add sr-only inline styles to focus-trap sentinels to prevent CLS
-- Cache `isMacOS()` result to avoid repeated userAgent parsing
 - Use `:scope` selector for faster direct-child sentinel lookup
+- Add `IndexedSet` for O(1) membership checks in focus zone hot paths

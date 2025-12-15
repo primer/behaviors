@@ -247,22 +247,12 @@ export type FocusZoneSettings = IterateFocusableElements & {
   ignoreHoverEvents?: boolean
 }
 
-// PERFORMANCE: Cache the result to avoid repeated userAgent regex parsing on every keydown.
-// This is called frequently in keyboard event handlers.
-let cachedIsMac: boolean | undefined
-function getIsMac(): boolean {
-  if (cachedIsMac === undefined) {
-    cachedIsMac = isMacOS()
-  }
-  return cachedIsMac
-}
-
 function getDirection(keyboardEvent: KeyboardEvent) {
   const direction = KEY_TO_DIRECTION[keyboardEvent.key as keyof typeof KEY_TO_DIRECTION]
   if (keyboardEvent.key === 'Tab' && keyboardEvent.shiftKey) {
     return 'previous'
   }
-  const isMac = getIsMac()
+  const isMac = isMacOS()
   if ((isMac && keyboardEvent.metaKey) || (!isMac && keyboardEvent.ctrlKey)) {
     if (keyboardEvent.key === 'ArrowLeft' || keyboardEvent.key === 'ArrowUp') {
       return 'start'
@@ -306,7 +296,7 @@ function shouldIgnoreFocusHandling(keyboardEvent: KeyboardEvent, activeElement: 
 
   // Some situations we specifically want to ignore with <select> elements
   if (isSelect) {
-    const isMac = getIsMac()
+    const isMac = isMacOS()
     // On macOS, bare ArrowDown opens the select, so ignore that
     if (key === 'ArrowDown' && isMac && !keyboardEvent.metaKey) {
       return true

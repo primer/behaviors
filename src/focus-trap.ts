@@ -13,6 +13,21 @@ interface FocusTrapMetadata {
 const suspendedTrapStack: FocusTrapMetadata[] = []
 let activeTrap: FocusTrapMetadata | undefined = undefined
 
+// PERFORMANCE (CLS): Inline sr-only styles prevent Cumulative Layout Shift.
+// Without these styles, sentinels could briefly affect layout before CSS loads.
+const SR_ONLY_STYLES =
+  'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
+
+function createSentinel(onFocus: () => void): HTMLSpanElement {
+  const sentinel = document.createElement('span')
+  sentinel.setAttribute('class', 'sentinel')
+  sentinel.setAttribute('tabindex', '0')
+  sentinel.setAttribute('aria-hidden', 'true')
+  sentinel.style.cssText = SR_ONLY_STYLES
+  sentinel.onfocus = onFocus
+  return sentinel
+}
+
 function tryReactivate() {
   const trapToReactivate = suspendedTrapStack.pop()
   if (trapToReactivate) {
@@ -80,31 +95,16 @@ export function focusTrap(
   container.setAttribute('data-focus-trap', 'active')
 
   // Create sentinels outside DOM first to batch operations
-  const sentinelStart = document.createElement('span')
-  sentinelStart.setAttribute('class', 'sentinel')
-  sentinelStart.setAttribute('tabindex', '0')
-  sentinelStart.setAttribute('aria-hidden', 'true')
-  // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
-  // Without these styles, sentinels could briefly affect layout before CSS loads.
-  sentinelStart.style.cssText =
-    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
-  sentinelStart.onfocus = () => {
+  const sentinelStart = createSentinel(() => {
     const lastFocusableChild = getFocusableChild(container, true)
     lastFocusableChild?.focus()
-  }
+  })
 
-  const sentinelEnd = document.createElement('span')
-  sentinelEnd.setAttribute('class', 'sentinel')
-  sentinelEnd.setAttribute('tabindex', '0')
-  sentinelEnd.setAttribute('aria-hidden', 'true')
-  // PERFORMANCE (CLS): Use inline sr-only styles to prevent Cumulative Layout Shift.
-  sentinelEnd.style.cssText =
-    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
-  sentinelEnd.onfocus = () => {
+  const sentinelEnd = createSentinel(() => {
     // If the end sentinel was focused, move focus to the start
     const firstFocusableChild = getFocusableChild(container)
     firstFocusableChild?.focus()
-  }
+  })
 
   // If the container already has sentinels as direct children, don't add more.
   // The mutation observer will take care of moving existing sentinels to the correct position.

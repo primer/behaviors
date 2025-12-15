@@ -472,7 +472,10 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   }
 
   function beginFocusManagement(...elements: HTMLElement[]) {
-    const filteredElements = elements.filter(e => settings?.focusableElementFilter?.(e) ?? true)
+    // PERFORMANCE: Skip filter allocation when no filter function is provided (common case)
+    const filteredElements = settings?.focusableElementFilter
+      ? elements.filter(e => settings.focusableElementFilter!(e))
+      : elements
     if (filteredElements.length === 0) {
       return
     }
@@ -610,6 +613,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         endFocusManagement(...toRemove)
       }
     }
+    // PERFORMANCE: For small Sets (typically 1-2 attribute mutations), spread is fine
     if (attributeRemovals.size > 0) {
       endFocusManagement(...attributeRemovals)
     }
@@ -626,6 +630,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         beginFocusManagement(...toAdd)
       }
     }
+    // PERFORMANCE: For small Sets (typically 1-2 attribute mutations), spread is fine
     if (attributeAdditions.size > 0) {
       beginFocusManagement(...attributeAdditions)
     }

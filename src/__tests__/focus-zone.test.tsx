@@ -36,7 +36,8 @@ beforeAll(() => {
             }
           }
 
-          if (this.style?.position?.toLowerCase() === 'fixed') {
+          const position = this.style?.position?.toLowerCase()
+          if (position === 'fixed' || position === 'sticky') {
             return null
           }
 
@@ -913,4 +914,42 @@ it('Should not set initial focus via active descendant when focusInStrategy is "
   expect(control.hasAttribute('aria-activedescendant')).toBeFalsy()
 
   controller.abort()
+})
+
+it('Should not respond to DOM changes after abort is called', async () => {
+  const {container, rerender} = render(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton] = focusZoneContainer.querySelectorAll('button')
+  const controller = focusZone(focusZoneContainer)
+
+  firstButton.focus()
+  expect(document.activeElement).toEqual(firstButton)
+
+  // Abort the focus zone
+  controller.abort()
+
+  // Add a new button - should not cause issues since observer is disconnected
+  rerender(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+      <button tabIndex={0}>Dragonfruit</button>
+    </div>,
+  )
+
+  await nextTick()
+
+  // Focus zone should no longer be managing focus, so all buttons should have their original tabindex
+  const buttons = focusZoneContainer.querySelectorAll('button')
+  for (const button of buttons) {
+    expect(button.getAttribute('tabindex')).toEqual('0')
+  }
 })

@@ -13,6 +13,25 @@ interface FocusTrapMetadata {
 const suspendedTrapStack: FocusTrapMetadata[] = []
 let activeTrap: FocusTrapMetadata | undefined = undefined
 
+// PERFORMANCE (CLS): Inline sr-only styles prevent Cumulative Layout Shift.
+// Without these styles, sentinels could briefly affect layout before CSS loads.
+const SR_ONLY_STYLES =
+  'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
+
+interface CreateSentinelOptions {
+  onFocus: () => void
+}
+
+function createSentinel({onFocus}: CreateSentinelOptions): HTMLSpanElement {
+  const sentinel = document.createElement('span')
+  sentinel.setAttribute('class', 'sentinel')
+  sentinel.setAttribute('tabindex', '0')
+  sentinel.setAttribute('aria-hidden', 'true')
+  sentinel.style.cssText = SR_ONLY_STYLES
+  sentinel.onfocus = onFocus
+  return sentinel
+}
+
 function tryReactivate() {
   const trapToReactivate = suspendedTrapStack.pop()
   if (trapToReactivate) {
@@ -34,13 +53,11 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
       if (mutation.type === 'childList' && mutation.addedNodes.length) {
-        const sentinelChildren = Array.from(mutation.addedNodes).filter(
-          e => e instanceof HTMLElement && e.classList.contains('sentinel') && e.tagName === 'SPAN',
-        )
-
-        // If any of the added nodes are sentinels, don't do anything
-        if (sentinelChildren.length) {
-          return
+        // Check if any added nodes are sentinels - use loop to avoid Array.from allocation
+        for (const node of mutation.addedNodes) {
+          if (node instanceof HTMLElement && node.tagName === 'SPAN' && node.classList.contains('sentinel')) {
+            return
+          }
         }
         // If the first and last children of container aren't sentinels, move them to the start and end
         const firstChild = container.firstElementChild
@@ -80,32 +97,29 @@ export function focusTrap(
   const signal = abortSignal ?? controller.signal
 
   container.setAttribute('data-focus-trap', 'active')
-  const sentinelStart = document.createElement('span')
-  sentinelStart.setAttribute('class', 'sentinel')
-  sentinelStart.setAttribute('tabindex', '0')
-  sentinelStart.setAttribute('aria-hidden', 'true')
-  sentinelStart.onfocus = () => {
-    const lastFocusableChild = getFocusableChild(container, true)
-    lastFocusableChild?.focus()
-  }
 
-  const sentinelEnd = document.createElement('span')
-  sentinelEnd.setAttribute('class', 'sentinel')
-  sentinelEnd.setAttribute('tabindex', '0')
-  sentinelEnd.setAttribute('aria-hidden', 'true')
-  sentinelEnd.onfocus = () => {
-    // If the end sentinel was focused, move focus to the start
-    const firstFocusableChild = getFocusableChild(container)
-    firstFocusableChild?.focus()
-  }
+  // Create sentinels outside DOM first to batch operations
+  const sentinelStart = createSentinel({
+    onFocus: () => {
+      const lastFocusableChild = getFocusableChild(container, true)
+      lastFocusableChild?.focus()
+    },
+  })
+
+  const sentinelEnd = createSentinel({
+    onFocus: () => {
+      // If the end sentinel was focused, move focus to the start
+      const firstFocusableChild = getFocusableChild(container)
+      firstFocusableChild?.focus()
+    },
+  })
 
   // If the container already has sentinels as direct children, don't add more.
   // The mutation observer will take care of moving existing sentinels to the correct position.
-  const existingSentinels = Array.from(container.children).filter(
-    e => e.classList.contains('sentinel') && e.tagName === 'SPAN',
-  )
+  // Use :scope > to only check direct children, avoiding deep DOM traversal
+  const hasExistingSentinels = container.querySelector(':scope > span.sentinel') !== null
 
-  if (!existingSentinels.length) {
+  if (!hasExistingSentinels) {
     container.prepend(sentinelStart)
     container.append(sentinelEnd)
   }

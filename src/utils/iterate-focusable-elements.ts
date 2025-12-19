@@ -77,6 +77,10 @@ export function getFocusableChild(container: HTMLElement, lastChild = false) {
   return iterateFocusableElements(container, {reverse: lastChild, strict: true, onlyTabbable: true}).next().value
 }
 
+// PERFORMANCE: Use Set for O(1) lookup instead of Array.includes() which is O(n).
+// This is called for every element during focus zone initialization and DOM mutations.
+const DISABLEABLE_TAGS = new Set(['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'OPTGROUP', 'OPTION', 'FIELDSET'])
+
 /**
  * Determines whether the given element is focusable. If `strict` is true, we may
  * perform additional checks that require a reflow (less performant).
@@ -84,28 +88,38 @@ export function getFocusableChild(container: HTMLElement, lastChild = false) {
  * @param strict
  */
 export function isFocusable(elem: HTMLElement, strict = false): boolean {
+  // Fast path: Check simple properties first (no reflow)
   // Certain conditions cause an element to never be focusable, even if they have tabindex="0"
-  const disabledAttrInert =
-    ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'OPTGROUP', 'OPTION', 'FIELDSET'].includes(elem.tagName) &&
-    (elem as HTMLElement & {disabled: boolean}).disabled
-  const hiddenInert = elem.hidden
-  const hiddenInputInert = elem instanceof HTMLInputElement && elem.type === 'hidden'
-  const sentinelInert = elem.classList.contains('sentinel')
-  if (disabledAttrInert || hiddenInert || hiddenInputInert || sentinelInert) {
-    return false
-  }
+  if (elem.hidden) return false
+  if (elem.classList.contains('sentinel')) return false
+  if (elem instanceof HTMLInputElement && elem.type === 'hidden') return false
+  if (DISABLEABLE_TAGS.has(elem.tagName) && (elem as HTMLElement & {disabled: boolean}).disabled) return false
 
   // Each of the conditions checked below require a reflow, thus are gated by the `strict`
   // argument. If any are true, the element is not focusable, even if tabindex is set.
   if (strict) {
+    // PERFORMANCE: Batch all reflow-causing reads together to minimize layout thrashing.
+    // Reading offsetWidth/Height/Parent together allows the browser to compute layout once.
+    // DO NOT interleave these reads with conditional logic or DOM writes.
+    const offsetWidth = elem.offsetWidth
+    const offsetHeight = elem.offsetHeight
+    const offsetParent = elem.offsetParent
+
+    // Fast fail on zero dimensions before calling expensive getComputedStyle
+    if (offsetWidth === 0 || offsetHeight === 0) return false
+
+    // getComputedStyle is expensive - only call if we passed the cheaper checks
     const style = getComputedStyle(elem)
-    const sizeInert = elem.offsetWidth === 0 || elem.offsetHeight === 0
-    const visibilityInert = ['hidden', 'collapse'].includes(style.visibility)
-    const displayInert = style.display === 'none' || !elem.offsetParent
-    const clientRectsInert = elem.getClientRects().length === 0
-    if (sizeInert || visibilityInert || clientRectsInert || displayInert) {
-      return false
-    }
+    if (style.display === 'none') return false
+    if (style.visibility === 'hidden' || style.visibility === 'collapse') return false
+
+    // offsetParent is null for fixed/sticky positioned elements, so only use this check
+    // for elements that are not fixed or sticky positioned
+    const position = style.position
+    if (!offsetParent && position !== 'fixed' && position !== 'sticky') return false
+
+    // getClientRects is expensive - check last
+    if (elem.getClientRects().length === 0) return false
   }
 
   // Any element with `tabindex` explicitly set can be focusable, even if it's set to "-1"

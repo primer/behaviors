@@ -435,10 +435,10 @@ describe('getAnchoredPosition', () => {
 
       // With the optimization, we should make:
       // - 1 call for each intermediate div (5 calls total during traversal)
-      // - 1 call for root (positioned parent and clipping node in one traversal)
+      // - 1 call for root (positioned parent and clipping node found in one traversal)
       // - 1 call for the positioned parent to get its borders
       // - 1 call for the clipping node to get its borders
-      // Total: 5 + 1 + 1 + 1 = 8 calls (but positioned parent and clipping node are same, so 7 calls)
+      // Total: 5 + 1 + 1 + 1 = 8 calls
       //
       // Without optimization it would be:
       // - 6 calls for getPositionedParent (5 intermediate + 1 root)

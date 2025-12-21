@@ -433,14 +433,11 @@ describe('getAnchoredPosition', () => {
       expect(result.top).toBeDefined()
       expect(result.left).toBeDefined()
 
-      // With the optimization, we should make:
+      // With the latest optimization (cached styles), we should make:
       // - 5 calls during traversal (one for each intermediate div)
-      // - 1 call for root during traversal (finds both positioned parent and clipping node)
-      // - 1 call in getClippingRect for root's borders
-      // - 1 call for positioned parent's borders (root again, but separate call)
-      // Total: 5 + 1 + 1 + 1 = 8 calls
-      // Note: Even though root is both positioned parent and clipping node, we make 2 separate
-      // calls for it after traversal (one for clipping rect, one for parent borders)
+      // - 1 call for root during traversal (finds both positioned parent and clipping node, caches style)
+      // - 0 additional calls (both clippingRect and parent borders use cached styles from traversal)
+      // Total: 5 + 1 = 6 calls
       //
       // Without optimization it would be:
       // - 6 calls for getPositionedParent traversal (5 intermediate + 1 root)
@@ -449,7 +446,7 @@ describe('getAnchoredPosition', () => {
       // - 1 call for clipping rect borders (same element but separate call)
       // Total: 6 + 6 + 1 + 1 = 14 calls
       //
-      // Optimization reduces calls from 14 to 8 (42% reduction)
+      // Optimization reduces calls from 14 to 6 (57% reduction, improved from 42%)
       expect(callCount).toBeLessThan(14)
       expect(callCount).toBeGreaterThan(0)
 

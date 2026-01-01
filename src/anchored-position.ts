@@ -142,10 +142,16 @@ export function getAnchoredPosition(
   anchorElement: Element | DOMRect,
   settings: Partial<PositionSettings> = {},
 ): AnchorPosition {
-  const parentElement = getPositionedParent(floatingElement)
-  const clippingRect = getClippingRect(parentElement)
+  const {
+    positionedParent: parentElement,
+    clippingNode,
+    positionedParentStyle,
+    clippingNodeStyle,
+  } = getPositionedParentAndClippingNode(floatingElement)
+  const clippingRect = getClippingRect(clippingNode, clippingNodeStyle)
 
-  const parentElementStyle = getComputedStyle(parentElement)
+  // Use cached style if available, otherwise compute it
+  const parentElementStyle = positionedParentStyle || getComputedStyle(parentElement)
   const parentElementRect = parentElement.getBoundingClientRect()
   const [borderTop, borderLeft] = [parentElementStyle.borderTopWidth, parentElementStyle.borderLeftWidth].map(
     v => parseInt(v, 10) || 0,
@@ -164,24 +170,65 @@ export function getAnchoredPosition(
   )
 }
 
-/**
- * Returns the nearest proper HTMLElement parent of `element` whose
- * position is not "static", or document.body, whichever is closer
- */
-function getPositionedParent(element: Element) {
-  if (isOnTopLayer(element)) return document.body
+interface ParentAndClippingInfo {
+  positionedParent: HTMLElement
+  clippingNode: HTMLElement
+  positionedParentStyle: CSSStyleDeclaration | null
+  clippingNodeStyle: CSSStyleDeclaration | null
+}
 
+/**
+ * Returns both the positioned parent and clipping node in a single DOM traversal.
+ * This optimizes performance by reducing the number of getComputedStyle calls.
+ * Also returns cached computed styles to avoid redundant getComputedStyle calls later.
+ */
+function getPositionedParentAndClippingNode(element: Element): ParentAndClippingInfo {
+  if (isOnTopLayer(element)) {
+    return {
+      positionedParent: document.body,
+      clippingNode: document.body,
+      positionedParentStyle: null,
+      clippingNodeStyle: null,
+    }
+  }
+
+  let positionedParent: HTMLElement | null = null
+  let clippingNode: HTMLElement | null = null
+  let positionedParentStyle: CSSStyleDeclaration | null = null
+  let clippingNodeStyle: CSSStyleDeclaration | null = null
   let parentNode = element.parentNode
+
   while (parentNode !== null && parentNode !== document.body) {
     if (parentNode instanceof HTMLElement) {
-      // Check position property - exit early if not static
-      if (getComputedStyle(parentNode).position !== 'static') {
-        return parentNode
+      // Get computed style once per element
+      const style = getComputedStyle(parentNode)
+
+      // Check for positioned parent (only set first one found)
+      if (!positionedParent && style.position !== 'static') {
+        positionedParent = parentNode
+        positionedParentStyle = style
+      }
+
+      // Check for clipping ancestor (only set first one found)
+      if (!clippingNode && style.overflow !== 'visible') {
+        clippingNode = parentNode
+        clippingNodeStyle = style
+      }
+
+      // If we've found both, we can exit early
+      if (positionedParent && clippingNode) {
+        break
       }
     }
     parentNode = parentNode.parentNode
   }
-  return document.body
+
+  return {
+    positionedParent: positionedParent ?? document.body,
+    clippingNode: clippingNode ?? document.body,
+    positionedParentStyle,
+    clippingNodeStyle,
+  }
 }
 
 /**
@@ -205,29 +252,14 @@ function isOnTopLayer(element: Element) {
 /**
  * Returns the rectangle (relative to the window) that will clip the given element
  * if it is rendered outside of its bounds.
- * @param element
+ * @param clippingNode The element to use as the clipping boundary
+ * @param cachedStyle Optional cached computed style to avoid redundant getComputedStyle call
  * @returns
  */
-function getClippingRect(element: Element): BoxPosition {
-  // Find the first ancestor with overflow !== 'visible'
-  let clippingNode: HTMLElement = document.body
-  let parentNode: typeof element.parentNode = element
-
-  while (parentNode !== null && parentNode !== document.body) {
-    if (parentNode instanceof HTMLElement) {
-      // Only call getComputedStyle once per element
-      const overflow = getComputedStyle(parentNode).overflow
-      if (overflow !== 'visible') {
-        clippingNode = parentNode
-        break
-      }
-    }
-    parentNode = parentNode.parentNode
-  }
-
+function getClippingRect(clippingNode: HTMLElement, cachedStyle: CSSStyleDeclaration | null = null): BoxPosition {
   // Batch all reads from the clipping node together
   const elemRect = clippingNode.getBoundingClientRect()
-  const elemStyle = getComputedStyle(clippingNode)
+  const elemStyle = cachedStyle || getComputedStyle(clippingNode)
 
   // Parse all border values in one batch
   const borderTop = parseInt(elemStyle.borderTopWidth, 10) || 0

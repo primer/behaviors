@@ -384,6 +384,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const activeDescendantCallback = settings?.onActiveDescendantChanged
   const ignoreHoverEvents = settings?.ignoreHoverEvents ?? false
   let currentFocusedElement: HTMLElement | undefined
+  let wasDirectlyActivated = false
   const preventScroll = settings?.preventScroll ?? false
   const preventInitialFocus = focusInStrategy === 'initial' && settings?.activeDescendantControl
 
@@ -398,6 +399,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   function updateFocusedElement(to?: HTMLElement, directlyActivated = false) {
     const from = currentFocusedElement
     currentFocusedElement = to
+    wasDirectlyActivated = directlyActivated
 
     if (activeDescendantControl) {
       if (to && isActiveDescendantInputFocused()) {
@@ -470,7 +472,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       return
     }
     // Insert all elements atomically.
-    focusableElements.insertAt(findInsertionIndex(filteredElements), ...filteredElements)
+    const insertionIndex = findInsertionIndex(filteredElements)
+    focusableElements.insertAt(insertionIndex, ...filteredElements)
     for (const element of filteredElements) {
       // Set tabindex="-1" on all tabbable elements, but save the original
       // value in case we need to disable the behavior
@@ -480,7 +483,11 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       element.setAttribute('tabindex', '-1')
     }
 
-    if (!currentFocusedElement && !preventInitialFocus) {
+    // Update focus to the first element if:
+    // 1. There's no current focused element, OR
+    // 2. Elements were inserted at the beginning AND the current focus wasn't directly
+    //    activated by the user (e.g., it was set automatically after element removal)
+    if (!preventInitialFocus && (!currentFocusedElement || (insertionIndex === 0 && !wasDirectlyActivated))) {
       updateFocusedElement(getFirstFocusableElement())
     }
   }

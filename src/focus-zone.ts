@@ -245,6 +245,15 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * When `true`, moving the mouse will have no effect on the current active descendant value.
    */
   ignoreHoverEvents?: boolean
+
+  /**
+   * Controls whether focus should move to a newly prepended element when the current
+   * focus was not directly activated by the user (e.g., it was set automatically after
+   * element removal).
+   * When `true`, focus will move to the newly prepended element in this situation.
+   * When `false` (default), focus will remain on the current element.
+   */
+  focusPrependedElements?: boolean
 }
 
 function getDirection(keyboardEvent: KeyboardEvent) {
@@ -383,7 +392,9 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
   const ignoreHoverEvents = settings?.ignoreHoverEvents ?? false
+  const focusPrependedElements = settings?.focusPrependedElements ?? false
   let currentFocusedElement: HTMLElement | undefined
+  let wasDirectlyActivated = false
   const preventScroll = settings?.preventScroll ?? false
   const preventInitialFocus = focusInStrategy === 'initial' && settings?.activeDescendantControl
 
@@ -398,6 +409,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   function updateFocusedElement(to?: HTMLElement, directlyActivated = false) {
     const from = currentFocusedElement
     currentFocusedElement = to
+    wasDirectlyActivated = directlyActivated
 
     if (activeDescendantControl) {
       if (to && isActiveDescendantInputFocused()) {
@@ -470,7 +482,8 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       return
     }
     // Insert all elements atomically.
-    focusableElements.insertAt(findInsertionIndex(filteredElements), ...filteredElements)
+    const insertionIndex = findInsertionIndex(filteredElements)
+    focusableElements.insertAt(insertionIndex, ...filteredElements)
     for (const element of filteredElements) {
       // Set tabindex="-1" on all tabbable elements, but save the original
       // value in case we need to disable the behavior
@@ -480,7 +493,12 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
       element.setAttribute('tabindex', '-1')
     }
 
-    if (!currentFocusedElement && !preventInitialFocus) {
+    // Update focus to the first element if:
+    // 1. There's no current focused element, OR
+    // 2. focusPrependedElements is enabled AND elements were inserted at the beginning
+    //    AND the current focus wasn't directly activated by the user
+    const shouldFocusPrepended = focusPrependedElements && insertionIndex === 0 && !wasDirectlyActivated
+    if (!preventInitialFocus && (!currentFocusedElement || shouldFocusPrepended)) {
       updateFocusedElement(getFirstFocusableElement())
     }
   }

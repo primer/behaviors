@@ -1058,3 +1058,53 @@ it('Should NOT update focus to prepended element when focusPrependedElements is 
 
   controller.abort()
 })
+
+it('Should NOT update focus to prepended element when current focus was directly activated via keyboard (activeDescendant mode)', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <input id="control" />
+      <div id="focusZone">
+        <button tabIndex={0} id="apple">Apple</button>
+        <button tabIndex={0} id="banana">Banana</button>
+        <button tabIndex={0} id="cantaloupe">Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const control = container.querySelector<HTMLElement>('#control')!
+  const bananaButton = container.querySelector<HTMLElement>('#banana')!
+  const cantaloupeButton = container.querySelector<HTMLElement>('#cantaloupe')!
+  // Note: focusPrependedElements is enabled, using activeDescendantControl mode
+  const controller = focusZone(focusZoneContainer, {
+    focusPrependedElements: true,
+    activeDescendantControl: control,
+  })
+
+  // Focus the control (activates apple by default), then navigate via arrow keys
+  control.focus()
+  // First arrow moves from apple to banana
+  await user.keyboard('{arrowdown}')
+  expect(control.getAttribute('aria-activedescendant')).toEqual(bananaButton.id)
+
+  // Second arrow moves from banana to cantaloupe (directly activated)
+  await user.keyboard('{arrowdown}')
+  expect(control.getAttribute('aria-activedescendant')).toEqual(cantaloupeButton.id)
+
+  // Now prepend a new element to the focus zone
+  const newButton = document.createElement('button')
+  newButton.tabIndex = 0
+  newButton.id = 'dragonfruit'
+  newButton.textContent = 'Dragonfruit'
+  focusZoneContainer.insertBefore(newButton, focusZoneContainer.firstChild)
+
+  // The mutation observer fires asynchronously
+  await nextTick()
+
+  // Active descendant should remain on cantaloupeButton because it was directly activated
+  // by the user via keyboard navigation, even though focusPrependedElements is enabled
+  expect(control.getAttribute('aria-activedescendant')).toEqual(cantaloupeButton.id)
+
+  controller.abort()
+})

@@ -250,6 +250,8 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * Controls whether focus should move to a newly prepended element when the current
    * focus was not directly activated by the user (e.g., it was set automatically after
    * element removal).
+   * When `true`, focus will move to the newly prepended element in this situation.
+   * When `false` (default), focus will remain on the current element.
    */
   focusPrependedElements?: boolean
 }

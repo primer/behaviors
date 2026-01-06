@@ -1065,9 +1065,15 @@ it('Should NOT update focus to prepended element when current focus was directly
     <div>
       <input id="control" />
       <div id="focusZone">
-        <button tabIndex={0} id="apple">Apple</button>
-        <button tabIndex={0} id="banana">Banana</button>
-        <button tabIndex={0} id="cantaloupe">Cantaloupe</button>
+        <button tabIndex={0} id="apple">
+          Apple
+        </button>
+        <button tabIndex={0} id="banana">
+          Banana
+        </button>
+        <button tabIndex={0} id="cantaloupe">
+          Cantaloupe
+        </button>
       </div>
     </div>,
   )

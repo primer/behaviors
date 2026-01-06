@@ -245,6 +245,13 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * When `true`, moving the mouse will have no effect on the current active descendant value.
    */
   ignoreHoverEvents?: boolean
+
+  /**
+   * Controls whether focus should move to a newly prepended element when the current
+   * focus was not directly activated by the user (e.g., it was set automatically after
+   * element removal).
+   */
+  focusPrependedElements?: boolean
 }
 
 function getDirection(keyboardEvent: KeyboardEvent) {
@@ -383,6 +390,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   const activeDescendantControl = settings?.activeDescendantControl
   const activeDescendantCallback = settings?.onActiveDescendantChanged
   const ignoreHoverEvents = settings?.ignoreHoverEvents ?? false
+  const focusPrependedElements = settings?.focusPrependedElements ?? false
   let currentFocusedElement: HTMLElement | undefined
   let wasDirectlyActivated = false
   const preventScroll = settings?.preventScroll ?? false
@@ -485,9 +493,10 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
 
     // Update focus to the first element if:
     // 1. There's no current focused element, OR
-    // 2. Elements were inserted at the beginning AND the current focus wasn't directly
-    //    activated by the user (e.g., it was set automatically after element removal)
-    if (!preventInitialFocus && (!currentFocusedElement || (insertionIndex === 0 && !wasDirectlyActivated))) {
+    // 2. focusPrependedElements is enabled AND elements were inserted at the beginning
+    //    AND the current focus wasn't directly activated by the user
+    const shouldFocusPrepended = focusPrependedElements && insertionIndex === 0 && !wasDirectlyActivated
+    if (!preventInitialFocus && (!currentFocusedElement || shouldFocusPrepended)) {
       updateFocusedElement(getFirstFocusableElement())
     }
   }

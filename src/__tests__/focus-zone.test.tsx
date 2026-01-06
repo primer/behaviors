@@ -954,7 +954,7 @@ it('Should not respond to DOM changes after abort is called', async () => {
   }
 })
 
-it('Should update focus to prepended element when current focus was not directly activated', async () => {
+it('Should update focus to prepended element when focusPrependedElements is enabled and current focus was not directly activated', async () => {
   const user = userEvent.setup()
   const {container} = render(
     <div>
@@ -972,7 +972,7 @@ it('Should update focus to prepended element when current focus was not directly
   const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
   const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')
   const outsideButton = container.querySelector<HTMLElement>('#outside')!
-  const controller = focusZone(focusZoneContainer)
+  const controller = focusZone(focusZoneContainer, {focusPrependedElements: true})
 
   // Focus the first button, then move to second using keyboard (directly activated)
   firstButton.focus()
@@ -1003,6 +1003,58 @@ it('Should update focus to prepended element when current focus was not directly
   // because the previous focus (Apple) was not directly activated by the user
   await user.tab()
   expect(document.activeElement).toEqual(newButton)
+
+  controller.abort()
+})
+
+it('Should NOT update focus to prepended element when focusPrependedElements is disabled (default)', async () => {
+  const user = userEvent.setup()
+  const {container} = render(
+    <div>
+      <button tabIndex={0} id="outside">
+        Outside
+      </button>
+      <div id="focusZone">
+        <button tabIndex={0}>Apple</button>
+        <button tabIndex={0}>Banana</button>
+        <button tabIndex={0}>Cantaloupe</button>
+      </div>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [firstButton, secondButton] = focusZoneContainer.querySelectorAll('button')
+  const outsideButton = container.querySelector<HTMLElement>('#outside')!
+  // Note: focusPrependedElements is NOT set (defaults to false)
+  const controller = focusZone(focusZoneContainer)
+
+  // Focus the first button, then move to second using keyboard (directly activated)
+  firstButton.focus()
+  await user.keyboard('{arrowdown}')
+  expect(document.activeElement).toEqual(secondButton)
+
+  // Move focus outside and remove the second button
+  // This simulates the "bouncing" behavior where focus falls back to an arbitrary survivor
+  outsideButton.focus()
+  focusZoneContainer.removeChild(secondButton)
+
+  // The mutation observer fires asynchronously
+  await nextTick()
+
+  // At this point, currentFocusedElement is firstButton, but it was NOT directly activated
+  // (it was set automatically when secondButton was removed)
+
+  // Now prepend a new element to the focus zone
+  const newButton = document.createElement('button')
+  newButton.tabIndex = 0
+  newButton.textContent = 'Dragonfruit'
+  focusZoneContainer.insertBefore(newButton, firstButton)
+
+  // The mutation observer fires asynchronously
+  await nextTick()
+
+  await user.tab()
+  expect(document.activeElement).toEqual(firstButton)
 
   controller.abort()
 })

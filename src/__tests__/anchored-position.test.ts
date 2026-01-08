@@ -480,8 +480,9 @@ describe('getAnchoredPosition', () => {
       const result = getAnchoredPosition(float, anchor, settings)
 
       // Should work correctly when both are the same element
-      expect(result.top).toBeDefined()
-      expect(result.left).toBeDefined()
+      // With default side='outside-bottom', align='start':
+      expect(result.top).toEqual(234) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(280) // anchorRect.left - parentRect.left
     })
 
     it('should handle case where positioned parent is found before clipping node', () => {
@@ -523,8 +524,9 @@ describe('getAnchoredPosition', () => {
       const result = getAnchoredPosition(float, anchor, settings)
 
       // Should work correctly when positioned parent is closer than clipping node
-      expect(result.top).toBeDefined()
-      expect(result.left).toBeDefined()
+      // Position is calculated relative to the positioned parent (inner element)
+      expect(result.top).toEqual(234) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(280) // anchorRect.left - parentRect.left
     })
 
     it('should handle case where clipping node is found before positioned parent', () => {
@@ -566,8 +568,9 @@ describe('getAnchoredPosition', () => {
       const result = getAnchoredPosition(float, anchor, settings)
 
       // Should work correctly when clipping node is closer than positioned parent
-      expect(result.top).toBeDefined()
-      expect(result.left).toBeDefined()
+      // Position is calculated relative to the positioned parent (outer element)
+      expect(result.top).toEqual(244) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(290) // anchorRect.left - parentRect.left
     })
   })
 })

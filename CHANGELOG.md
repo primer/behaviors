@@ -1,5 +1,15 @@
 # @primer/behaviors
 
+## 1.9.2
+
+### Patch Changes
+
+- [#661](https://github.com/primer/behaviors/pull/661) [`419bcf0`](https://github.com/primer/behaviors/commit/419bcf091f7a4767286a69c7e3ed76547b28e187) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Optimize `getAnchoredPosition` by reducing `getComputedStyle` calls
+  - Combine DOM traversals for positioned parent and clipping node lookups into a single pass
+  - Cache computed styles during traversal to avoid redundant `getComputedStyle` calls
+  - Reduce calls from `2n + 2` to `n` for DOM trees of depth `n` (57% reduction for typical cases)
+  - Improve performance for anchored positioning with deep DOM trees
+
 ## 1.9.1
 
 ### Patch Changes

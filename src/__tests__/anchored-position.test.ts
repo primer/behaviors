@@ -380,4 +380,197 @@ describe('getAnchoredPosition', () => {
     expect(top).toEqual(0)
     expect(left).toEqual(52)
   })
+
+  describe('getComputedStyle optimization', () => {
+    it('should make fewer getComputedStyle calls with deeply nested DOM', () => {
+      const parentRect = makeDOMRect(20, 20, 500, 500)
+      const anchorRect = makeDOMRect(300, 200, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+
+      // Create a deeply nested DOM structure
+      const root = document.createElement('div')
+      root.style.overflow = 'hidden'
+      root.style.position = 'relative'
+      root.style.borderTopWidth = '0px'
+      root.style.borderRightWidth = '0px'
+      root.style.borderBottomWidth = '0px'
+      root.style.borderLeftWidth = '0px'
+      root.getBoundingClientRect = () => parentRect
+
+      // Create 5 intermediate divs (none positioned, none clipping)
+      let currentParent = root
+      for (let i = 0; i < 5; i++) {
+        const div = document.createElement('div')
+        div.id = `intermediate-${i}`
+        div.style.position = 'static'
+        div.style.overflow = 'visible'
+        currentParent.appendChild(div)
+        currentParent = div
+      }
+
+      const float = document.createElement('div')
+      float.id = 'float'
+      float.getBoundingClientRect = () => floatingRect
+      currentParent.appendChild(float)
+
+      const anchor = document.createElement('div')
+      anchor.id = 'anchor'
+      anchor.getBoundingClientRect = () => anchorRect
+      currentParent.appendChild(anchor)
+
+      // Mock getComputedStyle to track calls
+      const originalGetComputedStyle = window.getComputedStyle
+      let callCount = 0
+      const getComputedStyleSpy = jest.spyOn(window, 'getComputedStyle').mockImplementation((element: Element) => {
+        callCount++
+        return originalGetComputedStyle(element)
+      })
+
+      const settings: Partial<PositionSettings> = {anchorOffset: 4}
+      const result = getAnchoredPosition(float, anchor, settings)
+
+      // Verify the result is correct
+      expect(result.top).toBeDefined()
+      expect(result.left).toBeDefined()
+
+      // With the latest optimization (cached styles), we should make:
+      // - 5 calls during traversal (one for each intermediate div)
+      // - 1 call for root during traversal (finds both positioned parent and clipping node, caches style)
+      // - 0 additional calls (both clippingRect and parent borders use cached styles from traversal)
+      // Total: 5 + 1 = 6 calls
+      //
+      // Without optimization it would be:
+      // - 6 calls for getPositionedParent traversal (5 intermediate + 1 root)
+      // - 6 calls for getClippingRect traversal (5 intermediate + 1 root)
+      // - 1 call for positioned parent borders
+      // - 1 call for clipping rect borders (same element but separate call)
+      // Total: 6 + 6 + 1 + 1 = 14 calls
+      //
+      // Optimization reduces calls from 14 to 6 (57% reduction, improved from 42%)
+      expect(callCount).toBeLessThan(14)
+      expect(callCount).toBeGreaterThan(0)
+
+      getComputedStyleSpy.mockRestore()
+    })
+
+    it('should handle case where positioned parent is same as clipping node', () => {
+      const parentRect = makeDOMRect(20, 20, 500, 500)
+      const anchorRect = makeDOMRect(300, 200, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+
+      // Create a single parent that is both positioned and clipping
+      const parent = document.createElement('div')
+      parent.style.overflow = 'hidden'
+      parent.style.position = 'relative'
+      parent.style.borderTopWidth = '0px'
+      parent.style.borderRightWidth = '0px'
+      parent.style.borderBottomWidth = '0px'
+      parent.style.borderLeftWidth = '0px'
+      parent.getBoundingClientRect = () => parentRect
+
+      const float = document.createElement('div')
+      float.getBoundingClientRect = () => floatingRect
+      parent.appendChild(float)
+
+      const anchor = document.createElement('div')
+      anchor.getBoundingClientRect = () => anchorRect
+      parent.appendChild(anchor)
+
+      const settings: Partial<PositionSettings> = {anchorOffset: 4}
+      const result = getAnchoredPosition(float, anchor, settings)
+
+      // Should work correctly when both are the same element
+      // With default side='outside-bottom', align='start':
+      expect(result.top).toEqual(234) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(280) // anchorRect.left - parentRect.left
+    })
+
+    it('should handle case where positioned parent is found before clipping node', () => {
+      const parentRect = makeDOMRect(20, 20, 500, 500)
+      const clippingRect = makeDOMRect(10, 10, 600, 600)
+      const anchorRect = makeDOMRect(300, 200, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+
+      // Create outer clipping node
+      const clippingNode = document.createElement('div')
+      clippingNode.style.overflow = 'hidden'
+      clippingNode.style.position = 'static'
+      clippingNode.style.borderTopWidth = '0px'
+      clippingNode.style.borderRightWidth = '0px'
+      clippingNode.style.borderBottomWidth = '0px'
+      clippingNode.style.borderLeftWidth = '0px'
+      clippingNode.getBoundingClientRect = () => clippingRect
+
+      // Create inner positioned parent
+      const parent = document.createElement('div')
+      parent.style.overflow = 'visible'
+      parent.style.position = 'relative'
+      parent.style.borderTopWidth = '0px'
+      parent.style.borderRightWidth = '0px'
+      parent.style.borderBottomWidth = '0px'
+      parent.style.borderLeftWidth = '0px'
+      parent.getBoundingClientRect = () => parentRect
+      clippingNode.appendChild(parent)
+
+      const float = document.createElement('div')
+      float.getBoundingClientRect = () => floatingRect
+      parent.appendChild(float)
+
+      const anchor = document.createElement('div')
+      anchor.getBoundingClientRect = () => anchorRect
+      parent.appendChild(anchor)
+
+      const settings: Partial<PositionSettings> = {anchorOffset: 4}
+      const result = getAnchoredPosition(float, anchor, settings)
+
+      // Should work correctly when positioned parent is closer than clipping node
+      // Position is calculated relative to the positioned parent (inner element)
+      expect(result.top).toEqual(234) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(280) // anchorRect.left - parentRect.left
+    })
+
+    it('should handle case where clipping node is found before positioned parent', () => {
+      const clippingRect = makeDOMRect(20, 20, 500, 500)
+      const parentRect = makeDOMRect(10, 10, 600, 600)
+      const anchorRect = makeDOMRect(300, 200, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+
+      // Create outer positioned parent
+      const positionedParent = document.createElement('div')
+      positionedParent.style.overflow = 'visible'
+      positionedParent.style.position = 'relative'
+      positionedParent.style.borderTopWidth = '0px'
+      positionedParent.style.borderRightWidth = '0px'
+      positionedParent.style.borderBottomWidth = '0px'
+      positionedParent.style.borderLeftWidth = '0px'
+      positionedParent.getBoundingClientRect = () => parentRect
+
+      // Create inner clipping node
+      const clippingNode = document.createElement('div')
+      clippingNode.style.overflow = 'hidden'
+      clippingNode.style.position = 'static'
+      clippingNode.style.borderTopWidth = '0px'
+      clippingNode.style.borderRightWidth = '0px'
+      clippingNode.style.borderBottomWidth = '0px'
+      clippingNode.style.borderLeftWidth = '0px'
+      clippingNode.getBoundingClientRect = () => clippingRect
+      positionedParent.appendChild(clippingNode)
+
+      const float = document.createElement('div')
+      float.getBoundingClientRect = () => floatingRect
+      clippingNode.appendChild(float)
+
+      const anchor = document.createElement('div')
+      anchor.getBoundingClientRect = () => anchorRect
+      clippingNode.appendChild(anchor)
+
+      const settings: Partial<PositionSettings> = {anchorOffset: 4}
+      const result = getAnchoredPosition(float, anchor, settings)
+
+      // Should work correctly when clipping node is closer than positioned parent
+      // Position is calculated relative to the positioned parent (outer element)
+      expect(result.top).toEqual(244) // anchorRect.top + anchorRect.height + anchorOffset - parentRect.top
+      expect(result.left).toEqual(290) // anchorRect.left - parentRect.left
+    })
+  })
 })

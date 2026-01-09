@@ -498,9 +498,30 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     // 2. focusPrependedElements is enabled AND elements were inserted at the beginning
     //    AND the current focus wasn't directly activated by the user
     const shouldFocusPrepended = focusPrependedElements && insertionIndex === 0 && !wasDirectlyActivated
-    if (!preventInitialFocus && (!currentFocusedElement || shouldFocusPrepended)) {
+    if (!preventInitialFocus && shouldFocusPrepended) {
+      // Reinitialize with fresh DOM order, this ensures focus moves to the actual first element
+      reinitializeWithFreshElements()
+    } else if (!preventInitialFocus && !currentFocusedElement) {
       updateFocusedElement(getFirstFocusableElement())
     }
+  }
+
+  /**
+   * Reinitializes the focus zone with fresh elements from the DOM.
+   * This clears the existing focusable elements and scans the container again,
+   * then focuses the first element.
+   */
+  function reinitializeWithFreshElements() {
+    const freshElements = [...iterateFocusableElements(container, iterateFocusableElementsOptions)]
+    focusableElements.clear()
+    focusableElements.insertAt(0, ...freshElements)
+    for (const element of freshElements) {
+      if (!savedTabIndex.has(element)) {
+        savedTabIndex.set(element, element.getAttribute('tabindex'))
+      }
+      element.setAttribute('tabindex', '-1')
+    }
+    updateFocusedElement(getFirstFocusableElement())
   }
 
   function findInsertionIndex(elementsToInsert: HTMLElement[]) {
@@ -635,7 +656,12 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
         }
       }
       if (toAdd.length > 0) {
-        beginFocusManagement(...toAdd)
+        if (focusPrependedElements) {
+          // When focusPrependedElements is enabled, reinitialize to ensure correct focus
+          reinitializeWithFreshElements()
+        } else {
+          beginFocusManagement(...toAdd)
+        }
       }
     }
     // PERFORMANCE: For small Sets (typically 1-2 attribute mutations), spread is fine

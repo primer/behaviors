@@ -800,8 +800,7 @@ export const PrependedElementsActiveDescendant: Story = {
               {isActive ? (
                 <>
                   Use arrow keys to navigate the list. A new item will be prepended in a few seconds. When{' '}
-                  <code>focusPrependedElements</code> is enabled, the active descendant stays on the item you directly
-                  activated via keyboard, even after a new element is prepended.
+                  <code>focusPrependedElements</code> is enabled, the active descendant will be set on the first item in the focus zone after a new element is prepended.
                 </>
               ) : (
                 <>

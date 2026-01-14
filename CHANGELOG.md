@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.10.0
+
+### Minor Changes
+
+- [#668](https://github.com/primer/behaviors/pull/668) [`15b49ab`](https://github.com/primer/behaviors/commit/15b49abc0caee6a1390c951e52f28472fc3b57ff) Thanks [@TylerJDev](https://github.com/TylerJDev)! - Focus-zone: Reinitialize focus zone when new items are added and focusPrependedElements is `true`
+
 ## 1.9.2
 
 ### Patch Changes

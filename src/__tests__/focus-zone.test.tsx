@@ -1110,7 +1110,7 @@ it('Should update focus to prepended element when current focus was directly act
 
   // Active descendant should remain on cantaloupeButton because it was directly activated
   // by the user via keyboard navigation, even though focusPrependedElements is enabled
-  expect(control.getAttribute('aria-activedescendant')).toEqual(dragonfruit.id)
+  expect(control.getAttribute('aria-activedescendant')).toEqual(newButton.id)
 
   controller.abort()
 })

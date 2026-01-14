@@ -683,3 +683,161 @@ export const ActiveDescendantWithInput: Story = {
     )
   },
 }
+
+export const PrependedElementsActiveDescendant: Story = {
+  args: {
+    bindKeys: ['Arrow Vertical'],
+    focusOutBehavior: 'stop',
+    focusInStrategy: 'previous',
+  },
+  render: () => {
+    const [isActive, setIsActive] = useState(false)
+    const [activeIndex, setActiveIndex] = useState<number | null>(null)
+    const [items, setItems] = useState(['Apple', 'Banana', 'Cantaloupe'])
+    const [countdown, setCountdown] = useState<number | null>(null)
+    const controlRef = useRef<HTMLInputElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
+    const [controller, setController] = useState<AbortController | undefined>(undefined)
+
+    const activateZone = () => {
+      if (!listRef.current || !controlRef.current || controller) return
+
+      const onActiveDescendantChanged = (
+        newActiveDescendant: HTMLElement | undefined,
+        previousActiveDescendant: HTMLElement | undefined,
+      ) => {
+        if (previousActiveDescendant) {
+          previousActiveDescendant.classList.remove(styles.activeDescendant)
+        }
+
+        if (newActiveDescendant) {
+          newActiveDescendant.classList.add(styles.activeDescendant)
+          const index = Array.from(listRef.current!.children).indexOf(newActiveDescendant)
+          setActiveIndex(index)
+        } else {
+          setActiveIndex(null)
+        }
+      }
+
+      setController(
+        focusZone(listRef.current, {
+          bindKeys: FocusKeys.ArrowVertical | FocusKeys.HomeAndEnd,
+          focusOutBehavior: 'stop',
+          focusInStrategy: 'previous',
+          activeDescendantControl: controlRef.current,
+          onActiveDescendantChanged,
+          focusPrependedElements: true,
+        }),
+      )
+      setIsActive(true)
+
+      controlRef.current.focus()
+
+      // Start countdown to prepend new item
+      setCountdown(4)
+    }
+
+    const deactivateZone = () => {
+      if (controller) {
+        controller.abort()
+        setController(undefined)
+        setIsActive(false)
+        setActiveIndex(null)
+        setCountdown(null)
+      }
+    }
+
+    const resetDemo = () => {
+      deactivateZone()
+      setItems(['Apple', 'Banana', 'Cantaloupe'])
+    }
+
+    useEffect(() => {
+      return () => {
+        if (controller) controller.abort()
+      }
+    }, [controller])
+
+    useEffect(() => {
+      if (countdown === null || countdown < 0) return
+
+      if (countdown === 0) {
+        // Prepend new item
+        setItems(prev => ['Dragonfruit', ...prev])
+        setCountdown(null)
+        return
+      }
+
+      const timer = setTimeout(() => {
+        setCountdown(prev => (prev !== null ? prev - 1 : null))
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    }, [countdown])
+
+    return (
+      <div className="sb-demo">
+        <div className="sb-controls">
+          <button onClick={activateZone} disabled={isActive}>
+            Activate Focus Zone
+          </button>
+          <button onClick={deactivateZone} disabled={!isActive}>
+            Deactivate Focus Zone
+          </button>
+          <button onClick={resetDemo} disabled={!isActive && items.length === 3}>
+            Reset Demo
+          </button>
+          <span className="sb-status">
+            Status: <strong>{isActive ? 'Active' : 'Inactive'}</strong>
+            {activeIndex !== null && ` | Active: ${items[activeIndex]}`}
+            {countdown !== null && countdown > 0 && ` | Prepending in ${countdown}s...`}
+          </span>
+        </div>
+        <div className={styles.container}>
+          <div className={clsx(styles.content, isActive && styles.active)}>
+            <h1>Prepended Elements (Active Descendant)</h1>
+            <p className={clsx('sb-instructions', isActive && 'active')}>
+              {isActive ? (
+                <>
+                  Use arrow keys to navigate the list. A new item will be prepended in a few seconds. When{' '}
+                  <code>focusPrependedElements</code> is enabled, the active descendant stays on the item you directly
+                  activated via keyboard, even after a new element is prepended.
+                </>
+              ) : (
+                <>
+                  Demonstrates <code>focusPrependedElements</code> with <code>activeDescendantControl</code>. Activate
+                  and navigate with arrow keys, then watch as a new item is prepended.
+                </>
+              )}
+            </p>
+            <div>
+              <input
+                type="text"
+                role="combobox"
+                aria-label="Navigate Fruits"
+                className={styles.activeDescendantInput}
+                ref={controlRef}
+                placeholder="Focus here and use arrow keys"
+              />
+              <div className={styles.activeDescendantControl} aria-label="Fruit list">
+                <div ref={listRef} role="listbox" className={styles.activeDescendantList}>
+                  {items.map(item => (
+                    <div
+                      key={item}
+                      role="option"
+                      id={`fruit-option-${item.toLowerCase()}`}
+                      tabIndex={-1}
+                      className={styles.activeDescendantItem}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+}

@@ -301,6 +301,18 @@ const LongScrollableDemo: React.FC = () => {
     }
   }, [isOverlayOpen])
 
+  // Lock/unlock body scroll when dialog is open
+  useEffect(() => {
+    if (isDialogOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isDialogOpen])
+
   return (
     <div className={styles.longDemo}>
       {/* Trigger button to open dialog */}

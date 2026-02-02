@@ -293,9 +293,10 @@ const LongScrollableDemo: React.FC = () => {
         align: 'start',
         anchorOffset: 8,
         alignmentOffset: 0,
-        allowOutOfBounds: true,
+        allowOutOfBounds: false,
+        displayInVisibleViewport: true,
       }
-      
+
       const result = getAnchoredPosition(floatingRef.current, anchorRef.current, positionSettings)
       setPosition(result)
     }
@@ -306,7 +307,7 @@ const LongScrollableDemo: React.FC = () => {
     if (isDialogOpen) {
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
-      
+
       return () => {
         document.body.style.overflow = originalOverflow
       }
@@ -319,14 +320,11 @@ const LongScrollableDemo: React.FC = () => {
       <div className={styles.triggerSection}>
         <h1>Long Scrollable Page with Floating Dialog</h1>
         <p>This page demonstrates anchored positioning within a floating dialog overlay.</p>
-        <button 
-          onClick={toggleDialog}
-          className={styles.triggerButton}
-        >
+        <button onClick={toggleDialog} className={styles.triggerButton}>
           Open Settings Dialog
         </button>
       </div>
-      
+
       {/* Long content to create scroll */}
       <div className={styles.longContent}>
         {/* Create lots of content sections */}
@@ -334,22 +332,21 @@ const LongScrollableDemo: React.FC = () => {
           <div key={i} className={styles.contentSection}>
             <h2>Section {i + 1}</h2>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
-              irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla 
-              pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
-              officia deserunt mollit anim id est laborum.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+              mollit anim id est laborum.
             </p>
             <p>
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
-              doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore 
-              veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
+              rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+              explicabo.
             </p>
           </div>
         ))}
       </div>
-      
+
       {/* Floating Dialog Modal */}
       {isDialogOpen && (
         <>
@@ -358,22 +355,18 @@ const LongScrollableDemo: React.FC = () => {
             <div className={styles.dialog}>
               <div className={styles.dialogHeader}>
                 <h3>Settings Dialog</h3>
-                <button 
-                  onClick={toggleDialog}
-                  className={styles.dialogCloseButton}
-                >
+                <button onClick={toggleDialog} className={styles.dialogCloseButton}>
                   ×
                 </button>
               </div>
               <div className={styles.dialogContent}>
                 <p>This floating dialog contains a button that will trigger an anchored overlay.</p>
-                <p>The overlay position is calculated using getAnchoredPosition and will be positioned relative to the button below.</p>
-                
-                <button
-                  ref={anchorRef}
-                  onClick={toggleOverlay}
-                  className={styles.anchorButton}
-                >
+                <p>
+                  The overlay position is calculated using getAnchoredPosition and will be positioned relative to the
+                  button below.
+                </p>
+
+                <button ref={anchorRef} onClick={toggleOverlay} className={styles.anchorButton}>
                   {isOverlayOpen ? 'Close Overlay' : 'Open Overlay'}
                 </button>
               </div>
@@ -381,7 +374,7 @@ const LongScrollableDemo: React.FC = () => {
           </div>
         </>
       )}
-      
+
       {/* Render overlay outside dialog to avoid clipping */}
       {isDialogOpen && isOverlayOpen && (
         <div
@@ -395,16 +388,16 @@ const LongScrollableDemo: React.FC = () => {
         >
           <div className={styles.overlayHeader}>
             <h4>Anchored Overlay</h4>
-            <button
-              onClick={toggleOverlay}
-              className={styles.closeButton}
-            >
+            <button onClick={toggleOverlay} className={styles.closeButton}>
               ×
             </button>
           </div>
           <div className={styles.overlayContent}>
             <p>This overlay is positioned using getAnchoredPosition!</p>
-            <p>Position: {position ? `top: ${Math.round(position.top)}px, left: ${Math.round(position.left)}px` : 'calculating...'}</p>
+            <p>
+              Position:{' '}
+              {position ? `top: ${Math.round(position.top)}px, left: ${Math.round(position.left)}px` : 'calculating...'}
+            </p>
             <p>Side: {position?.anchorSide}</p>
             <p>Alignment: {position?.anchorAlign}</p>
             <ul>
@@ -425,7 +418,8 @@ export const LongScrollableContent: Story = {
     layout: 'fullscreen',
     docs: {
       description: {
-        story: 'A story demonstrating getAnchoredPosition within a long scrollable page. Features a dialog with a button that opens an anchored overlay.',
+        story:
+          'A story demonstrating getAnchoredPosition within a long scrollable page. Features a dialog with a button that opens an anchored overlay.',
       },
     },
   },

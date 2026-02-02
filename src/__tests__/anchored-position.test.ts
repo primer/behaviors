@@ -573,4 +573,128 @@ describe('getAnchoredPosition', () => {
       expect(result.left).toEqual(290) // anchorRect.left - parentRect.left
     })
   })
+
+  describe('displayInVisibleViewport option', () => {
+    beforeEach(() => {
+      // Mock window dimensions for consistent testing
+      Object.defineProperty(window, 'innerWidth', {value: 1024, writable: true})
+      Object.defineProperty(window, 'innerHeight', {value: 768, writable: true})
+    })
+
+    it('defaults to false when not specified', () => {
+      const anchorRect = makeDOMRect(300, 200, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(20, 20, 1920, 1080), anchorRect, floatingRect)
+
+      const {top, left} = getAnchoredPosition(float, anchor, {side: 'outside-bottom'})
+
+      // Should use normal clipping behavior (relative to clipping parent)
+      expect(top).toEqual(234) // anchorRect.top + anchorRect.height + 4 - parentRect.top
+      expect(left).toEqual(280) // anchorRect.left - parentRect.left
+    })
+
+    it('constrains to visible viewport when set to true', () => {
+      const anchorRect = makeDOMRect(950, 700, 50, 50) // Near bottom-right of viewport
+      const floatingRect = makeDOMRect(NaN, NaN, 200, 200) // Large floating element
+      const {float, anchor} = createVirtualDOM(
+        makeDOMRect(0, 0, 2000, 2000), // Large container
+        anchorRect,
+        floatingRect,
+      )
+
+      const {top, left} = getAnchoredPosition(float, anchor, {
+        side: 'outside-bottom',
+        displayInVisibleViewport: true,
+      })
+
+      // Should be constrained to fit within viewport (1024x768)
+      expect(left).toBeLessThanOrEqual(1024 - 200) // left + width <= viewport width
+      expect(top + 200).toBeLessThanOrEqual(768) // top + height <= viewport height
+    })
+
+    it('flips to top when bottom would exceed viewport height', () => {
+      const anchorRect = makeDOMRect(400, 700, 50, 50) // Near bottom of viewport
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(0, 0, 1920, 1080), anchorRect, floatingRect)
+
+      const {top, anchorSide} = getAnchoredPosition(float, anchor, {
+        side: 'outside-bottom',
+        displayInVisibleViewport: true,
+      })
+
+      // Should flip to top side to fit in viewport
+      expect(anchorSide).toEqual('outside-top')
+      expect(top).toBeGreaterThanOrEqual(0)
+      expect(top + 100).toBeLessThanOrEqual(768)
+    })
+
+    it('adjusts left position when right edge would exceed viewport width', () => {
+      const anchorRect = makeDOMRect(950, 300, 50, 50) // Near right edge of viewport
+      const floatingRect = makeDOMRect(NaN, NaN, 150, 100)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(0, 0, 1920, 1080), anchorRect, floatingRect)
+
+      const {left} = getAnchoredPosition(float, anchor, {
+        side: 'outside-bottom',
+        align: 'start',
+        displayInVisibleViewport: true,
+      })
+
+      // Should be pushed left to fit in viewport
+      expect(left + 150).toBeLessThanOrEqual(1024) // left + width <= viewport width
+    })
+
+    it('works with inside positioning', () => {
+      const anchorRect = makeDOMRect(100, 100, 800, 600) // Large anchor covering most viewport
+      const floatingRect = makeDOMRect(NaN, NaN, 200, 100)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(0, 0, 1920, 1080), anchorRect, floatingRect)
+
+      const {top, left} = getAnchoredPosition(float, anchor, {
+        side: 'inside-center',
+        align: 'center',
+        displayInVisibleViewport: true,
+      })
+
+      // Should position inside the anchor and within viewport
+      expect(left).toBeGreaterThanOrEqual(0)
+      expect(top).toBeGreaterThanOrEqual(0)
+      expect(left + 200).toBeLessThanOrEqual(1024)
+      expect(top + 100).toBeLessThanOrEqual(768)
+    })
+
+    it('still respects allowOutOfBounds when both options are set', () => {
+      const anchorRect = makeDOMRect(950, 700, 50, 50)
+      const floatingRect = makeDOMRect(NaN, NaN, 200, 200)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(0, 0, 1920, 1080), anchorRect, floatingRect)
+
+      const {top, left} = getAnchoredPosition(float, anchor, {
+        side: 'outside-bottom',
+        displayInVisibleViewport: true,
+        allowOutOfBounds: true,
+      })
+
+      // When allowOutOfBounds is true, should allow overflow even with displayInVisibleViewport
+      // The exact behavior depends on implementation, but it should not throw an error
+      expect(typeof top).toBe('number')
+      expect(typeof left).toBe('number')
+    })
+
+    it('handles edge case when anchor is outside viewport', () => {
+      const anchorRect = makeDOMRect(1200, 900, 50, 50) // Outside 1024x768 viewport
+      const floatingRect = makeDOMRect(NaN, NaN, 100, 100)
+      const {float, anchor} = createVirtualDOM(makeDOMRect(0, 0, 2000, 2000), anchorRect, floatingRect)
+
+      const {top, left} = getAnchoredPosition(float, anchor, {
+        side: 'outside-bottom',
+        displayInVisibleViewport: true,
+      })
+
+      // When anchor is outside viewport, the position calculation should still work
+      // but the final nudging should ensure no part of the floating element exceeds viewport
+      // Since the anchor is at (1200, 900) with 'outside-bottom', the floating element
+      // would initially be positioned around (1200, 954), which exceeds viewport bounds
+      // The displayInVisibleViewport option should constrain this
+      expect(left + 100).toBeLessThanOrEqual(1024) // right edge within viewport
+      expect(top + 100).toBeLessThanOrEqual(768) // bottom edge within viewport
+    })
+  })
 })

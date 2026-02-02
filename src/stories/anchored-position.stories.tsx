@@ -412,14 +412,14 @@ const LongScrollableDemo: React.FC = () => {
   )
 }
 
-export const LongScrollableContent: Story = {
+export const InsideDialog: Story = {
   render: () => <LongScrollableDemo />,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
         story:
-          'A story demonstrating getAnchoredPosition within a long scrollable page. Features a dialog with a button that opens an anchored overlay.',
+          'A story demonstrating getAnchoredPosition inside a dialog. Features a dialog with a button that opens an anchored overlay.',
       },
     },
   },

@@ -42,6 +42,80 @@ describe('IndexedSet', () => {
     })
   })
 
+  describe('insertArrayAt', () => {
+    it('inserts an array of elements at the specified index', () => {
+      const set = new IndexedSet<string>()
+      set.insertArrayAt(0, ['a', 'b', 'c'])
+
+      expect(set.get(0)).toBe('a')
+      expect(set.get(1)).toBe('b')
+      expect(set.get(2)).toBe('c')
+      expect(set.size).toBe(3)
+    })
+
+    it('inserts elements in the middle', () => {
+      const set = new IndexedSet<string>()
+      set.insertArrayAt(0, ['a', 'c'])
+      set.insertArrayAt(1, ['b'])
+
+      expect(set.get(0)).toBe('a')
+      expect(set.get(1)).toBe('b')
+      expect(set.get(2)).toBe('c')
+    })
+
+    it('deduplicates elements', () => {
+      const set = new IndexedSet<string>()
+      set.insertArrayAt(0, ['a', 'b'])
+      set.insertArrayAt(2, ['b', 'c']) // 'b' should be ignored
+
+      expect(set.size).toBe(3)
+      expect(set.get(0)).toBe('a')
+      expect(set.get(1)).toBe('b')
+      expect(set.get(2)).toBe('c')
+    })
+
+    it('handles empty arrays', () => {
+      const set = new IndexedSet<string>()
+      set.insertArrayAt(0, ['a', 'b'])
+      set.insertArrayAt(0, []) // empty array
+
+      expect(set.size).toBe(2)
+    })
+
+    it('handles large arrays (500k elements) without stack overflow', () => {
+      const set = new IndexedSet<number>()
+      // Use 500k elements to ensure we test beyond the typical call stack limit
+      // which causes "Maximum call stack size exceeded" when using spread with splice
+      const largeArray = Array.from({length: 500000}, (_, i) => i)
+
+      // Use insertArrayAt for large arrays to avoid spread operator stack overflow
+      expect(() => {
+        set.insertArrayAt(0, largeArray)
+      }).not.toThrow()
+
+      expect(set.size).toBe(500000)
+      expect(set.get(0)).toBe(0)
+      expect(set.get(499999)).toBe(499999)
+      expect(set.has(250000)).toBe(true)
+    })
+
+    it('handles inserting large arrays at middle positions', () => {
+      const set = new IndexedSet<number>()
+      set.insertAt(0, -2, -1)
+      const largeArray = Array.from({length: 500000}, (_, i) => i)
+
+      // Use insertArrayAt for large arrays to avoid spread operator stack overflow
+      expect(() => {
+        set.insertArrayAt(1, largeArray)
+      }).not.toThrow()
+
+      expect(set.size).toBe(500002)
+      expect(set.get(0)).toBe(-2)
+      expect(set.get(1)).toBe(0)
+      expect(set.get(500001)).toBe(-1)
+    })
+  })
+
   describe('delete', () => {
     it('removes an element and returns true', () => {
       const set = new IndexedSet<string>()

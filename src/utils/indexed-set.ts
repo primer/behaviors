@@ -10,16 +10,30 @@ export class IndexedSet<T> {
   private _itemSet = new Set<T>()
 
   /**
-   * Insert elements at a specific index. If index is omitted, appends to end.
+   * Insert an array of elements at a specific index.
+   * Use this method for large arrays to avoid stack overflow issues with spread operators.
    */
-  insertAt(index: number, ...elements: T[]): void {
+  insertArrayAt(index: number, elements: T[]): void {
     const newElements = elements.filter(e => !this._itemSet.has(e))
     if (newElements.length === 0) return
 
-    this._items.splice(index, 0, ...newElements)
+    // Avoid using spread with splice to prevent stack overflow with large arrays.
+    // Use Array.prototype.concat which handles large arrays without spreading.
+    const before = this._items.slice(0, index)
+    const after = this._items.slice(index)
+    this._items = before.concat(newElements, after)
+
     for (const element of newElements) {
       this._itemSet.add(element)
     }
+  }
+
+  /**
+   * Insert elements at a specific index. If index is omitted, appends to end.
+   * Note: For large arrays, use insertArrayAt() instead to avoid stack overflow.
+   */
+  insertAt(index: number, ...elements: T[]): void {
+    this.insertArrayAt(index, elements)
   }
 
   /**

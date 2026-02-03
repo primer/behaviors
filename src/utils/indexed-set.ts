@@ -25,8 +25,24 @@ export class IndexedSet<T> {
    * O(n) due to array operations, but optimized for batch insertions.
    */
   insertAt(index: number, elements: T[]): void {
-    // Filter out duplicates
-    const newElements = elements.filter(e => !this._itemSet.has(e))
+    // Filter out duplicates (both from existing set AND within the input array)
+    let newElements: T[]
+    if (elements.length <= 100) {
+      // For small arrays, use filter with indexOf for simplicity
+      newElements = elements.filter((e, i, arr) => !this._itemSet.has(e) && arr.indexOf(e) === i)
+    } else {
+      // For large arrays, build incrementally to avoid O(n²) indexOf and memory spikes
+      const seen = new Set<T>()
+      newElements = []
+      for (let i = 0; i < elements.length; i++) {
+        const e = elements[i]
+        if (!this._itemSet.has(e) && !seen.has(e)) {
+          seen.add(e)
+          newElements.push(e)
+        }
+      }
+    }
+
     if (newElements.length === 0) return
 
     // Clamp index to valid range

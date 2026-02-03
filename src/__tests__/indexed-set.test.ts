@@ -1,5 +1,8 @@
 import {IndexedSet} from '../utils/indexed-set'
 
+// Size used for large array tests - must exceed typical call stack limit to verify no stack overflow
+const LARGE_ARRAY_SIZE = 500000
+
 describe('IndexedSet', () => {
   describe('insertAt', () => {
     it('inserts elements at the specified index', () => {
@@ -84,35 +87,33 @@ describe('IndexedSet', () => {
 
     it('handles large arrays (500k elements) without stack overflow', () => {
       const set = new IndexedSet<number>()
-      // Use 500k elements to ensure we test beyond the typical call stack limit
-      // which causes "Maximum call stack size exceeded" when using spread with splice
-      const largeArray = Array.from({length: 500000}, (_, i) => i)
+      const largeArray = Array.from({length: LARGE_ARRAY_SIZE}, (_, i) => i)
 
       // Use insertArrayAt for large arrays to avoid spread operator stack overflow
       expect(() => {
         set.insertArrayAt(0, largeArray)
       }).not.toThrow()
 
-      expect(set.size).toBe(500000)
+      expect(set.size).toBe(LARGE_ARRAY_SIZE)
       expect(set.get(0)).toBe(0)
-      expect(set.get(499999)).toBe(499999)
-      expect(set.has(250000)).toBe(true)
+      expect(set.get(LARGE_ARRAY_SIZE - 1)).toBe(LARGE_ARRAY_SIZE - 1)
+      expect(set.has(LARGE_ARRAY_SIZE / 2)).toBe(true)
     })
 
     it('handles inserting large arrays at middle positions', () => {
       const set = new IndexedSet<number>()
-      set.insertAt(0, -2, -1)
-      const largeArray = Array.from({length: 500000}, (_, i) => i)
+      set.insertArrayAt(0, [-2, -1])
+      const largeArray = Array.from({length: LARGE_ARRAY_SIZE}, (_, i) => i)
 
       // Use insertArrayAt for large arrays to avoid spread operator stack overflow
       expect(() => {
         set.insertArrayAt(1, largeArray)
       }).not.toThrow()
 
-      expect(set.size).toBe(500002)
+      expect(set.size).toBe(LARGE_ARRAY_SIZE + 2)
       expect(set.get(0)).toBe(-2)
       expect(set.get(1)).toBe(0)
-      expect(set.get(500001)).toBe(-1)
+      expect(set.get(LARGE_ARRAY_SIZE + 1)).toBe(-1)
     })
   })
 

@@ -204,4 +204,73 @@ describe('IndexedSet Performance Benchmarks', () => {
       expect(set.indexOf('element-4999')).toBeGreaterThanOrEqual(0)
     })
   })
+
+  describe('large dataset performance', () => {
+    it('handles inserting 45,000 elements', () => {
+      const set = new IndexedSet<number>()
+      const elements = Array.from({length: 45000}, (_, i) => i)
+
+      set.insertAt(0, elements)
+
+      expect(set.size).toBe(45000)
+      expect(set.get(0)).toBe(0)
+      expect(set.get(44999)).toBe(44999)
+      expect(set.has(22500)).toBe(true)
+      expect(set.indexOf(22500)).toBe(22500)
+    })
+
+    it('handles inserting 45,000 elements at middle index', () => {
+      const set = new IndexedSet<number>()
+      set.insertAt(0, [0, 1, 2])
+
+      const elements = Array.from({length: 45000}, (_, i) => i + 100)
+      set.insertAt(1, elements) // Insert in middle
+
+      expect(set.size).toBe(45003)
+      expect(set.get(0)).toBe(0)
+      expect(set.get(1)).toBe(100) // First inserted element
+      expect(set.get(45001)).toBe(1) // Shifted original element
+      expect(set.get(45002)).toBe(2) // Shifted original element
+    })
+
+    it('handles inserting 45,000 elements at the beginning', () => {
+      const set = new IndexedSet<number>()
+      set.insertAt(0, [-1, -2, -3])
+
+      const elements = Array.from({length: 45000}, (_, i) => i)
+      set.insertAt(0, elements) // Prepend
+
+      expect(set.size).toBe(45003)
+      expect(set.get(0)).toBe(0)
+      expect(set.get(44999)).toBe(44999)
+      expect(set.get(45000)).toBe(-1) // Original elements shifted
+      expect(set.indexOf(-1)).toBe(45000)
+    })
+
+    it('deduplicates within a large array', () => {
+      const set = new IndexedSet<number>()
+      // Create array with duplicates: [0, 1, 2, ..., 22499, 0, 1, 2, ..., 22499]
+      const elements = Array.from({length: 45000}, (_, i) => i % 22500)
+
+      set.insertAt(0, elements)
+
+      expect(set.size).toBe(22500) // Should deduplicate
+      expect(set.has(0)).toBe(true)
+      expect(set.has(22499)).toBe(true)
+    })
+
+    it('filters out existing elements when inserting large array', () => {
+      const set = new IndexedSet<number>()
+      set.insertAt(
+        0,
+        Array.from({length: 1000}, (_, i) => i),
+      )
+
+      // Try to insert 45k elements, 1000 of which already exist
+      const newElements = Array.from({length: 45000}, (_, i) => i)
+      set.insertAt(1000, newElements)
+
+      expect(set.size).toBe(45000) // 1000 original + 44000 new
+    })
+  })
 })

@@ -160,7 +160,11 @@ describe('IndexedSet', () => {
   describe('find', () => {
     it('returns the first matching element', () => {
       const set = new IndexedSet<{id: number; name: string}>()
-      set.insertAt(0, [{id: 1, name: 'a'}, {id: 2, name: 'b'}, {id: 3, name: 'c'}])
+      set.insertAt(0, [
+        {id: 1, name: 'a'},
+        {id: 2, name: 'b'},
+        {id: 3, name: 'c'},
+      ])
 
       const found = set.find(el => el.id === 2)
       expect(found).toEqual({id: 2, name: 'b'})

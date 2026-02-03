@@ -66,7 +66,7 @@ export class IndexedSet<T> {
           this._items.unshift(newElements[i])
         }
       } else {
-        this._items.splice(0, 0, ...newElements.length <= 10000 ? newElements : this._chunkedInsert(0, newElements))
+        this._items.splice(0, 0, ...(newElements.length <= 10000 ? newElements : this._chunkedInsert(0, newElements)))
       }
       // Add new elements to Set and Map
       for (let i = 0; i < newElements.length; i++) {

@@ -1,5 +1,22 @@
 # @primer/behaviors
 
+## 1.10.1
+
+### Patch Changes
+
+- [#685](https://github.com/primer/behaviors/pull/685) [`de1a034`](https://github.com/primer/behaviors/commit/de1a0348e78d230f67e672576b8d2efe2ac07c98) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Fix IndexedSet stack overflow and optimize performance
+
+  **Fixes:**
+  - Fix `RangeError: Maximum call stack size exceeded` when inserting large numbers of elements (50k+) in focus zones
+  - Changed `insertAt` API from rest parameters to array parameter to avoid call stack issues
+
+  **Performance improvements:**
+  - Optimize `indexOf()` from O(n) to O(1) using a Map for index lookups
+  - Optimize `delete()` from O(2n) to O(n) by using the index map
+  - Add fast paths for common insertion patterns (append to end, prepend to start)
+
+  **Note:** This is a minor API change - `insertAt(index, ...elements)` is now `insertAt(index, elements)`. Callers should pass an array instead of spreading arguments.
+
 ## 1.10.0
 
 ### Minor Changes

@@ -25,19 +25,8 @@ export class IndexedSet<T> {
    * O(n) due to array operations, but optimized for batch insertions.
    */
   insertAt(index: number, elements: T[]): void {
-    // Filter without creating intermediate array for small inputs
-    let newElements: T[]
-    if (elements.length <= 100) {
-      newElements = elements.filter(e => !this._itemSet.has(e))
-    } else {
-      // For large arrays, build incrementally to avoid memory spikes
-      newElements = []
-      for (let i = 0; i < elements.length; i++) {
-        if (!this._itemSet.has(elements[i])) {
-          newElements.push(elements[i])
-        }
-      }
-    }
+    // Filter out duplicates
+    const newElements = elements.filter(e => !this._itemSet.has(e))
     if (newElements.length === 0) return
 
     // Clamp index to valid range
@@ -60,13 +49,11 @@ export class IndexedSet<T> {
       for (let i = 0; i < this._items.length; i++) {
         this._indexMap.set(this._items[i], i + newElements.length)
       }
-      // Use unshift for small arrays, splice for larger (V8 optimizes splice better for large arrays)
-      if (newElements.length <= 10 && this._items.length <= 100) {
-        for (let i = newElements.length - 1; i >= 0; i--) {
-          this._items.unshift(newElements[i])
-        }
+      // Insert elements (use chunked approach for very large arrays to avoid stack overflow)
+      if (newElements.length <= 10000) {
+        this._items.splice(0, 0, ...newElements)
       } else {
-        this._items.splice(0, 0, ...(newElements.length <= 10000 ? newElements : this._chunkedInsert(0, newElements)))
+        this._chunkedInsert(0, newElements)
       }
       // Add new elements to Set and Map
       for (let i = 0; i < newElements.length; i++) {
@@ -99,14 +86,15 @@ export class IndexedSet<T> {
 
   /**
    * Insert elements in chunks to avoid call stack overflow.
+   * This is needed because spreading very large arrays (>10k elements) into
+   * splice can cause "Maximum call stack size exceeded" errors.
    */
-  private _chunkedInsert(index: number, elements: T[]): T[] {
+  private _chunkedInsert(index: number, elements: T[]): void {
     const CHUNK_SIZE = 10000
     for (let i = 0; i < elements.length; i += CHUNK_SIZE) {
       const chunk = elements.slice(i, i + CHUNK_SIZE)
       this._items.splice(index + i, 0, ...chunk)
     }
-    return [] // Return empty to signal we handled it
   }
 
   /**

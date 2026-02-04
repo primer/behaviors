@@ -1,38 +1,135 @@
 /**
- * A data structure that maintains both an ordered array and a Set for O(1) membership checks.
- * Use this when you need both ordered iteration/index access AND fast membership tests.
+ * A data structure that maintains both an ordered array and a Set for O(1) membership checks,
+ * plus a Map for O(1) index lookups by element.
  *
- * PERFORMANCE: Provides O(1) `has()` checks while maintaining insertion order.
- * Trade-off: Slightly more memory (Set overhead) and must call proper methods to stay in sync.
+ * PERFORMANCE:
+ * - O(1) `has()` checks
+ * - O(1) `indexOf()` lookups
+ * - O(1) `get()` by index
+ * - O(n) insertions/deletions (unavoidable for ordered array, but optimized)
+ *
+ * Optimized for focusZone use cases:
+ * - Frequent `has()` checks (mousemove handlers)
+ * - Frequent `get(index)` access (arrow key navigation)
+ * - Batch insertions via MutationObserver
+ * - Relatively infrequent deletions
  */
 export class IndexedSet<T> {
   private _items: T[] = []
   private _itemSet = new Set<T>()
+  private _indexMap = new Map<T, number>()
 
   /**
-   * Insert elements at a specific index. If index is omitted, appends to end.
+   * Insert elements at a specific index.
+   * Accepts an array to avoid call stack overflow with large datasets.
+   * O(n) due to array operations, but optimized for batch insertions.
    */
-  insertAt(index: number, ...elements: T[]): void {
-    const newElements = elements.filter(e => !this._itemSet.has(e))
+  insertAt(index: number, elements: T[]): void {
+    // Filter out duplicates (both from existing set AND within the input array)
+    let newElements: T[]
+    if (elements.length <= 100) {
+      // For small arrays, use filter with indexOf for simplicity
+      newElements = elements.filter((e, i, arr) => !this._itemSet.has(e) && arr.indexOf(e) === i)
+    } else {
+      // For large arrays, build incrementally to avoid O(n²) indexOf and memory spikes
+      const seen = new Set<T>()
+      newElements = []
+      for (let i = 0; i < elements.length; i++) {
+        const e = elements[i]
+        if (!this._itemSet.has(e) && !seen.has(e)) {
+          seen.add(e)
+          newElements.push(e)
+        }
+      }
+    }
+
     if (newElements.length === 0) return
 
-    this._items.splice(index, 0, ...newElements)
-    for (const element of newElements) {
+    // Clamp index to valid range
+    const insertIndex = Math.max(0, Math.min(index, this._items.length))
+
+    // Fast path: appending to end (common case for initial load)
+    if (insertIndex === this._items.length) {
+      for (let i = 0; i < newElements.length; i++) {
+        const element = newElements[i]
+        this._indexMap.set(element, this._items.length)
+        this._items.push(element)
+        this._itemSet.add(element)
+      }
+      return
+    }
+
+    // Fast path: prepending to start
+    if (insertIndex === 0) {
+      // Update all existing indices first
+      for (let i = 0; i < this._items.length; i++) {
+        this._indexMap.set(this._items[i], i + newElements.length)
+      }
+      // Insert elements (use chunked approach for very large arrays to avoid stack overflow)
+      if (newElements.length <= 10000) {
+        this._items.splice(0, 0, ...newElements)
+      } else {
+        this._chunkedInsert(0, newElements)
+      }
+      // Add new elements to Set and Map
+      for (let i = 0; i < newElements.length; i++) {
+        this._itemSet.add(newElements[i])
+        this._indexMap.set(newElements[i], i)
+      }
+      return
+    }
+
+    // General case: middle insertion
+    // Update indices for elements that will shift
+    for (let i = this._items.length - 1; i >= insertIndex; i--) {
+      this._indexMap.set(this._items[i], i + newElements.length)
+    }
+
+    // Insert new elements - use chunked approach for very large arrays
+    if (newElements.length <= 10000) {
+      this._items.splice(insertIndex, 0, ...newElements)
+    } else {
+      this._chunkedInsert(insertIndex, newElements)
+    }
+
+    // Add new elements to Set and Map
+    for (let i = 0; i < newElements.length; i++) {
+      const element = newElements[i]
       this._itemSet.add(element)
+      this._indexMap.set(element, insertIndex + i)
+    }
+  }
+
+  /**
+   * Insert elements in chunks to avoid call stack overflow.
+   * This is needed because spreading very large arrays (>10k elements) into
+   * splice can cause "Maximum call stack size exceeded" errors.
+   */
+  private _chunkedInsert(index: number, elements: T[]): void {
+    const CHUNK_SIZE = 10000
+    for (let i = 0; i < elements.length; i += CHUNK_SIZE) {
+      const chunk = elements.slice(i, i + CHUNK_SIZE)
+      this._items.splice(index + i, 0, ...chunk)
     }
   }
 
   /**
    * Remove an element by reference. Returns true if element was found and removed.
+   * O(n) due to array splice and index updates.
    */
   delete(element: T): boolean {
     if (!this._itemSet.has(element)) return false
 
-    const index = this._items.indexOf(element)
-    if (index >= 0) {
-      this._items.splice(index, 1)
-    }
+    const index = this._indexMap.get(element)!
+    this._items.splice(index, 1)
     this._itemSet.delete(element)
+    this._indexMap.delete(element)
+
+    // Update indices for elements that shifted
+    for (let i = index; i < this._items.length; i++) {
+      this._indexMap.set(this._items[i], i)
+    }
+
     return true
   }
 
@@ -44,16 +141,14 @@ export class IndexedSet<T> {
   }
 
   /**
-   * Get the index of an element. Returns -1 if not found.
-   * Note: This is O(n) but first does O(1) membership check to fast-fail.
+   * O(1) index lookup (improved from O(n)).
    */
   indexOf(element: T): number {
-    if (!this._itemSet.has(element)) return -1
-    return this._items.indexOf(element)
+    return this._indexMap.get(element) ?? -1
   }
 
   /**
-   * Get element at index.
+   * O(1) element access by index.
    */
   get(index: number): T | undefined {
     return this._items[index]
@@ -79,6 +174,7 @@ export class IndexedSet<T> {
   clear(): void {
     this._items = []
     this._itemSet.clear()
+    this._indexMap.clear()
   }
 
   /**

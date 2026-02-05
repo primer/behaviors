@@ -87,6 +87,14 @@ export interface PositionSettings {
    * this direction.
    */
   allowOutOfBounds: boolean
+
+  /**
+   * If true, attempt to position the floating element entirely within the visible
+   * viewport (window.innerWidth/innerHeight) without requiring scrolling.
+   * This is useful when the anchor is inside a dialog or other container that
+   * prevents scrolling of the main document.
+   */
+  displayInViewport?: boolean
 }
 
 // For each outside anchor position, list the order of alternate positions to try in
@@ -167,6 +175,7 @@ export function getAnchoredPosition(
     floatingElement.getBoundingClientRect(),
     anchorElement instanceof Element ? anchorElement.getBoundingClientRect() : anchorElement,
     getDefaultSettings(settings),
+    {width: window.innerWidth, height: window.innerHeight},
   )
 }
 
@@ -292,6 +301,7 @@ const positionDefaults: PositionSettings = {
   alignmentOffset: 4,
 
   allowOutOfBounds: false,
+  displayInViewport: false,
 }
 
 /**
@@ -311,6 +321,7 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
       settings.alignmentOffset ??
       (align !== 'center' && side.startsWith('inside') ? positionDefaults.alignmentOffset : 0),
     allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds,
+    displayInViewport: settings.displayInViewport ?? positionDefaults.displayInViewport,
   }
 }
 
@@ -324,20 +335,34 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
  * @param floatingRect WidthAndHeight for the floating element
  * @param anchorRect BoxPosition for the anchor element
  * @param PositionSettings to customize the calculated position for the floating element.
+ * @param visibleViewportSize Size of the visible viewport (window dimensions), used when displayInVisibleViewport is true
  */
 function pureCalculateAnchoredPosition(
   viewportRect: BoxPosition,
   relativePosition: Position,
   floatingRect: Size,
   anchorRect: BoxPosition,
-  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset}: PositionSettings,
+  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset, displayInViewport}: PositionSettings,
+  visibleViewportSize: Size,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
+  let effectiveViewportRect = viewportRect
+
+  // If displayInViewport is true, constrain to the actual visible viewport
+  if (displayInViewport) {
+    effectiveViewportRect = {
+      top: 0,
+      left: 0,
+      width: visibleViewportSize.width,
+      height: visibleViewportSize.height,
+    }
+  }
+
   const relativeViewportRect: BoxPosition = {
-    top: viewportRect.top - relativePosition.top,
-    left: viewportRect.left - relativePosition.left,
-    width: viewportRect.width,
-    height: viewportRect.height,
+    top: effectiveViewportRect.top - relativePosition.top,
+    left: effectiveViewportRect.left - relativePosition.left,
+    width: effectiveViewportRect.width,
+    height: effectiveViewportRect.height,
   }
 
   let pos = calculatePosition(floatingRect, anchorRect, side, align, anchorOffset, alignmentOffset)
@@ -400,16 +425,14 @@ function pureCalculateAnchoredPosition(
     if (pos.left < relativeViewportRect.left) {
       pos.left = relativeViewportRect.left
     }
-    if (pos.left + floatingRect.width > viewportRect.width + relativeViewportRect.left) {
-      pos.left = viewportRect.width + relativeViewportRect.left - floatingRect.width
+    if (pos.left + floatingRect.width > effectiveViewportRect.width + relativeViewportRect.left) {
+      pos.left = effectiveViewportRect.width + relativeViewportRect.left - floatingRect.width
     }
-    // If we have exhausted all possible positions and none of them worked, we
-    // say that overflowing the bottom of the screen is acceptable since it is
-    // likely to be able to scroll.
-    if (alternateOrder && positionAttempt < alternateOrder.length) {
-      if (pos.top + floatingRect.height > viewportRect.height + relativeViewportRect.top) {
+    // Always apply bottom constraint when displayInViewport is true
+    if (displayInViewport || (alternateOrder && positionAttempt < alternateOrder.length)) {
+      if (pos.top + floatingRect.height > effectiveViewportRect.height + relativeViewportRect.top) {
         // This prevents top from being a negative value
-        pos.top = Math.max(viewportRect.height + relativeViewportRect.top - floatingRect.height, 0)
+        pos.top = Math.max(effectiveViewportRect.height + relativeViewportRect.top - floatingRect.height, 0)
       }
     }
   }

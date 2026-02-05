@@ -2,4 +2,4 @@
 "@primer/behaviors": patch
 ---
 
-fix(getAnchoredPosition): add better support for floatingElements inside dialogs through new "displayInVisibleViewport" setting
+fix(getAnchoredPosition): add better support for floatingElements inside dialogs through new "displayInViewport" setting

@@ -483,7 +483,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
     }
     // Insert all elements atomically.
     const insertionIndex = findInsertionIndex(filteredElements)
-    focusableElements.insertAt(insertionIndex, ...filteredElements)
+    focusableElements.insertAt(insertionIndex, filteredElements)
     for (const element of filteredElements) {
       // Set tabindex="-1" on all tabbable elements, but save the original
       // value in case we need to disable the behavior
@@ -514,7 +514,7 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   function reinitializeWithFreshElements() {
     const freshElements = [...iterateFocusableElements(container, iterateFocusableElementsOptions)]
     focusableElements.clear()
-    focusableElements.insertAt(0, ...freshElements)
+    focusableElements.insertAt(0, freshElements)
     for (const element of freshElements) {
       if (!savedTabIndex.has(element)) {
         savedTabIndex.set(element, element.getAttribute('tabindex'))

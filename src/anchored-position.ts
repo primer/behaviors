@@ -175,6 +175,7 @@ export function getAnchoredPosition(
     floatingElement.getBoundingClientRect(),
     anchorElement instanceof Element ? anchorElement.getBoundingClientRect() : anchorElement,
     getDefaultSettings(settings),
+    {width: window.innerWidth, height: window.innerHeight},
   )
 }
 
@@ -334,6 +335,7 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
  * @param floatingRect WidthAndHeight for the floating element
  * @param anchorRect BoxPosition for the anchor element
  * @param PositionSettings to customize the calculated position for the floating element.
+ * @param visibleViewportSize Size of the visible viewport (window dimensions), used when displayInVisibleViewport is true
  */
 function pureCalculateAnchoredPosition(
   viewportRect: BoxPosition,
@@ -341,6 +343,7 @@ function pureCalculateAnchoredPosition(
   floatingRect: Size,
   anchorRect: BoxPosition,
   {side, align, allowOutOfBounds, anchorOffset, alignmentOffset, displayInViewport}: PositionSettings,
+  visibleViewportSize: Size,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
   let effectiveViewportRect = viewportRect
@@ -350,8 +353,8 @@ function pureCalculateAnchoredPosition(
     effectiveViewportRect = {
       top: 0,
       left: 0,
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: visibleViewportSize.width,
+      height: visibleViewportSize.height,
     }
   }
 

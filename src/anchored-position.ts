@@ -94,7 +94,7 @@ export interface PositionSettings {
    * This is useful when the anchor is inside a dialog or other container that
    * prevents scrolling of the main document.
    */
-  displayInVisibleViewport?: boolean
+  displayInViewport?: boolean
 }
 
 // For each outside anchor position, list the order of alternate positions to try in
@@ -300,7 +300,7 @@ const positionDefaults: PositionSettings = {
   alignmentOffset: 4,
 
   allowOutOfBounds: false,
-  displayInVisibleViewport: false,
+  displayInViewport: false,
 }
 
 /**
@@ -320,7 +320,7 @@ function getDefaultSettings(settings: Partial<PositionSettings> = {}): PositionS
       settings.alignmentOffset ??
       (align !== 'center' && side.startsWith('inside') ? positionDefaults.alignmentOffset : 0),
     allowOutOfBounds: settings.allowOutOfBounds ?? positionDefaults.allowOutOfBounds,
-    displayInVisibleViewport: settings.displayInVisibleViewport ?? positionDefaults.displayInVisibleViewport,
+    displayInViewport: settings.displayInViewport ?? positionDefaults.displayInViewport,
   }
 }
 
@@ -340,13 +340,13 @@ function pureCalculateAnchoredPosition(
   relativePosition: Position,
   floatingRect: Size,
   anchorRect: BoxPosition,
-  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset, displayInVisibleViewport}: PositionSettings,
+  {side, align, allowOutOfBounds, anchorOffset, alignmentOffset, displayInViewport}: PositionSettings,
 ): AnchorPosition {
   // Compute the relative viewport rect, to bring it into the same coordinate space as `pos`
   let effectiveViewportRect = viewportRect
 
-  // If displayInVisibleViewport is true, constrain to the actual visible viewport
-  if (displayInVisibleViewport) {
+  // If displayInViewport is true, constrain to the actual visible viewport
+  if (displayInViewport) {
     effectiveViewportRect = {
       top: 0,
       left: 0,
@@ -425,8 +425,8 @@ function pureCalculateAnchoredPosition(
     if (pos.left + floatingRect.width > effectiveViewportRect.width + relativeViewportRect.left) {
       pos.left = effectiveViewportRect.width + relativeViewportRect.left - floatingRect.width
     }
-    // Always apply bottom constraint when displayInVisibleViewport is true
-    if (displayInVisibleViewport || (alternateOrder && positionAttempt < alternateOrder.length)) {
+    // Always apply bottom constraint when displayInViewport is true
+    if (displayInViewport || (alternateOrder && positionAttempt < alternateOrder.length)) {
       if (pos.top + floatingRect.height > effectiveViewportRect.height + relativeViewportRect.top) {
         // This prevents top from being a negative value
         pos.top = Math.max(effectiveViewportRect.height + relativeViewportRect.top - floatingRect.height, 0)

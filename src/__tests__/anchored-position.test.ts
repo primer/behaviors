@@ -574,7 +574,7 @@ describe('getAnchoredPosition', () => {
     })
   })
 
-  describe('displayInVisibleViewport option', () => {
+  describe('displayInViewport option', () => {
     beforeEach(() => {
       // Mock window dimensions for consistent testing
       Object.defineProperty(window, 'innerWidth', {value: 1024, writable: true})
@@ -604,7 +604,7 @@ describe('getAnchoredPosition', () => {
 
       const {top, left} = getAnchoredPosition(float, anchor, {
         side: 'outside-bottom',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       })
 
       // Should be constrained to fit within viewport (1024x768)
@@ -619,7 +619,7 @@ describe('getAnchoredPosition', () => {
 
       const {top, anchorSide} = getAnchoredPosition(float, anchor, {
         side: 'outside-bottom',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       })
 
       // Should flip to top side to fit in viewport
@@ -636,7 +636,7 @@ describe('getAnchoredPosition', () => {
       const {left} = getAnchoredPosition(float, anchor, {
         side: 'outside-bottom',
         align: 'start',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       })
 
       // Should be pushed left to fit in viewport
@@ -651,7 +651,7 @@ describe('getAnchoredPosition', () => {
       const {top, left} = getAnchoredPosition(float, anchor, {
         side: 'inside-center',
         align: 'center',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       })
 
       // Should position inside the anchor and within viewport
@@ -668,11 +668,11 @@ describe('getAnchoredPosition', () => {
 
       const {top, left} = getAnchoredPosition(float, anchor, {
         side: 'outside-bottom',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
         allowOutOfBounds: true,
       })
 
-      // When allowOutOfBounds is true, should allow overflow even with displayInVisibleViewport
+      // When allowOutOfBounds is true, should allow overflow even with displayInViewport
       // The exact behavior depends on implementation, but it should not throw an error
       expect(typeof top).toBe('number')
       expect(typeof left).toBe('number')
@@ -685,14 +685,14 @@ describe('getAnchoredPosition', () => {
 
       const {top, left} = getAnchoredPosition(float, anchor, {
         side: 'outside-bottom',
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       })
 
       // When anchor is outside viewport, the position calculation should still work
       // but the final nudging should ensure no part of the floating element exceeds viewport
       // Since the anchor is at (1200, 900) with 'outside-bottom', the floating element
       // would initially be positioned around (1200, 954), which exceeds viewport bounds
-      // The displayInVisibleViewport option should constrain this
+      // The displayInViewport option should constrain this
       expect(left + 100).toBeLessThanOrEqual(1024) // right edge within viewport
       expect(top + 100).toBeLessThanOrEqual(768) // bottom edge within viewport
     })

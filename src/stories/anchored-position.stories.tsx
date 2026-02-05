@@ -294,7 +294,7 @@ const LongScrollableDemo: React.FC = () => {
         anchorOffset: 8,
         alignmentOffset: 0,
         allowOutOfBounds: false,
-        displayInVisibleViewport: true,
+        displayInViewport: true,
       }
 
       const result = getAnchoredPosition(floatingRef.current, anchorRef.current, positionSettings)

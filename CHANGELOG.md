@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.10.2
+
+### Patch Changes
+
+- [#681](https://github.com/primer/behaviors/pull/681) [`09af9ad`](https://github.com/primer/behaviors/commit/09af9adddfc4c226c5784959e2b50cb3ac6648ec) Thanks [@francinelucca](https://github.com/francinelucca)! - fix(getAnchoredPosition): add better support for floatingElements inside dialogs through new "displayInViewport" setting
+
 ## 1.10.1
 
 ### Patch Changes

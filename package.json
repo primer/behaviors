@@ -4,7 +4,6 @@
   "description": "Shared behaviors for JavaScript components",
   "type": "module",
   "main": "dist/esm/index.mjs",
-  "module": "dist/esm/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",

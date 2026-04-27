@@ -3,6 +3,5 @@
   "type": "module",
   "types": "../dist/esm/utils/index.d.ts",
   "main": "../dist/esm/utils/index.mjs",
-  "module": "../dist/esm/utils/index.mjs",
   "sideEffects": false
 }

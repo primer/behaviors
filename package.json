@@ -2,25 +2,17 @@
   "name": "@primer/behaviors",
   "version": "1.10.2",
   "description": "Shared behaviors for JavaScript components",
-  "type": "commonjs",
-  "main": "dist/cjs/index.js",
+  "type": "module",
+  "main": "dist/esm/index.mjs",
   "module": "dist/esm/index.mjs",
   "exports": {
     ".": {
-      "types": {
-        "import": "./dist/esm/index.d.ts",
-        "require": "./dist/cjs/index.d.ts"
-      },
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.mjs"
     },
     "./utils": {
-      "types": {
-        "import": "./dist/esm/utils/index.d.ts",
-        "require": "./dist/cjs/utils/index.d.ts"
-      },
-      "import": "./dist/esm/utils/index.mjs",
-      "require": "./dist/cjs/utils/index.js"
+      "types": "./dist/esm/utils/index.d.ts",
+      "import": "./dist/esm/utils/index.mjs"
     }
   },
   "types": "dist/esm/index.d.ts",
@@ -30,9 +22,7 @@
   ],
   "sideEffects": [
     "dist/esm/focus-zone.mjs",
-    "dist/esm/focus-trap.mjs",
-    "dist/cjs/focus-zone.js",
-    "dist/cjs/focus-trap.js"
+    "dist/esm/focus-trap.mjs"
   ],
   "scripts": {
     "clean": "rimraf dist",

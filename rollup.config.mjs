@@ -18,48 +18,27 @@ const tsPluginBaseOptions = {
   exclude: ['src/stories/**/*'],
 }
 
-export default [
-  // ESM
-  {
-    input: ['src/index.ts', 'src/utils/index.ts'],
-    external,
-    plugins: [
-      typescript(tsPluginBaseOptions),
-      {
-        id: 'emit-package-json-file',
-        generateBundle() {
-          this.emitFile({
-            type: 'asset',
-            source: JSON.stringify({type: 'module'}),
-            fileName: 'package.json',
-          })
-        },
+export default {
+  input: ['src/index.ts', 'src/utils/index.ts'],
+  external,
+  plugins: [
+    typescript(tsPluginBaseOptions),
+    {
+      id: 'emit-package-json-file',
+      generateBundle() {
+        this.emitFile({
+          type: 'asset',
+          source: JSON.stringify({type: 'module'}),
+          fileName: 'package.json',
+        })
       },
-    ],
-    output: {
-      dir: 'dist/esm',
-      format: 'esm',
-      preserveModules: true,
-      preserveModulesRoot: 'src',
-      entryFileNames: '[name].mjs',
     },
+  ],
+  output: {
+    dir: 'dist/esm',
+    format: 'esm',
+    preserveModules: true,
+    preserveModulesRoot: 'src',
+    entryFileNames: '[name].mjs',
   },
-
-  // CommonJs
-  {
-    input: ['src/index.ts', 'src/utils/index.ts'],
-    external,
-    plugins: [
-      typescript({
-        ...tsPluginBaseOptions,
-        outDir: 'dist/cjs',
-      }),
-    ],
-    output: {
-      dir: 'dist/cjs',
-      format: 'commonjs',
-      preserveModules: true,
-      preserveModulesRoot: 'src',
-    },
-  },
-]
+}

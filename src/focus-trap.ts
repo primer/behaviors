@@ -86,11 +86,15 @@ function observeFocusTrap(container: HTMLElement, sentinels: HTMLElement[]) {
  * @param container The container in which to trap focus
  * @param initialFocus The element to focus when the trap is enabled
  * @param abortSignal An AbortSignal to control the focus trap
+ * @param preventScroll When `true` (the default), the browser will not scroll
+ * the document to bring the newly-focused element into view. When `false`,
+ * the browser will scroll the element into view after focusing it.
  */
 export function focusTrap(
   container: HTMLElement,
   initialFocus?: HTMLElement,
   abortSignal?: AbortSignal,
+  preventScroll: boolean = true,
 ): AbortController | undefined {
   // Set up an abort controller if a signal was not passed in
   const controller = new AbortController()
@@ -102,7 +106,7 @@ export function focusTrap(
   const sentinelStart = createSentinel({
     onFocus: () => {
       const lastFocusableChild = getFocusableChild(container, true)
-      lastFocusableChild?.focus()
+      lastFocusableChild?.focus({preventScroll})
     },
   })
 
@@ -110,7 +114,7 @@ export function focusTrap(
     onFocus: () => {
       // If the end sentinel was focused, move focus to the start
       const firstFocusableChild = getFocusableChild(container)
-      firstFocusableChild?.focus()
+      firstFocusableChild?.focus({preventScroll})
     },
   })
 
@@ -139,14 +143,14 @@ export function focusTrap(
         return
       } else {
         if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
-          lastFocusedChild.focus()
+          lastFocusedChild.focus({preventScroll})
           return
         } else if (initialFocus && container.contains(initialFocus)) {
-          initialFocus.focus()
+          initialFocus.focus({preventScroll})
           return
         } else {
           const firstFocusableChild = getFocusableChild(container)
-          firstFocusableChild?.focus()
+          firstFocusableChild?.focus({preventScroll})
           return
         }
       }

@@ -391,3 +391,47 @@ it('Should apply sr-only styles to sentinels to prevent layout shift', () => {
 
   controller?.abort()
 })
+
+it('Should focus with {preventScroll: true} when target has data-prevent-scroll-on-focus', () => {
+  const {container} = render(
+    <div id="trapContainer" style={{height: '100px', overflow: 'auto'}}>
+      <button data-prevent-scroll-on-focus tabIndex={0}>
+        Apple
+      </button>
+      <div style={{height: '2000px'}}>Tall content</div>
+      <button tabIndex={0}>Banana</button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const firstButton = trapContainer.querySelector('button')!
+  const focusSpy = jest.spyOn(firstButton, 'focus')
+
+  const controller = focusTrap(trapContainer)
+
+  expect(focusSpy).toHaveBeenCalledWith({preventScroll: true})
+
+  focusSpy.mockRestore()
+  controller?.abort()
+})
+
+it('Should focus with {preventScroll: false} when target does not have data-prevent-scroll-on-focus', () => {
+  const {container} = render(
+    <div id="trapContainer" style={{height: '100px', overflow: 'auto'}}>
+      <button tabIndex={0}>Apple</button>
+      <div style={{height: '2000px'}}>Tall content</div>
+      <button tabIndex={0}>Banana</button>
+    </div>,
+  )
+
+  const trapContainer = container.querySelector<HTMLElement>('#trapContainer')!
+  const firstButton = trapContainer.querySelector('button')!
+  const focusSpy = jest.spyOn(firstButton, 'focus')
+
+  const controller = focusTrap(trapContainer)
+
+  expect(focusSpy).toHaveBeenCalledWith({preventScroll: false})
+
+  focusSpy.mockRestore()
+  controller?.abort()
+})

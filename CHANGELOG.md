@@ -1,5 +1,11 @@
 # @primer/behaviors
 
+## 1.10.3
+
+### Patch Changes
+
+- [#739](https://github.com/primer/behaviors/pull/739) [`705cc19`](https://github.com/primer/behaviors/commit/705cc19490ccda081517e9a58f38f71c5f92208f) Thanks [@TylerJDev](https://github.com/TylerJDev)! - Focus-trap: Add option to prevent scrolling when programmatically setting focus.
+
 ## 1.10.2
 
 ### Patch Changes

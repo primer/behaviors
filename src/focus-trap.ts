@@ -18,6 +18,15 @@ let activeTrap: FocusTrapMetadata | undefined = undefined
 const SR_ONLY_STYLES =
   'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0'
 
+// Opt-in: elements with `data-prevent-scroll-on-focus` are focused with
+// { preventScroll: true } so the trap doesn't scroll any scrollable ancestor
+// to bring them into view.
+function focusWithDataOpt(el: HTMLElement | null | undefined): void {
+  if (!el) return
+  const preventScroll = el.hasAttribute('data-prevent-scroll-on-focus')
+  el.focus({preventScroll})
+}
+
 interface CreateSentinelOptions {
   onFocus: () => void
 }
@@ -102,7 +111,7 @@ export function focusTrap(
   const sentinelStart = createSentinel({
     onFocus: () => {
       const lastFocusableChild = getFocusableChild(container, true)
-      lastFocusableChild?.focus()
+      focusWithDataOpt(lastFocusableChild)
     },
   })
 
@@ -110,7 +119,7 @@ export function focusTrap(
     onFocus: () => {
       // If the end sentinel was focused, move focus to the start
       const firstFocusableChild = getFocusableChild(container)
-      firstFocusableChild?.focus()
+      focusWithDataOpt(firstFocusableChild)
     },
   })
 
@@ -139,14 +148,14 @@ export function focusTrap(
         return
       } else {
         if (lastFocusedChild && isTabbable(lastFocusedChild) && container.contains(lastFocusedChild)) {
-          lastFocusedChild.focus()
+          focusWithDataOpt(lastFocusedChild)
           return
         } else if (initialFocus && container.contains(initialFocus)) {
-          initialFocus.focus()
+          focusWithDataOpt(initialFocus)
           return
         } else {
           const firstFocusableChild = getFocusableChild(container)
-          firstFocusableChild?.focus()
+          focusWithDataOpt(firstFocusableChild)
           return
         }
       }

@@ -3,7 +3,7 @@
     "module": "ES2020",
     "target": "ES2015",
     "jsx": "react",
-    "lib": ["es2020", "dom", "dom.iterable"],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "strict": true,
     "declaration": true,
     "rootDir": "src",

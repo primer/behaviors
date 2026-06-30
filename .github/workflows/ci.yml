@@ -50,4 +50,4 @@ jobs:
       - name: Build package types
         run: npm run build
       - name: Check published TypeScript types
-        run: npx @arethetypeswrong/cli --pack .
+        run: npx @arethetypeswrong/cli --pack . --profile esm-only

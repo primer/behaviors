@@ -3,8 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-// eslint-disable-next-line filenames/match-regex,import/no-commonjs,no-undef
-module.exports = {
+export default {
   clearMocks: true,
   testEnvironment: 'jsdom',
   transform: {

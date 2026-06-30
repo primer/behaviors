@@ -225,11 +225,7 @@ export type FocusZoneSettings = IterateFocusableElements & {
    * For more information, @see https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_general_within
    */
   focusInStrategy?:
-    | 'first'
-    | 'closest'
-    | 'previous'
-    | 'initial'
-    | ((previousFocusedElement: Element) => HTMLElement | undefined)
+    'first' | 'closest' | 'previous' | 'initial' | ((previousFocusedElement: Element) => HTMLElement | undefined)
 
   /**
    * A boolean value indicating whether or not the browser should scroll the

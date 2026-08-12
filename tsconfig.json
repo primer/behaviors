@@ -11,7 +11,8 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "exclude": ["src/__tests__", "dist"]
 }

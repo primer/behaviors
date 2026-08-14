@@ -72,8 +72,8 @@
   ],
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.0",
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.18.1",
+    "@changesets/changelog-github": "^1.0.0",
+    "@changesets/cli": "^3.0.0",
     "@github/prettier-config": "^0.0.6",
     "@rollup/plugin-typescript": "^12.1.0",
     "@rollup/wasm-node": "^4.19.1",

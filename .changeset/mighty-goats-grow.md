@@ -2,4 +2,4 @@
 '@primer/behaviors': minor
 ---
 
-Add support to skip hangling arrow keys when meta/ctrl is pressed
+Update behavior when control or meta keys are pressed along with arrow keys for shifting focus

@@ -80,6 +80,40 @@ it('Should allow arrow keys to move focus', async () => {
   controller.abort()
 })
 
+it('Should allow the browser to handle modified horizontal arrow keys', () => {
+  const {container} = render(
+    <div id="focusZone">
+      <button tabIndex={0}>Apple</button>
+      <button tabIndex={0}>Banana</button>
+      <button tabIndex={0}>Cantaloupe</button>
+    </div>,
+  )
+
+  const focusZoneContainer = container.querySelector<HTMLElement>('#focusZone')!
+  const [, secondButton] = focusZoneContainer.querySelectorAll('button')
+  const controller = focusZone(focusZoneContainer, {bindKeys: FocusKeys.ArrowHorizontal})
+
+  secondButton.focus()
+
+  for (const modifier of ['metaKey', 'ctrlKey'] as const) {
+    for (const key of ['ArrowLeft', 'ArrowRight']) {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        [modifier]: true,
+        bubbles: true,
+        cancelable: true,
+      })
+
+      secondButton.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(false)
+      expect(document.activeElement).toEqual(secondButton)
+    }
+  }
+
+  controller.abort()
+})
+
 it('Should have one tab-stop inside the focus zone when enabled', async () => {
   const user = userEvent.setup()
   const {container} = render(

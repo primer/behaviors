@@ -850,6 +850,12 @@ export function focusZone(container: HTMLElement, settings?: FocusZoneSettings):
   keyboardEventRecipient.addEventListener(
     'keydown',
     event => {
+      // Skip handling when meta/ctrl + arrow keys are pressed; let the browser
+      // handle native shortcuts (e.g. Firefox on Mac: cmd+left/right for back/forward).
+      if ((event.metaKey || event.ctrlKey) && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+        return
+      }
+
       if (event.key in KEY_TO_DIRECTION) {
         const keyBit = KEY_TO_BIT[event.key as keyof typeof KEY_TO_BIT]
         // Check if the pressed key (keyBit) is one that is being used for focus (bindKeys)

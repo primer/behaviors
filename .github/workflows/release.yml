@@ -44,10 +44,11 @@ jobs:
         id: changesets
         uses: changesets/action@v2
         with:
-          github-token: ${{ steps.app-token.outputs.token }}
           pr-title: Release Tracking
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish-script: npm run release
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   release-canary:
     name: Canary

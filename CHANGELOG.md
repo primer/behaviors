@@ -1,5 +1,15 @@
 # @primer/behaviors
 
+## 1.11.0
+
+### Minor Changes
+
+- [#783](https://github.com/primer/behaviors/pull/783) [`d8c8f98`](https://github.com/primer/behaviors/commit/d8c8f98638021c01ab421ca57ba528e7153fe016) Thanks [@waterWang](https://github.com/waterWang)! - Update behavior when control or meta keys are pressed along with arrow keys for shifting focus
+
+### Patch Changes
+
+- [#799](https://github.com/primer/behaviors/pull/799) [`6e83c46`](https://github.com/primer/behaviors/commit/6e83c4631bcac98b59a1f01eac9dd99d83669889) Thanks [@dependabot](https://github.com/apps/dependabot)! - Update js-yaml to address a security vulnerability.
+
 ## 1.10.3
 
 ### Patch Changes
